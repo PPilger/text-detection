@@ -17,7 +17,7 @@ public class TextDetection {
 
 		//10/90
 		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000, 5000);
-		FeatureLinker linker = new AngleScanFeatureLinker(1, 0.05, 0);
+		FeatureLinker linker = new DistanceBasedFeatureLinker(1, 0.05, 10);
 		
 		img.findCharacters(detector, linker);
 		img.save("C:\\Users\\PilgerstorferP\\workspace\\TextDetection\\TestbildOut.jpg");

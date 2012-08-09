@@ -4,7 +4,7 @@ public class Feature implements Comparable<Feature> {
 	private Vector2D position;
 	private double width;
 	private double height;
-	private double angle;
+	private Angle180 angle;
 	private boolean text;
 	private Box2D box;
 	//private CvBox2D cvBox;
@@ -12,7 +12,7 @@ public class Feature implements Comparable<Feature> {
 	public Feature(CvBox2D box) {
 		this.box = new Box2D(box);
 		init(box.center().x(), box.center().y(), box.size().width(), box.size()
-				.height(), box.angle() * Math.PI / 180);
+				.height(), Angle180.degToRad(box.angle()));
 	}
 
 	public Feature(double x, double y, double width, double height) {
@@ -30,18 +30,12 @@ public class Feature implements Comparable<Feature> {
 		this.position = new Vector2D(x, y);
 		this.width = width;
 		this.height = height;
-		this.angle = angle;
+		this.angle = new Angle180(angle);
 
 		if (width < height) {
 			this.width = height;
 			this.height = width;
-			this.angle += Math.PI / 2;
-		}
-
-		if (this.angle >= Math.PI) {
-			this.angle -= Math.PI;
-		} else if (this.angle < 0) {
-			this.angle += Math.PI;
+			this.angle.rotate(Math.PI / 2);
 		}
 
 		if (Math.min(width / (double) height, height / (double) width) < 0.5) {
@@ -79,7 +73,7 @@ public class Feature implements Comparable<Feature> {
 		return text;
 	}
 
-	public double angle() {
+	public Angle180 angle() {
 		return angle;
 	}
 
@@ -125,22 +119,10 @@ public class Feature implements Comparable<Feature> {
 		return true;
 	}
 
-	public String toString() {
-		return position + ", " + width + "/" + height + ", " + angle;
-	}
-
 	public CvPoint cvPosition() {
 		return cvPoint((int) Math.round(position.x),
 				(int) Math.round(position.y));
 	}
-
-	/*public CvBox2D cvBox() {
-		if (cvBox == null) {
-			cvBox = new CvBox2D(cvPoint2D32f(position.x, position.y),
-					cvSize2D32f(width, height), (float) (angle * 180 / Math.PI));
-		}
-		return cvBox;
-	}*/
 
 	public double distance(Feature other) {
 		return box.distance(other.box);
@@ -149,7 +131,10 @@ public class Feature implements Comparable<Feature> {
 	public void draw(IplImage img, CvScalar color) {
 		CvPoint pos = cvPosition();
 		cvDrawCircle(img, pos, 1, color, 2, 0, 0);
-		// cvDrawCircle(img, pos, (int) Math.round(size()), color, 1, 0, 0);
 		box.draw(img, color);
+	}
+
+	public String toString() {
+		return position + ", " + width + "/" + height + ", " + angle.getDegrees() + "°";
 	}
 }

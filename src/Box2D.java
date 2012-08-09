@@ -6,7 +6,7 @@ public class Box2D {
 
 	public Box2D(double x, double y, double width, double height, double angle) {
 		this(new CvBox2D(cvPoint2D32f(x, y), cvSize2D32f(width, height),
-				(float) (angle * 180 / Math.PI)));
+				(float) Angle180.radToDeg(angle)));
 	}
 
 	public Box2D(CvBox2D box) {

@@ -6,15 +6,20 @@ import java.util.*;
 
 import com.googlecode.javacv.cpp.opencv_core.*;
 
-public class AngleScanFeatureLinker implements FeatureLinker {
+public class DistanceBasedFeatureLinker implements FeatureLinker {
 	private int numScans;
 	private double maxVariance;
 	private double maxDistance;
 
-	public AngleScanFeatureLinker(int numScans, double maxVariance, double maxDistance) {
+	public DistanceBasedFeatureLinker(int numScans, double maxVariance,
+			double maxDistance) {
 		this.numScans = numScans;
 		this.maxVariance = maxVariance;
 		this.maxDistance = maxDistance;
+	}
+
+	private boolean approxEqual(double value0, double value1, double tolerance) {
+		return value0 < value1 * tolerance && value1 < value0 * tolerance;
 	}
 
 	@Override
@@ -23,7 +28,7 @@ public class AngleScanFeatureLinker implements FeatureLinker {
 
 		// scan through every angle
 		for (int i = 0; i < numScans; i++) {
-			//double angle = Math.PI * i / numScans;
+			// double angle = Math.PI * i / numScans;
 			Map<Feature, List<Feature>> adjacencyList = new HashMap<Feature, List<Feature>>();
 
 			// initialize the adjacency list
@@ -37,22 +42,43 @@ public class AngleScanFeatureLinker implements FeatureLinker {
 					Feature f0 = features.get(j);
 					Feature f1 = features.get(k);
 
-					//Vector2D dir = f0.position().sub(f1.position()).normalize();
+					// Vector2D dir =
+					// f0.position().sub(f1.position()).normalize();
 
-					/*double dAngle = Math.abs(Math.acos(dir.x) - angle);
-					if (dAngle > maxVariance && Math.PI - dAngle > maxVariance) {
-						continue;
-					}*/
+					/*
+					 * double dAngle = Math.abs(Math.acos(dir.x) - angle); if
+					 * (dAngle > maxVariance && Math.PI - dAngle > maxVariance)
+					 * { continue; }
+					 */
 
 					double dPos = f0.distance(f1);
 					if (dPos > maxDistance) {
 						continue;
 					}
+
+					Angle180 angle = new Angle180(f0.position(), f1.position());
+
+					double diff0 = angle.difference(f0.angle()).difference(Angle180.degToRad(45)).getRadians();
+					double diff1 = angle.difference(f1.angle()).difference(Angle180.degToRad(45)).getRadians();
 					
-					cvDrawLine(img, f0.cvPosition(), f1.cvPosition(), CvScalar.BLACK, 1, 0, 0);
-					//cvShowImage("", img);
-					//cvWaitKey();
+					double size0 = angle.difference(f0.angle()).getRadians() < Angle180.degToRad(45) ? f0.height() : f0.width();
+					double size1 = angle.difference(f1.angle()).getRadians() < Angle180.degToRad(45) ? f1.height() : f1.width();
 					
+					CvScalar color = CvScalar.BLACK;
+
+					if(diff0 < Angle180.degToRad(30) || diff1 < Angle180.degToRad(30)) {
+						continue;
+					} else if(approxEqual(size0, size1, 1.3)) {
+						color = CvScalar.BLUE;
+					} else {
+						continue;
+					}
+
+					cvDrawLine(img, f0.cvPosition(), f1.cvPosition(), color, 2,
+							0, 0);
+					// cvShowImage("", img);
+					// cvWaitKey();
+
 					adjacencyList.get(f0).add(f1);
 					adjacencyList.get(f1).add(f0);
 				}
@@ -88,7 +114,6 @@ public class AngleScanFeatureLinker implements FeatureLinker {
 
 		return linkedFeatures;
 	}
-
 	/*
 	 * private void depthSearch(Feature feature, Map<Feature, List<Feature>>
 	 * adjacencyList, Set<Feature> marked, List<Feature> result) {
