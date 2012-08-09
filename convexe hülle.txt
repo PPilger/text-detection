@@ -1,0 +1,9 @@
+				CvMemStorage mem3 = cvCreateMemStorage(0);
+				CvSeq hull = cvConvexHull2(contour, mem3, CV_CLOCKWISE, 1);
+
+				CvPoint p0 = new CvPoint(cvGetSeqElem(hull, hull.total() - 1));
+				for (int j = 0; j < hull.total(); j++) {
+					CvPoint p1 = new CvPoint(cvGetSeqElem(hull, j));
+					cvDrawLine(colorImg, p0, p1, CvScalar.WHITE, 1, 0, 0);
+					p0 = p1;
+				}
