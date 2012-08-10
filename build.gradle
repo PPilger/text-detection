@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.6
+
+files('src')	
+
+repositories {
+  mavenCentral()
+  mavenRepo urls: 'http://maven2.javacv.googlecode.com/git/'
+}
+
+dependencies {
+  compile 'com.googlecode.javacv:javacv:0.2:'
+  compile 'com.googlecode.javacv:javacv:0.2:windows-x86'
+  compile 'com.googlecode.javacv:javacv:0.2:linux-x86'
+}
