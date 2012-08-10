@@ -9,11 +9,13 @@ import java.util.List;
 public class ContourBasedFeatureDetector implements FeatureDetector {
 	private int minPerimeter;
 	private int maxPerimeter;
+	private int minArea;
 	private int maxArea;
 
-	public ContourBasedFeatureDetector(int minPerimeter, int maxPerimeter, int maxArea) {
+	public ContourBasedFeatureDetector(int minPerimeter, int maxPerimeter, int minArea, int maxArea) {
 		this.minPerimeter = minPerimeter;
 		this.maxPerimeter = maxPerimeter;
+		this.minArea = minArea;
 		this.maxArea = maxArea;
 	}
 
@@ -53,7 +55,7 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 					}
 				}
 				
-				if(inside || f0.area() >= maxArea) {
+				if(inside || maxArea <= f0.area() || f0.area() <= minArea) {
 					iter.remove();
 				}
 			}
