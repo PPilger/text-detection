@@ -6,8 +6,8 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 import java.util.*;
 
 public class Image {
-	IplImage img;
-	List<ImageProcessor> processors;
+	private IplImage img;
+	private List<ImageProcessor> processors;
 
 	public Image(String filename) {
 		this.img = cvLoadImage(filename);
@@ -17,6 +17,10 @@ public class Image {
 	public Image(IplImage img) {
 		this.img = img;
 		this.processors = new ArrayList<ImageProcessor>();
+	}
+	
+	public IplImage iplImage() {
+		return img;
 	}
 
 	public void show() {
@@ -34,15 +38,6 @@ public class Image {
 
 	public void addProcessor(ImageProcessor processor) {
 		processors.add(processor);
-	}
-
-	public Image threshold(int lower, int upper) {
-		IplImage temp = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
-		cvCvtColor(img, temp, CV_BGR2GRAY);
-
-		cvThreshold(temp, temp, lower, upper, CV_THRESH_BINARY);
-
-		return new Image(temp);
 	}
 
 	public Image findCharacters(FeatureDetector detector, FeatureLinker linker) {
@@ -63,7 +58,7 @@ public class Image {
 		
 		String title = "" + f0.distance(f1);*/
 
-		//tempImg.show();
+		tempImg.show();
 
 		// retrieve features of the image
 		List<Feature> features = detector.findFeatures(temp);
