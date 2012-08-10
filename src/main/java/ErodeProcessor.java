@@ -12,7 +12,7 @@ public class ErodeProcessor extends MorphologicalProcessor {
 	}
 
 	@Override
-	public void process(IplImage img) {
+	public void process(IplImage img, IplImage colorImg) {
 		cvErode(img, img, getStructuringElement(), 1);
 	}
 }

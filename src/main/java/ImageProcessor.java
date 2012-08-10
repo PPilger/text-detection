@@ -3,8 +3,8 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public interface ImageProcessor {
 	/**
-	 * Processes an 8u1c image (8 bit, 1 channel)
-	 * @param img
+	 * @param img 8u1c image
+	 * @param colorImg 8u3c image
 	 */
-	public void process(IplImage img);
+	public void process(IplImage img, IplImage colorImg);
 }

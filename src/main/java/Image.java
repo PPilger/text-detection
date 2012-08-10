@@ -1,4 +1,3 @@
-import static com.googlecode.javacpp.Loader.sizeof;
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
@@ -8,6 +7,9 @@ import java.util.*;
 public class Image {
 	private IplImage img;
 	private List<ImageProcessor> processors;
+	private boolean showProcessedImage = false;
+	private boolean showDetectedFeatures = false;
+	private boolean showLinkedFeatures = false;
 
 	public Image(String filename) {
 		this.img = cvLoadImage(filename);
@@ -18,7 +20,7 @@ public class Image {
 		this.img = img;
 		this.processors = new ArrayList<ImageProcessor>();
 	}
-	
+
 	public IplImage iplImage() {
 		return img;
 	}
@@ -40,48 +42,54 @@ public class Image {
 		processors.add(processor);
 	}
 
-	public Image findCharacters(FeatureDetector detector, FeatureLinker linker) {
+	public void setImageDisplay(boolean showProcessedImage,
+			boolean showDetectedFeatures, boolean showLinkedFeatures) {
+		this.showProcessedImage = showProcessedImage;
+		this.showDetectedFeatures = showDetectedFeatures;
+		this.showLinkedFeatures = showLinkedFeatures;
+	}
+
+	public List<LinkedFeature> findText(FeatureDetector detector, FeatureLinker linker) {
 		IplImage temp = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
 		cvCvtColor(img, temp, CV_BGR2GRAY);
 		Image tempImg = new Image(temp);
 
 		// pre-processing
 		for (ImageProcessor processor : processors) {
-			processor.process(temp);
+			processor.process(temp, img);
 		}
 
-		/*cvSetZero(temp);
-		Feature f0 = new Feature(380, 567, 20, 4, 1.5707963267948966);
-		Feature f1 = new Feature(372.5, 411.5, 19, 11, 1.5707963267948966);
-		f0.draw(temp, CvScalar.WHITE);
-		f1.draw(temp, CvScalar.GRAY);
-		
-		String title = "" + f0.distance(f1);*/
+		if (showProcessedImage) {
+			tempImg.show();
+		}
 
-		tempImg.show();
-
-		// retrieve features of the image
+		// detect features in the image
 		List<Feature> features = detector.findFeatures(temp);
-
-		System.out.println(features.size());
+		System.out.println("number of features detected: " + features.size());
 
 		for (Feature f : features) {
 			f.draw(img, CvScalar.BLACK);
 			f.box().draw(img, CvScalar.BLACK);
 		}
-		//show();
 
+		if (showDetectedFeatures) {
+			show();
+		}
+
+		// link features together
 		List<LinkedFeature> linkedFeatures = linker.linkFeatures(features, img);
 
-		System.out.println(linkedFeatures.size());
+		System.out.println("number of features after linking: "
+				+ linkedFeatures.size());
 
-		// merge components
 		for (LinkedFeature lf : linkedFeatures) {
 			lf.draw(img, CvScalar.GREEN);
 		}
 
-		show();
+		if (showLinkedFeatures) {
+			show();
+		}
 
-		return tempImg;
+		return linkedFeatures;
 	}
 }

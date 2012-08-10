@@ -13,7 +13,7 @@ public class DilateProcessor extends MorphologicalProcessor {
 	}
 
 	@Override
-	public void process(IplImage img) {
+	public void process(IplImage img, IplImage colorImg) {
 		cvDilate(img, img, getStructuringElement(), 1);
 	}
 }
