@@ -18,8 +18,8 @@ public class DistanceBasedFeatureLinker implements FeatureLinker {
 		this.maxDistance = maxDistance;
 	}
 
-	private boolean approxEqual(double value0, double value1, double tolerance) {
-		return value0 < value1 * tolerance && value1 < value0 * tolerance;
+	private boolean approxEqual(double value0, double value1, double tolerance, double offset) {
+		return value0 < value1 * tolerance + offset && value1 < value0 * tolerance + offset;
 	}
 
 	@Override
@@ -50,6 +50,12 @@ public class DistanceBasedFeatureLinker implements FeatureLinker {
 					 * (dAngle > maxVariance && Math.PI - dAngle > maxVariance)
 					 * { continue; }
 					 */
+					
+					LinkedFeature lf = LinkedFeature.create(Arrays.asList(f0, f1));
+					if(approxEqual(lf.area(), f0.area()+f1.area(), 1.3, 9)) {
+
+						lf.box().draw(img, CvScalar.BLUE);
+					}
 
 					double dPos = f0.distance(f1);
 					if (dPos > maxDistance) {
@@ -58,18 +64,27 @@ public class DistanceBasedFeatureLinker implements FeatureLinker {
 
 					Angle180 angle = new Angle180(f0.position(), f1.position());
 
-					double diff0 = angle.difference(f0.angle()).difference(Angle180.degToRad(45)).getRadians();
-					double diff1 = angle.difference(f1.angle()).difference(Angle180.degToRad(45)).getRadians();
-					
-					double size0 = angle.difference(f0.angle()).getRadians() < Angle180.degToRad(45) ? f0.height() : f0.width();
-					double size1 = angle.difference(f1.angle()).getRadians() < Angle180.degToRad(45) ? f1.height() : f1.width();
-					
+					double diff0 = angle.difference(f0.angle()).absRadians();
+					double diff1 = angle.difference(f1.angle()).absRadians();
+
+					double size0 = angle.difference(f0.angle()).absRadians() < Angle180
+							.degToRad(45) ? f0.height() : f0.width();
+					double size1 = angle.difference(f1.angle()).absRadians() < Angle180
+							.degToRad(45) ? f1.height() : f1.width();
+
 					CvScalar color = CvScalar.BLACK;
 
-					if(diff0 < Angle180.degToRad(30) || diff1 < Angle180.degToRad(30)) {
+					// 45
+					int a = 10;
+					if (diff0 > Angle180.degToRad(a)
+							&& diff0 < Angle180.degToRad(90 - a)
+							|| diff1 > Angle180.degToRad(a)
+							&& diff1 < Angle180.degToRad(90 - a)) {
+						color = CvScalar.BLACK;
 						continue;
-					} else if(approxEqual(size0, size1, 1.3)) {
+					} else if (approxEqual(size0, size1, 1.3, 3)) {
 						color = CvScalar.BLUE;
+						// continue;
 					} else {
 						continue;
 					}

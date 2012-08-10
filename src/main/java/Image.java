@@ -61,9 +61,9 @@ public class Image {
 		f0.draw(temp, CvScalar.WHITE);
 		f1.draw(temp, CvScalar.GRAY);
 		
-		String title = "" + f0.distance(f1);
+		String title = "" + f0.distance(f1);*/
 
-		tempImg.show(title);*/
+		//tempImg.show();
 
 		// retrieve features of the image
 		List<Feature> features = detector.findFeatures(temp);
@@ -72,8 +72,9 @@ public class Image {
 
 		for (Feature f : features) {
 			f.draw(img, CvScalar.BLACK);
+			f.box().draw(img, CvScalar.BLACK);
 		}
-		show();
+		//show();
 
 		List<LinkedFeature> linkedFeatures = linker.linkFeatures(features, img);
 
