@@ -58,6 +58,10 @@ public class Angle180 {
 		return new Angle180(this.rad - rad);
 	}
 	
+	public double absRadians() {
+		return rad > Math.PI/2 ? Math.PI - rad : rad;
+	}
+	
 	public void rotate(double rad) {
 		this.rad += rad;
 		fix();
