@@ -52,9 +52,13 @@ public class DistanceBasedFeatureLinker implements FeatureLinker {
 					 */
 					
 					LinkedFeature lf = LinkedFeature.create(Arrays.asList(f0, f1));
-					if(approxEqual(lf.area(), f0.area()+f1.area(), 1.3, 9)) {
+					if(lf.area()-f0.area()-f1.area() < 1000) {//0.5*(f0.area()+f1.area())) {
+						//cvDrawLine(img, f0.cvPosition(), f1.cvPosition(), CvScalar.BLACK, 2,
+						//		0, 0);
 
-						lf.box().draw(img, CvScalar.BLUE);
+						adjacencyList.get(f0).add(f1);
+						adjacencyList.get(f1).add(f0);
+						continue;
 					}
 
 					double dPos = f0.distance(f1);
@@ -89,13 +93,13 @@ public class DistanceBasedFeatureLinker implements FeatureLinker {
 						continue;
 					}
 
-					cvDrawLine(img, f0.cvPosition(), f1.cvPosition(), color, 2,
+					/*cvDrawLine(img, f0.cvPosition(), f1.cvPosition(), color, 2,
 							0, 0);
 					// cvShowImage("", img);
 					// cvWaitKey();
 
 					adjacencyList.get(f0).add(f1);
-					adjacencyList.get(f1).add(f0);
+					adjacencyList.get(f1).add(f0);*/
 				}
 			}
 
