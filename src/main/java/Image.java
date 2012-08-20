@@ -7,9 +7,9 @@ import java.util.*;
 public class Image {
 	private IplImage img;
 	private List<ImageProcessor> processors;
-	private boolean showProcessedImage = false;
-	private boolean showDetectedFeatures = false;
-	private boolean showLinkedFeatures = false;
+	private ImageDisplay processedImageDisplay;
+	private ImageDisplay detectedFeaturesDisplay;
+	private ImageDisplay linkedFeaturesDisplay;
 
 	public Image(String filename) {
 		this.img = cvLoadImage(filename);
@@ -25,19 +25,6 @@ public class Image {
 		return img;
 	}
 
-	public void show() {
-		show(this.toString());
-	}
-
-	public void show(String title) {
-		Image.show(title, img);
-	}
-	
-	public static void show(String title, IplImage img) {
-		cvShowImage(title, img);
-		cvWaitKey();
-	}
-
 	public void save(String filename) {
 		cvSaveImage(filename, img);
 	}
@@ -46,29 +33,31 @@ public class Image {
 		processors.add(processor);
 	}
 
-	public void setImageDisplay(boolean showProcessedImage,
-			boolean showDetectedFeatures, boolean showLinkedFeatures) {
-		this.showProcessedImage = showProcessedImage;
-		this.showDetectedFeatures = showDetectedFeatures;
-		this.showLinkedFeatures = showLinkedFeatures;
+	public void setImageDisplay(ImageDisplay processedImageDisplay,
+			ImageDisplay detectedFeaturesDisplay,
+			ImageDisplay linkedFeaturesDisplay) {
+		this.processedImageDisplay = processedImageDisplay;
+		this.detectedFeaturesDisplay = detectedFeaturesDisplay;
+		this.linkedFeaturesDisplay = linkedFeaturesDisplay;
 	}
 
-	public List<LinkedFeature> findText(FeatureDetector detector, FeatureLinker linker) {
-		IplImage temp = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
-		Image tempImg = new Image(temp);
+	public List<LinkedFeature> findText(FeatureDetector detector,
+			FeatureLinker linker) {
+		IplImage grayscale = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
 
 		// pre-processing
-		IplImage processorImage = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
+		IplImage temp = IplImage
+				.create(img.cvSize(), IPL_DEPTH_8U, 1);
 		for (ImageProcessor processor : processors) {
-			processor.process(temp, img, processorImage);
+			processor.process(grayscale, img, temp);
 		}
 
-		if (showProcessedImage) {
-			tempImg.show();
+		if (processedImageDisplay != null) {
+			processedImageDisplay.show(grayscale);
 		}
 
 		// detect features in the image
-		List<Feature> features = detector.findFeatures(temp);
+		List<Feature> features = detector.findFeatures(grayscale);
 		System.out.println("number of features detected: " + features.size());
 
 		for (Feature f : features) {
@@ -76,8 +65,8 @@ public class Image {
 			f.box().draw(img, CvScalar.BLACK);
 		}
 
-		if (showDetectedFeatures) {
-			show();
+		if (detectedFeaturesDisplay != null) {
+			detectedFeaturesDisplay.show(img);
 		}
 
 		// link features together
@@ -90,8 +79,8 @@ public class Image {
 			lf.draw(img, CvScalar.GREEN);
 		}
 
-		if (showLinkedFeatures) {
-			show();
+		if (linkedFeaturesDisplay != null) {
+			linkedFeaturesDisplay.show(img);
 		}
 
 		return linkedFeatures;

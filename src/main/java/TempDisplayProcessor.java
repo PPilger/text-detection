@@ -1,19 +1,18 @@
-import static com.googlecode.javacv.cpp.opencv_highgui.*;
-
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class TempDisplayProcessor implements ImageProcessor {
-	private String title;
+public class TempDisplayProcessor extends ImageDisplayProcessor {
 
 	public TempDisplayProcessor(String title) {
-		this.title = title;
+		super(title);
+	}
+
+	public TempDisplayProcessor(String title, int width, int height) {
+		super(title, width, height);
 	}
 
 	@Override
 	public void process(IplImage img, IplImage colorImg, IplImage temp) {
-		cvShowImage(title, temp);
-		cvResizeWindow(title, Math.min(temp.width(), 1200), Math.min(temp.height(), 800));
-		cvWaitKey();
+		super.process(temp, null, null);
 	}
 
 }
