@@ -51,7 +51,6 @@ public class Image {
 
 	public List<LinkedFeature> findText(FeatureDetector detector, FeatureLinker linker) {
 		IplImage temp = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
-		cvCvtColor(img, temp, CV_BGR2GRAY);
 		Image tempImg = new Image(temp);
 
 		// pre-processing
