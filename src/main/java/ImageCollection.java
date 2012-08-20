@@ -1,4 +1,5 @@
 import static com.googlecode.javacv.cpp.opencv_core.*;
+import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +13,17 @@ public class ImageCollection {
 	public ImageCollection(IplImage color) {
 		images = new HashMap<String, IplImage>();
 		
-		IplImage img = IplImage.create(color.cvSize(), IPL_DEPTH_8U, 1);
+		IplImage gray = IplImage.create(color.cvSize(), IPL_DEPTH_8U, 1);
+		cvCvtColor(color, gray, CV_BGR2GRAY);
 		
 		images.put("color", color);
-		images.put("processed", img);
-		images.put("temp", cvCloneImage(img));
+		images.put("gray", gray);
+		images.put("processed", cvCloneImage(gray));
+		images.put("temp", cvCloneImage(gray));
 		
-		IplImage red = cvCloneImage(img);
-		IplImage green = cvCloneImage(img);
-		IplImage blue = cvCloneImage(img);
+		IplImage red = cvCloneImage(gray);
+		IplImage green = cvCloneImage(gray);
+		IplImage blue = cvCloneImage(gray);
 		
 		cvSplit(color, blue, green, red, null);
 
@@ -28,7 +31,7 @@ public class ImageCollection {
 		images.put("green", green);
 		images.put("blue", blue);
 
-		IplImage rgRatio = IplImage.create(img.cvSize(), IPL_DEPTH_32F, 1);
+		IplImage rgRatio = IplImage.create(gray.cvSize(), IPL_DEPTH_32F, 1);
 		IplImage rbRatio = cvCloneImage(rgRatio);
 		IplImage gbRatio = cvCloneImage(rgRatio);
 
@@ -47,6 +50,10 @@ public class ImageCollection {
 
 	public IplImage getColor() {
 		return images.get("color");
+	}
+
+	public IplImage getGray() {
+		return images.get("gray");
 	}
 
 	public IplImage getProcessed() {

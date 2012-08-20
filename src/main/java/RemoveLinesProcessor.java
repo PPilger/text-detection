@@ -1,6 +1,9 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -21,15 +24,23 @@ public class RemoveLinesProcessor implements ImageProcessor {
 		CvMemStorage mem = CvMemStorage.create();
 		CvSeq lines = cvHoughLines2(processed, mem, CV_HOUGH_STANDARD, 0.5,
 				Angle180.degToRad(0.5), threshold, 0, 0);
+		
+		List<List<Line2D>> l = new ArrayList<List<Line2D>>();
 
 		for (int i = 0; i < lines.total(); i++) {
 			CvPoint2D32f polar = new CvPoint2D32f(cvGetSeqElem(lines, i));
 
+			//Line2D line = new Line2D(polar.x(), polar.y());
+			//line.draw(processed, CvScalar.BLACK);
+			//line.draw(temp, CvScalar.WHITE);
+			
 			int px = (int) (Math.cos(polar.y()) * polar.x());
 			int py = (int) (Math.sin(polar.y()) * polar.x());
 
 			double lineLength = processed.width() + processed.height();
 			double angle = polar.y() + Math.PI / 2;
+
+			//System.out.println("0: " + px + " "+ py + " " + angle);
 			cvDrawLine(
 					processed,
 					cvPoint(px - (int) (Math.cos(angle) * lineLength), py
@@ -44,6 +55,7 @@ public class RemoveLinesProcessor implements ImageProcessor {
 					cvPoint(px + (int) (Math.cos(angle) * lineLength), py
 							+ (int) (Math.sin(angle) * lineLength)),
 					CvScalar.WHITE, 2, 0, 0);
+			
 		}
 	}
 
