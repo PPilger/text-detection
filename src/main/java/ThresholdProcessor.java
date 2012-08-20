@@ -11,7 +11,7 @@ public class ThresholdProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		cvThreshold(img, img, threshold, 255, CV_THRESH_BINARY);
 	}
 }

@@ -11,9 +11,10 @@ public class ColorEraseProcessor implements ImageProcessor {
 	private int bMin;
 	private int bMax;
 	private int border;
+	private boolean and;
 
 	public ColorEraseProcessor(int rMin, int rMax, int gMin, int gMax,
-			int bMin, int bMax, int border) {
+			int bMin, int bMax, int border, boolean and) {
 		this.rMin = rMin;
 		this.rMax = rMax;
 		this.gMin = gMin;
@@ -21,18 +22,17 @@ public class ColorEraseProcessor implements ImageProcessor {
 		this.bMin = bMin;
 		this.bMax = bMax;
 		this.border = border;
+		this.and = and;
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		IplImage rImg = IplImage
 				.create(cvSize(img.width(), img.height()), 8, 1);
 		IplImage gImg = IplImage
 				.create(cvSize(img.width(), img.height()), 8, 1);
 		IplImage bImg = IplImage
 				.create(cvSize(img.width(), img.height()), 8, 1);
-		IplImage erase = IplImage.create(cvSize(img.width(), img.height()), 8,
-				1);
 
 		cvSplit(colorImg, rImg, gImg, bImg, null);
 
@@ -43,13 +43,20 @@ public class ColorEraseProcessor implements ImageProcessor {
 		cvThreshold(bImg, bImg, bMin, 255, CV_THRESH_TOZERO);
 		cvThreshold(bImg, bImg, bMax, 255, CV_THRESH_TOZERO_INV);
 
-		cvSet(erase, CvScalar.WHITE, rImg);
-		cvSet(erase, CvScalar.WHITE, gImg);
-		cvSet(erase, CvScalar.WHITE, bImg);
+		cvSetZero(temp);
+		
+		if(and) {
+			cvAnd(rImg, gImg, temp, null);
+			cvAnd(temp, bImg, temp, null);
+		} else {
+			cvOr(rImg, gImg, temp, null);
+			cvOr(temp, bImg, temp, null);
+		}
+		cvSet(temp, CvScalar.WHITE, temp);
+		
+		new DilateProcessor(border).process(temp, null, null);
 
-		new DilateProcessor(border).process(erase, null);
-
-		cvSet(img, CvScalar.BLACK, erase);
+		cvSet(img, CvScalar.BLACK, temp);
 	}
 
 }

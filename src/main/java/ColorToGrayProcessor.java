@@ -6,7 +6,7 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 public class ColorToGrayProcessor implements ImageProcessor {
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		cvCvtColor(colorImg, img, CV_BGR2GRAY);
 	}
 

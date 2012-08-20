@@ -30,6 +30,10 @@ public class Image {
 	}
 
 	public void show(String title) {
+		Image.show(title, img);
+	}
+	
+	public static void show(String title, IplImage img) {
 		cvShowImage(title, img);
 		cvWaitKey();
 	}
@@ -54,8 +58,9 @@ public class Image {
 		Image tempImg = new Image(temp);
 
 		// pre-processing
+		IplImage processorImage = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
 		for (ImageProcessor processor : processors) {
-			processor.process(temp, img);
+			processor.process(temp, img, processorImage);
 		}
 
 		if (showProcessedImage) {

@@ -1,5 +1,6 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.*;
 
 public class DilateProcessor extends MorphologicalProcessor {
@@ -13,7 +14,7 @@ public class DilateProcessor extends MorphologicalProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		cvDilate(img, img, getStructuringElement(), 1);
 	}
 }

@@ -12,7 +12,7 @@ public class CloseProcessor extends MorphologicalProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImage) {
+	public void process(IplImage img, IplImage colorImage, IplImage temp) {
 		cvMorphologyEx(img, img, null, getStructuringElement(), CV_MOP_CLOSE, 1);
 	}
 }

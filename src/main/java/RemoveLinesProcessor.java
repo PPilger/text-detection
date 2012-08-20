@@ -1,6 +1,8 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
 public class RemoveLinesProcessor implements ImageProcessor {
 	private int threshold;
 
@@ -9,7 +11,9 @@ public class RemoveLinesProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
+		cvSetZero(temp);
+
 		CvMemStorage mem = CvMemStorage.create();
 		CvSeq lines = cvHoughLines2(img, mem, CV_HOUGH_STANDARD, 0.5,
 				Angle180.degToRad(0.5), threshold, 0, 0);
@@ -29,6 +33,13 @@ public class RemoveLinesProcessor implements ImageProcessor {
 					cvPoint(px + (int) (Math.cos(angle) * lineLength), py
 							+ (int) (Math.sin(angle) * lineLength)),
 					CvScalar.BLACK, 2, 0, 0);
+			cvDrawLine(
+					temp,
+					cvPoint(px - (int) (Math.cos(angle) * lineLength), py
+							- (int) (Math.sin(angle) * lineLength)),
+					cvPoint(px + (int) (Math.cos(angle) * lineLength), py
+							+ (int) (Math.sin(angle) * lineLength)),
+					CvScalar.WHITE, 2, 0, 0);
 		}
 	}
 

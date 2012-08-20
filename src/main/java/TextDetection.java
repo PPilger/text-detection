@@ -11,14 +11,18 @@ public class TextDetection {
 		img.addProcessor(new ColorToGrayProcessor());
 		img.addProcessor(new ThresholdProcessor(165)); // 170 TB, 200 BI, 150 PA
 		img.addProcessor(new InvertProcessor());
+		
+		//img.addProcessor(new ImageDisplayProcessor("0"));
+		
+		//img.addProcessor(new ColorEraseProcessor(70, 130, 70, 110, 80, 100, 10, true));
+		img.addProcessor(new ColorEraseProcessor(70, 110, 70, 100, 80, 90, 10, true));
 
-		//img.addProcessor(new ImageDisplayProcessor("Threshold"));
-		img.addProcessor(new ColorEraseProcessor(70, 70, 80, 80, 210, 255, 10));
-		img.addProcessor(new ImageDisplayProcessor("Color"));
-		img.addProcessor(new ColorEraseProcessor(70, 70, 80, 80, 200, 255, 10));
-		img.addProcessor(new ImageDisplayProcessor("Color"));
-		img.addProcessor(new ColorEraseProcessor(70, 70, 80, 80, 190, 255, 10));
-		img.addProcessor(new ImageDisplayProcessor("Color"));
+		//img.addProcessor(new ImageDisplayProcessor("1"));
+		
+		
+		img.addProcessor(new ColorEraseProcessor(0, 50, 0, 255, 0, 255, 10, true));
+		img.addProcessor(new TempDisplayProcessor("2"));
+		
 		//img.addProcessor(new ColorEraseProcessor(0, 50, 0, 50, 0, 100, 10));
 		//img.addProcessor(new ColorEraseProcessor(0, 50, 0, 50, 0, 100, 10));
 		
@@ -38,7 +42,7 @@ public class TextDetection {
 		img.addProcessor(new ColorToGrayProcessor());
 		img.addProcessor(new ThresholdProcessor(207)); // 170 TB, 200 BI, 150 PA
 		img.addProcessor(new InvertProcessor());
-		img.addProcessor(new ColorEraseProcessor(0, 50, 0, 50, 0, 100, 10));
+		img.addProcessor(new ColorEraseProcessor(0, 50, 0, 50, 0, 100, 10, false));
 		img.addProcessor(new ThicknessProcessor(1, 5));
 		img.addProcessor(new RemoveLinesProcessor(60));
 		img.addProcessor(new DilateProcessor(3));

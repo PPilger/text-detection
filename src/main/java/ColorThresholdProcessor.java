@@ -16,7 +16,7 @@ public class ColorThresholdProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		IplImage rImg = IplImage.create(cvSize(img.width(), img.height()), 8,
 				1);
 		IplImage gImg = IplImage.create(cvSize(img.width(), img.height()), 8,

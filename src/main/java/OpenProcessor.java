@@ -12,7 +12,7 @@ public class OpenProcessor extends MorphologicalProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		cvMorphologyEx(img, img, null, getStructuringElement(), CV_MOP_OPEN, 1);
 	}
 }

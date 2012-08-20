@@ -1,6 +1,9 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
+import com.googlecode.javacv.cpp.opencv_core.CvScalar;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
 public class ColorRangeProcessor implements ImageProcessor {
 	private int rMin;
 	private int rMax;
@@ -22,14 +25,12 @@ public class ColorRangeProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		IplImage rImg = IplImage
 				.create(cvSize(img.width(), img.height()), 8, 1);
 		IplImage gImg = IplImage
 				.create(cvSize(img.width(), img.height()), 8, 1);
 		IplImage bImg = IplImage
-				.create(cvSize(img.width(), img.height()), 8, 1);
-		IplImage mask = IplImage
 				.create(cvSize(img.width(), img.height()), 8, 1);
 
 		cvSplit(colorImg, rImg, gImg, bImg, null);
@@ -41,15 +42,18 @@ public class ColorRangeProcessor implements ImageProcessor {
 		cvThreshold(bImg, bImg, bMin, 255, CV_THRESH_TOZERO);
 		cvThreshold(bImg, bImg, bMax, 255, CV_THRESH_TOZERO_INV);
 
+		cvSetZero(temp);
+		
 		if (and) {
-			cvAnd(rImg, gImg, mask, null);
-			cvAnd(mask, bImg, mask, null);
+			cvAnd(rImg, gImg, temp, null);
+			cvAnd(temp, bImg, temp, null);
 		} else {
-			cvOr(rImg, gImg, mask, null);
-			cvOr(mask, bImg, mask, null);
+			cvOr(rImg, gImg, temp, null);
+			cvOr(temp, bImg, temp, null);
 		}
+		cvSet(temp, CvScalar.WHITE, temp);
 
 		cvSetZero(img);
-		cvSet(img, CvScalar.WHITE, mask);
+		cvSet(img, CvScalar.WHITE, temp);
 	}
 }

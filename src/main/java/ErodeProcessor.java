@@ -1,5 +1,6 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.*;
 
 public class ErodeProcessor extends MorphologicalProcessor {
@@ -12,7 +13,7 @@ public class ErodeProcessor extends MorphologicalProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		cvErode(img, img, getStructuringElement(), 1);
 	}
 }

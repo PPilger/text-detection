@@ -1,6 +1,8 @@
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
 public class ThicknessProcessor implements ImageProcessor {
 	private int minThickness;
 	private int maxThickness;
@@ -15,10 +17,11 @@ public class ThicknessProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg) {
+	public void process(IplImage img, IplImage colorImg, IplImage temp) {
 		IplImage centers = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
 		IplImage distance = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
-		IplImage temp = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
+		
+		cvSetZero(temp);
 
 		cvDistTransform(img, distance, CV_DIST_L1, 3, null, null, 0);
 
@@ -37,6 +40,7 @@ public class ThicknessProcessor implements ImageProcessor {
 		cvSetZero(img);
 		cvCmpS(centers, maxThickness, img, CV_CMP_LT);
 		cvCmpS(centers, minThickness, temp, CV_CMP_LT);
+		
 		cvSet(img, CvScalar.BLACK, temp);
 	}
 }
