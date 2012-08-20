@@ -1,6 +1,6 @@
-import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class TempDisplayProcessor extends ImageDisplayProcessor {
+
+public class TempDisplayProcessor extends ImageDisplay implements ImageProcessor {
 
 	public TempDisplayProcessor(String title) {
 		super(title);
@@ -11,8 +11,7 @@ public class TempDisplayProcessor extends ImageDisplayProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg, IplImage temp) {
-		super.process(temp, null, null);
+	public void process(ImageCollection images) {
+		super.show(images.getTemp());
 	}
-
 }

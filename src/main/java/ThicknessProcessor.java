@@ -10,20 +10,23 @@ public class ThicknessProcessor implements ImageProcessor {
 	public ThicknessProcessor(int maxThickness) {
 		this(1, maxThickness);
 	}
-	
+
 	public ThicknessProcessor(int minThickness, int maxThickness) {
 		this.minThickness = minThickness;
 		this.maxThickness = maxThickness;
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg, IplImage temp) {
-		IplImage centers = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
-		IplImage distance = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
-		
+	public void process(ImageCollection images) {
+		IplImage processed = images.getProcessed();
+		IplImage temp = images.getTemp();
+
+		IplImage centers = IplImage.create(temp.cvSize(), IPL_DEPTH_8U, 1);
+		IplImage distance = IplImage.create(temp.cvSize(), IPL_DEPTH_8U, 1);
+
 		cvSetZero(temp);
 
-		cvDistTransform(img, distance, CV_DIST_L1, 3, null, null, 0);
+		cvDistTransform(processed, distance, CV_DIST_L1, 3, null, null, 0);
 
 		// get the centers of all objects
 		IplConvKernel strel = cvCreateStructuringElementEx(3, 3, 1, 1,
@@ -37,10 +40,10 @@ public class ThicknessProcessor implements ImageProcessor {
 		cvMul(distance, temp, centers, 1);
 
 		// set all valid centers to white
-		cvSetZero(img);
-		cvCmpS(centers, maxThickness, img, CV_CMP_LT);
+		cvSetZero(processed);
+		cvCmpS(centers, maxThickness, processed, CV_CMP_LT);
 		cvCmpS(centers, minThickness, temp, CV_CMP_LT);
-		
-		cvSet(img, CvScalar.BLACK, temp);
+
+		cvSet(processed, CvScalar.BLACK, temp);
 	}
 }

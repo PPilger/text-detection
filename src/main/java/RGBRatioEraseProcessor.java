@@ -13,8 +13,9 @@ public class RGBRatioEraseProcessor implements ImageProcessor {
 	private int border;
 	private boolean and;
 
-	public RGBRatioEraseProcessor(double rgMinRatio, double rgMaxRatio, double rbMinRatio, double rbMaxRatio,
-			double gbMinRatio, double gbMaxRatio, int border, boolean and) {
+	public RGBRatioEraseProcessor(double rgMinRatio, double rgMaxRatio,
+			double rbMinRatio, double rbMaxRatio, double gbMinRatio,
+			double gbMaxRatio, int border, boolean and) {
 		this.rgMinRatio = rgMinRatio;
 		this.rgMaxRatio = rgMaxRatio;
 		this.rbMinRatio = rbMinRatio;
@@ -26,47 +27,36 @@ public class RGBRatioEraseProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg, IplImage temp) {
-		IplImage rImg = IplImage
-				.create(cvSize(img.width(), img.height()), 8, 1);
-		IplImage gImg = IplImage
-				.create(cvSize(img.width(), img.height()), 8, 1);
-		IplImage bImg = IplImage
-				.create(cvSize(img.width(), img.height()), 8, 1);
+	public void process(ImageCollection images) {
+		IplImage processed = images.getProcessed();
+		IplImage temp = images.getTemp();
 
-		cvSplit(colorImg, rImg, gImg, bImg, null);
+		IplImage rgTemp = cvCloneImage(images.getRGRatio());
+		IplImage rbTemp = cvCloneImage(images.getRBRatio());
+		IplImage gbTemp = cvCloneImage(images.getGBRatio());
 
-		IplImage rgImg = IplImage
-				.create(cvSize(img.width(), img.height()), IPL_DEPTH_32F, 1);
-		IplImage rbImg = IplImage
-				.create(cvSize(img.width(), img.height()), IPL_DEPTH_32F, 1);
-		IplImage gbImg = IplImage
-				.create(cvSize(img.width(), img.height()), IPL_DEPTH_32F, 1);
-
-		cvDiv(rImg, gImg, rgImg, 1);
-		cvDiv(rImg, bImg, rbImg, 1);
-		cvDiv(gImg, bImg, gbImg, 1);
-		
-		cvInRangeS(rgImg, cvScalarAll(rgMinRatio), cvScalarAll(rgMaxRatio), rImg);
-		cvInRangeS(rbImg, cvScalarAll(rbMinRatio), cvScalarAll(rbMaxRatio), gImg);
-		cvInRangeS(gbImg, cvScalarAll(gbMinRatio), cvScalarAll(gbMaxRatio), bImg);
+		cvInRangeS(rgTemp, cvScalarAll(rgMinRatio), cvScalarAll(rgMaxRatio),
+				rgTemp);
+		cvInRangeS(rbTemp, cvScalarAll(rbMinRatio), cvScalarAll(rbMaxRatio),
+				rbTemp);
+		cvInRangeS(gbTemp, cvScalarAll(gbMinRatio), cvScalarAll(gbMaxRatio),
+				gbTemp);
 
 		cvSetZero(temp);
 
 		if (and) {
-			cvAnd(rImg, gImg, temp, null);
-			cvAnd(temp, bImg, temp, null);
+			cvAnd(rgTemp, rbTemp, temp, null);
+			cvAnd(temp, gbTemp, temp, null);
 		} else {
-			cvOr(rImg, gImg, temp, null);
-			cvOr(temp, bImg, temp, null);
+			cvOr(rgTemp, rbTemp, temp, null);
+			cvOr(temp, gbTemp, temp, null);
 		}
+
 		cvSet(temp, CvScalar.WHITE, temp);
-		
-		//cvConvertScale(gbImg, temp, 255, 0);
 
-		new DilateProcessor(border).process(temp, null, null);
+		new DilateProcessor(border).process(temp);
 
-		cvSet(img, CvScalar.BLACK, temp);
+		cvSet(processed, CvScalar.BLACK, temp);
 	}
 
 }

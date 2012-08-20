@@ -4,6 +4,8 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 
 import java.util.*;
 
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
 public class Image {
 	private IplImage img;
 	private List<ImageProcessor> processors;
@@ -43,44 +45,55 @@ public class Image {
 
 	public List<LinkedFeature> findText(FeatureDetector detector,
 			FeatureLinker linker) {
-		IplImage grayscale = IplImage.create(img.cvSize(), IPL_DEPTH_8U, 1);
+		ImageCollection images = new ImageCollection(img);
 
-		// pre-processing
-		IplImage temp = IplImage
-				.create(img.cvSize(), IPL_DEPTH_8U, 1);
-		for (ImageProcessor processor : processors) {
-			processor.process(grayscale, img, temp);
-		}
+		// do pre-processing
+		IplImage processed;
+		{
+			processed = images.getProcessed();
 
-		if (processedImageDisplay != null) {
-			processedImageDisplay.show(grayscale);
+			for (ImageProcessor processor : processors) {
+				processor.process(images);
+			}
+
+			if (processedImageDisplay != null) {
+				processedImageDisplay.show(processed);
+			}
 		}
 
 		// detect features in the image
-		List<Feature> features = detector.findFeatures(grayscale);
-		System.out.println("number of features detected: " + features.size());
+		List<Feature> features;
+		{
+			features = detector.findFeatures(processed);
 
-		for (Feature f : features) {
-			f.draw(img, CvScalar.BLACK);
-			f.box().draw(img, CvScalar.BLACK);
-		}
+			System.out.println("number of features detected: "
+					+ features.size());
 
-		if (detectedFeaturesDisplay != null) {
-			detectedFeaturesDisplay.show(img);
+			for (Feature f : features) {
+				f.draw(img, CvScalar.BLACK);
+				f.box().draw(img, CvScalar.BLACK);
+			}
+
+			if (detectedFeaturesDisplay != null) {
+				detectedFeaturesDisplay.show(img);
+			}
 		}
 
 		// link features together
-		List<LinkedFeature> linkedFeatures = linker.linkFeatures(features, img);
+		List<LinkedFeature> linkedFeatures;
+		{
+			linkedFeatures = linker.linkFeatures(features, img);
 
-		System.out.println("number of features after linking: "
-				+ linkedFeatures.size());
+			System.out.println("number of features after linking: "
+					+ linkedFeatures.size());
 
-		for (LinkedFeature lf : linkedFeatures) {
-			lf.draw(img, CvScalar.GREEN);
-		}
+			for (LinkedFeature lf : linkedFeatures) {
+				lf.draw(img, CvScalar.GREEN);
+			}
 
-		if (linkedFeaturesDisplay != null) {
-			linkedFeaturesDisplay.show(img);
+			if (linkedFeaturesDisplay != null) {
+				linkedFeaturesDisplay.show(img);
+			}
 		}
 
 		return linkedFeatures;

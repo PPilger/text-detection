@@ -1,5 +1,7 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
+import java.util.Map;
+
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class OpenProcessor extends MorphologicalProcessor {
@@ -10,9 +12,8 @@ public class OpenProcessor extends MorphologicalProcessor {
 	public OpenProcessor(int size) {
 		super(size);
 	}
-
-	@Override
-	public void process(IplImage img, IplImage colorImg, IplImage temp) {
-		cvMorphologyEx(img, img, null, getStructuringElement(), CV_MOP_OPEN, 1);
+	
+	public void process(IplImage processed) {
+		cvMorphologyEx(processed, processed, null, getStructuringElement(), CV_MOP_OPEN, 1);
 	}
 }

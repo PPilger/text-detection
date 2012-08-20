@@ -1,6 +1,7 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
+
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -25,35 +26,30 @@ public class ColorRangeProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg, IplImage temp) {
-		IplImage rImg = IplImage
-				.create(cvSize(img.width(), img.height()), 8, 1);
-		IplImage gImg = IplImage
-				.create(cvSize(img.width(), img.height()), 8, 1);
-		IplImage bImg = IplImage
-				.create(cvSize(img.width(), img.height()), 8, 1);
+	public void process(ImageCollection images) {
+		IplImage processed = images.getProcessed();
+		IplImage temp = images.getTemp();
+		
+		IplImage red = cvCloneImage(images.getRed());
+		IplImage green = cvCloneImage(images.getGreen());
+		IplImage blue = cvCloneImage(images.getBlue());
 
-		cvSplit(colorImg, rImg, gImg, bImg, null);
-
-		cvThreshold(rImg, rImg, rMin, 255, CV_THRESH_TOZERO);
-		cvThreshold(rImg, rImg, rMax, 255, CV_THRESH_TOZERO_INV);
-		cvThreshold(gImg, gImg, gMin, 255, CV_THRESH_TOZERO);
-		cvThreshold(gImg, gImg, gMax, 255, CV_THRESH_TOZERO_INV);
-		cvThreshold(bImg, bImg, bMin, 255, CV_THRESH_TOZERO);
-		cvThreshold(bImg, bImg, bMax, 255, CV_THRESH_TOZERO_INV);
+		cvInRangeS(red, cvScalarAll(rMin), cvScalarAll(rMax), red);
+		cvInRangeS(green, cvScalarAll(gMin), cvScalarAll(gMax), green);
+		cvInRangeS(blue, cvScalarAll(bMin), cvScalarAll(bMax), blue);
 
 		cvSetZero(temp);
 		
 		if (and) {
-			cvAnd(rImg, gImg, temp, null);
-			cvAnd(temp, bImg, temp, null);
+			cvAnd(red, green, temp, null);
+			cvAnd(temp, blue, temp, null);
 		} else {
-			cvOr(rImg, gImg, temp, null);
-			cvOr(temp, bImg, temp, null);
+			cvOr(red, green, temp, null);
+			cvOr(temp, blue, temp, null);
 		}
-		cvSet(temp, CvScalar.WHITE, temp);
 
-		cvSetZero(img);
-		cvSet(img, CvScalar.WHITE, temp);
+		cvSetZero(processed);
+		
+		cvSet(processed, CvScalar.WHITE, temp);
 	}
 }

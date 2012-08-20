@@ -1,6 +1,7 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
+
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class RemoveLinesProcessor implements ImageProcessor {
@@ -11,11 +12,14 @@ public class RemoveLinesProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg, IplImage temp) {
+	public void process(ImageCollection images) {
+		IplImage processed = images.getProcessed();
+		IplImage temp = images.getTemp();
+
 		cvSetZero(temp);
 
 		CvMemStorage mem = CvMemStorage.create();
-		CvSeq lines = cvHoughLines2(img, mem, CV_HOUGH_STANDARD, 0.5,
+		CvSeq lines = cvHoughLines2(processed, mem, CV_HOUGH_STANDARD, 0.5,
 				Angle180.degToRad(0.5), threshold, 0, 0);
 
 		for (int i = 0; i < lines.total(); i++) {
@@ -24,10 +28,10 @@ public class RemoveLinesProcessor implements ImageProcessor {
 			int px = (int) (Math.cos(polar.y()) * polar.x());
 			int py = (int) (Math.sin(polar.y()) * polar.x());
 
-			double lineLength = img.width() + img.height();
+			double lineLength = processed.width() + processed.height();
 			double angle = polar.y() + Math.PI / 2;
 			cvDrawLine(
-					img,
+					processed,
 					cvPoint(px - (int) (Math.cos(angle) * lineLength), py
 							- (int) (Math.sin(angle) * lineLength)),
 					cvPoint(px + (int) (Math.cos(angle) * lineLength), py

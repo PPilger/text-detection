@@ -1,5 +1,6 @@
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
+
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.*;
 
@@ -10,10 +11,14 @@ public class MedianProcessor implements ImageProcessor {
 	public MedianProcessor(int size) {
 		this.size = size;
 	}
+	
+	public void process(IplImage processed) {
+		cvSmooth(processed, processed, CV_MEDIAN, size);
+	}
 
 	@Override
-	public void process(IplImage img, IplImage colorImg, IplImage temp) {
-		cvSmooth(img, img, CV_MEDIAN, size);
+	public void process(ImageCollection images) {
+		process(images.getProcessed());
 	}
 	
 }

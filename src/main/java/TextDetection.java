@@ -7,6 +7,11 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
+		britishIsles();
+		//portolanAtlas();
+	}
+
+	public static void portolanAtlas() {
 		Image img = new Image("samples" + File.separator + "PORTOLAN_ATLAS_S.jpg");
 		img.addProcessor(new ColorToGrayProcessor());
 		img.addProcessor(new ThresholdProcessor(165)); // 170 TB, 200 BI, 150 PA
@@ -36,12 +41,16 @@ public class TextDetection {
 		img.addProcessor(new RGBRatioEraseProcessor(0, 3, 0, 3, 0.95, 3, dil, true));
 		img.addProcessor(new ImageDisplayProcessor("a"+i++, 1200, 800));
 		*/
+
+		//img.addProcessor(new ImageDisplayProcessor("color", 1200, 800));
+		//img.addProcessor(new ImageDisplayProcessor("rgRatio", 1200, 800, 0.5));
+		//img.addProcessor(new ImageDisplayProcessor("rbRatio", 1200, 800, 0.5));
+		//img.addProcessor(new ImageDisplayProcessor("gbRatio", 1200, 800, 0.5));
 		
 		
-		new ImageDisplay("", 1200,800).show(img.iplImage());
-		img.addProcessor(new ImageDisplayProcessor("a"+i++, 1200, 800));
+		img.addProcessor(new ImageDisplayProcessor("processed", "a"+i++, 1200, 800));
 		img.addProcessor(new ThicknessProcessor(1, 7));
-		img.addProcessor(new ImageDisplayProcessor("a"+i++, 1200, 800));
+		img.addProcessor(new ImageDisplayProcessor("processed", "a"+i++, 1200, 800));
 		//img.addProcessor(new RemoveLinesProcessor(60));
 		img.addProcessor(new DilateProcessor(3));
 		img.addProcessor(new CloseProcessor(3));
@@ -52,22 +61,30 @@ public class TextDetection {
 				//"PORTOLAN_ATLAS.jpg");
 				//TestbildM.jpg");//
 
-		/*Image img = new Image("samples" + File.separator + "British Isles.png");
+		
+		ImageDisplay display = new ImageDisplay("output", 1200, 800);
+		img.setImageDisplay(display, display, display);
+		img.findText(detector, linker);
+		img.save("Portolan Atlas.jpg");
+	}
+	
+	public static void britishIsles() {
+		Image img = new Image("samples" + File.separator + "British Isles.png");
 		img.addProcessor(new ColorToGrayProcessor());
 		img.addProcessor(new ThresholdProcessor(207)); // 170 TB, 200 BI, 150 PA
 		img.addProcessor(new InvertProcessor());
-		img.addProcessor(new ColorEraseProcessor(0, 50, 0, 50, 0, 100, 10, false));
+		img.addProcessor(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
 		img.addProcessor(new ThicknessProcessor(1, 5));
 		img.addProcessor(new RemoveLinesProcessor(60));
 		img.addProcessor(new DilateProcessor(3));
 		img.addProcessor(new CloseProcessor(3));
 		
 		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000, 100, 5000);
-		FeatureLinker linker = new AreaBasedFeatureLinker(1, 800);*/
+		FeatureLinker linker = new AreaBasedFeatureLinker(1, 800);
 		
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
-		img.setImageDisplay(display, display, display);
+		//img.setImageDisplay(display, display, display);
 		img.findText(detector, linker);
-		img.save("TestbildOut.jpg");
+		img.save("British Isles.png");
 	}
 }
