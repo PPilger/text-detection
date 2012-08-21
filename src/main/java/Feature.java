@@ -1,5 +1,8 @@
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
+import java.util.Formatter;
+import java.util.Locale;
+
 public class Feature implements Comparable<Feature> {
 	private Vector2D position;
 	private double width;
@@ -7,7 +10,8 @@ public class Feature implements Comparable<Feature> {
 	private Angle180 angle;
 	private boolean text;
 	private Box2D box;
-	//private CvBox2D cvBox;
+
+	// private CvBox2D cvBox;
 
 	public Feature(CvBox2D box) {
 		this.box = new Box2D(box);
@@ -48,7 +52,7 @@ public class Feature implements Comparable<Feature> {
 	public Vector2D position() {
 		return position;
 	}
-	
+
 	public Box2D box() {
 		return box;
 	}
@@ -134,7 +138,19 @@ public class Feature implements Comparable<Feature> {
 		box.draw(img, color);
 	}
 
+	public String toJSON() {
+		String corner0 = box.corners[0].toJSON();
+		String corner1 = box.corners[1].toJSON();
+		String corner2 = box.corners[2].toJSON();
+		String corner3 = box.corners[3].toJSON();
+
+		return String.format(Locale.US,
+				"{\"angle\": %.2f, \"corners\": [%s, %s, %s, %s]}",
+				angle.getDegrees(), corner0, corner1, corner2, corner3);
+	}
+
 	public String toString() {
-		return position + ", " + width + "/" + height + ", " + angle.getDegrees() + "°";
+		return position + ", " + width + "/" + height + ", "
+				+ angle.getDegrees() + "°";
 	}
 }

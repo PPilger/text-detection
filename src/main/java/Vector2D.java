@@ -1,3 +1,5 @@
+import java.util.Locale;
+
 public class Vector2D {
 	public double x;
 	public double y;
@@ -71,6 +73,10 @@ public class Vector2D {
 		if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))
 			return false;
 		return true;
+	}
+	
+	public String toJSON() {
+		return String.format(Locale.US, "{\"x\": %.2f, \"y\": %.2f}", x, y);
 	}
 
 	@Override

@@ -17,6 +17,7 @@ public class ImageCollection {
 		cvCvtColor(color, gray, CV_BGR2GRAY);
 		
 		images.put("color", color);
+		images.put("result", color.clone());
 		images.put("gray", gray);
 		images.put("processed", cvCloneImage(gray));
 		images.put("temp", cvCloneImage(gray));
@@ -50,6 +51,10 @@ public class ImageCollection {
 
 	public IplImage getColor() {
 		return images.get("color");
+	}
+
+	public IplImage getResult() {
+		return images.get("result");
 	}
 
 	public IplImage getGray() {

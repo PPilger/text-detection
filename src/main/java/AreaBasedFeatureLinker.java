@@ -12,8 +12,8 @@ public class AreaBasedFeatureLinker implements FeatureLinker {
 	}
 
 	@Override
-	public List<LinkedFeature> linkFeatures(List<Feature> features, IplImage img) {
-		List<LinkedFeature> linkedFeatures = new ArrayList<LinkedFeature>();
+	public FeatureSet linkFeatures(List<Feature> features, IplImage img) {
+		FeatureSet featureSet = new FeatureSet();
 
 		// scan through every angle
 		for (int i = 0; i < numScans; i++) {
@@ -65,11 +65,11 @@ public class AreaBasedFeatureLinker implements FeatureLinker {
 						}
 					}
 
-					linkedFeatures.add(LinkedFeature.create(component));
+					featureSet.add(LinkedFeature.create(component));
 				}
 			}
 		}
 
-		return linkedFeatures;
+		return featureSet;
 	}
 }

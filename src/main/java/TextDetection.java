@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.List;
 
 public class TextDetection {
 
@@ -7,8 +8,8 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		// britishIsles();
-		portolanAtlas();
+		 britishIsles();
+		//portolanAtlas();
 	}
 
 	public static void portolanAtlas() {
@@ -27,7 +28,7 @@ public class TextDetection {
 			lines.process(new SmallObjectErasorProcessor(20));
 			lines.process(new LineSegmentsProcessor(40, 50, 800));
 
-			//display.show(lines.getImage(), images.getGray());
+			display.show(lines.getImage(), images.getGray());
 		}
 
 		{
@@ -96,10 +97,12 @@ public class TextDetection {
 				100, 5000);
 		FeatureLinker linker = new AreaBasedFeatureLinker(1, 800);
 
-		ImageDisplay display = new ImageDisplay("output", 1200, 800);
-		// img.setImageDisplay(display, display);
+		//ImageDisplay display = new ImageDisplay("output", 1200, 800);
+		//img.setImageDisplay(display, display);
 
-		img.findText(detector, linker);
+		FeatureSet features = img.findText(detector, linker);
+		
+		features.save("Features.js");
 		img.save("British Isles.png");
 	}
 }
