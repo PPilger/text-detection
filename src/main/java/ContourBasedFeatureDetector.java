@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
+
 public class ContourBasedFeatureDetector implements FeatureDetector {
 	private int minPerimeter;
 	private int maxPerimeter;
@@ -25,7 +27,7 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 		
 		// find contours
 		{
-			CvMemStorage mem = cvCreateMemStorage(0);
+			CvMemStorage mem = CvMemStorage.create();
 			CvSeq contour = new CvSeq();
 			IplImage temp = cvCloneImage(img);
 			

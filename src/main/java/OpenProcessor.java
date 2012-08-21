@@ -13,7 +13,7 @@ public class OpenProcessor extends MorphologicalProcessor {
 		super(size);
 	}
 	
-	public void process(IplImage processed) {
+	public void process(IplImage processed, IplImage temp) {
 		cvMorphologyEx(processed, processed, null, getStructuringElement(), CV_MOP_OPEN, 1);
 	}
 }

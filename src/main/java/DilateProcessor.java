@@ -15,7 +15,7 @@ public class DilateProcessor extends MorphologicalProcessor {
 		super(size);
 	}
 	
-	public void process(IplImage processed) {
+	public void process(IplImage processed, IplImage temp) {
 		cvDilate(processed, processed, getStructuringElement(), 1);
 	}
 }

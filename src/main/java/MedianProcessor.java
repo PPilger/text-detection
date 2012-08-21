@@ -5,20 +5,14 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.*;
 
 
-public class MedianProcessor implements ImageProcessor {
+public class MedianProcessor extends SingleImageProcessor {
 	private int size;
 	
 	public MedianProcessor(int size) {
 		this.size = size;
 	}
 	
-	public void process(IplImage processed) {
+	public void process(IplImage processed, IplImage temp) {
 		cvSmooth(processed, processed, CV_MEDIAN, size);
 	}
-
-	@Override
-	public void process(ImageCollection images) {
-		process(images.getProcessed());
-	}
-	
 }

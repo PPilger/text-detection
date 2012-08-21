@@ -54,7 +54,7 @@ public class RGBRatioEraseProcessor implements ImageProcessor {
 
 		cvSet(temp, CvScalar.WHITE, temp);
 
-		new DilateProcessor(border).process(temp);
+		new DilateProcessor(border).process(temp, null);
 
 		cvSet(processed, CvScalar.BLACK, temp);
 	}

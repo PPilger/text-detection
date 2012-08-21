@@ -49,7 +49,7 @@ public class ColorEraseProcessor implements ImageProcessor {
 			cvOr(temp, blue, temp, null);
 		}
 		
-		new DilateProcessor(border).process(temp);
+		new DilateProcessor(border).process(temp, null);
 
 		cvSet(processed, CvScalar.BLACK, temp);
 	}

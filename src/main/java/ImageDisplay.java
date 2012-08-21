@@ -1,3 +1,5 @@
+import static com.googlecode.javacv.cpp.opencv_core.cvAdd;
+import static com.googlecode.javacv.cpp.opencv_core.cvCloneImage;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvResizeWindow;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvShowImage;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvWaitKey;
@@ -26,6 +28,21 @@ public class ImageDisplay {
 		width = (width == -1) ? img.width() : Math.min(img.width(), width);
 		height = (height == -1) ? img.height() : Math.min(img.height(), height);
 
+		cvShowImage(title, img);
+
+		cvResizeWindow(title, width, height);
+		cvWaitKey();
+	}
+
+	public void show(IplImage... images) {
+		width = (width == -1) ? images[0].width() : Math.min(images[0].width(), width);
+		height = (height == -1) ? images[0].height() : Math.min(images[0].height(), height);
+
+		IplImage img = cvCloneImage(images[0]);
+		for(int i = 1; i < images.length; i++) {
+			cvAdd(img, images[i], img, null);
+		}
+		
 		cvShowImage(title, img);
 
 		cvResizeWindow(title, width, height);

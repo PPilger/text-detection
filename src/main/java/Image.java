@@ -1,5 +1,4 @@
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
-import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
 import java.util.*;
@@ -7,64 +6,45 @@ import java.util.*;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class Image {
-	private IplImage img;
-	private List<ImageProcessor> processors;
-	private ImageDisplay processedImageDisplay;
+	private ImageCollection images;
 	private ImageDisplay detectedFeaturesDisplay;
 	private ImageDisplay linkedFeaturesDisplay;
 
 	public Image(String filename) {
-		this.img = cvLoadImage(filename);
-		this.processors = new ArrayList<ImageProcessor>();
+		IplImage img = cvLoadImage(filename);
+		this.images = new ImageCollection(img);
 	}
 
 	public Image(IplImage img) {
-		this.img = img;
-		this.processors = new ArrayList<ImageProcessor>();
+		this.images = new ImageCollection(img);
 	}
-
-	public IplImage iplImage() {
-		return img;
+	
+	public ImageCollection getImageCollection() {
+		return images;
 	}
 
 	public void save(String filename) {
-		cvSaveImage(filename, img);
+		cvSaveImage(filename, images.getProcessed());
 	}
 
-	public void addProcessor(ImageProcessor processor) {
-		processors.add(processor);
+	public void process(ImageProcessor processor) {
+		processor.process(images);
 	}
 
-	public void setImageDisplay(ImageDisplay processedImageDisplay,
-			ImageDisplay detectedFeaturesDisplay,
+	public void setImageDisplay(ImageDisplay detectedFeaturesDisplay,
 			ImageDisplay linkedFeaturesDisplay) {
-		this.processedImageDisplay = processedImageDisplay;
 		this.detectedFeaturesDisplay = detectedFeaturesDisplay;
 		this.linkedFeaturesDisplay = linkedFeaturesDisplay;
 	}
 
 	public List<LinkedFeature> findText(FeatureDetector detector,
 			FeatureLinker linker) {
-		ImageCollection images = new ImageCollection(img);
-
-		// do pre-processing
-		IplImage processed;
-		{
-			processed = images.getProcessed();
-
-			for (ImageProcessor processor : processors) {
-				processor.process(images);
-			}
-
-			if (processedImageDisplay != null) {
-				processedImageDisplay.show(processed);
-			}
-		}
-
+		IplImage img = images.getProcessed();
+		
 		// detect features in the image
 		List<Feature> features;
 		{
-			features = detector.findFeatures(processed);
+			features = detector.findFeatures(img);
 
 			System.out.println("number of features detected: "
 					+ features.size());

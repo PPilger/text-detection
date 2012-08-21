@@ -4,7 +4,7 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.cvThreshold;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class ThresholdProcessor implements ImageProcessor {
+public class ThresholdProcessor extends SingleImageProcessor {
 	private int threshold;
 
 	public ThresholdProcessor(int threshold) {
@@ -12,9 +12,7 @@ public class ThresholdProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(ImageCollection images) {
-		IplImage processed = images.getProcessed();
-		
-		cvThreshold(processed, processed, threshold, 255, CV_THRESH_BINARY);
+	public void process(IplImage img, IplImage temp) {
+		cvThreshold(img, img, threshold, 255, CV_THRESH_BINARY);
 	}
 }

@@ -28,7 +28,7 @@ public class FirstDerivateEraseProcessor implements ImageProcessor {
 		
 		cvThreshold(temp, temp, threshold, 255, CV_THRESH_BINARY);
 		
-		new DilateProcessor(border).process(temp);
+		new DilateProcessor(border).process(temp, null);
 		
 		cvAnd(processed, temp, processed, null);
 	}
