@@ -7,7 +7,7 @@ import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 
-public class SmallObjectErasorProcessor extends SingleImageProcessor {
+public class SmallObjectErasorProcessor extends SimpleImageProcessor {
 	private int minSize;
 
 	public SmallObjectErasorProcessor(int minSize) {

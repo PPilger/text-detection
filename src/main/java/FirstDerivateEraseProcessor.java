@@ -14,10 +14,10 @@ public class FirstDerivateEraseProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(ImageCollection images) {
-		IplImage gray = images.getGray();
-		IplImage processed = images.getProcessed();
-		IplImage temp = images.getTemp();
+	public void process(Image image) {
+		IplImage gray = image.getGray();
+		IplImage processed = image.getImg();
+		IplImage temp = image.getTemp();
 		IplImage hTemp = cvCloneImage(temp);
 		IplImage vTemp = cvCloneImage(temp);
 

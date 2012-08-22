@@ -5,7 +5,7 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.*;
 
 
-public class MedianProcessor extends SingleImageProcessor {
+public class MedianProcessor extends SimpleImageProcessor {
 	private int size;
 	
 	public MedianProcessor(int size) {

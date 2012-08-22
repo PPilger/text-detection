@@ -1,5 +1,4 @@
 import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -27,13 +26,13 @@ public class RGBRatioEraseProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(ImageCollection images) {
-		IplImage processed = images.getProcessed();
-		IplImage temp = images.getTemp();
+	public void process(Image image) {
+		IplImage processed = image.getImg();
+		IplImage temp = image.getTemp();
 
-		IplImage rgTemp = cvCloneImage(images.getRGRatio());
-		IplImage rbTemp = cvCloneImage(images.getRBRatio());
-		IplImage gbTemp = cvCloneImage(images.getGBRatio());
+		IplImage rgTemp = cvCloneImage(image.getRgRatio());
+		IplImage rbTemp = cvCloneImage(image.getRbRatio());
+		IplImage gbTemp = cvCloneImage(image.getGbRatio());
 
 		cvInRangeS(rgTemp, cvScalarAll(rgMinRatio), cvScalarAll(rgMaxRatio),
 				rgTemp);

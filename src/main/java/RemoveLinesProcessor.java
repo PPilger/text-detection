@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class RemoveLinesProcessor extends SingleImageProcessor {
+public class RemoveLinesProcessor extends SimpleImageProcessor {
 	private int threshold;
 
 	public RemoveLinesProcessor(int threshold) {

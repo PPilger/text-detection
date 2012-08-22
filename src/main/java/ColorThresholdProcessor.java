@@ -19,12 +19,12 @@ public class ColorThresholdProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(ImageCollection images) {
-		IplImage processed = images.getProcessed();
-		IplImage temp = images.getTemp();
-		IplImage red = cvCloneImage(images.getRed());
-		IplImage green = cvCloneImage(images.getGreen());
-		IplImage blue = cvCloneImage(images.getBlue());
+	public void process(Image image) {
+		IplImage processed = image.getImg();
+		IplImage temp = image.getTemp();
+		IplImage red = cvCloneImage(image.getRed());
+		IplImage green = cvCloneImage(image.getGreen());
+		IplImage blue = cvCloneImage(image.getBlue());
 		
 		cvThreshold(red, red, rThreshold, 255, CV_THRESH_BINARY);
 		cvThreshold(green, green, gThreshold, 255, CV_THRESH_BINARY);

@@ -3,7 +3,7 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class LineSegmentsProcessor extends SingleImageProcessor {
+public class LineSegmentsProcessor extends SimpleImageProcessor {
 	private int threshold;
 	private int minLength;
 	private int maxGap;

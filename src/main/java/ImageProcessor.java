@@ -5,5 +5,5 @@ public interface ImageProcessor {
 	 * @param images
 	 *            8u1c image
 	 */
-	public void process(ImageCollection images);
+	public void process(Image image);
 }

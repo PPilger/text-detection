@@ -3,7 +3,7 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public abstract class MorphologicalProcessor extends SingleImageProcessor {
+public abstract class MorphologicalProcessor extends SimpleImageProcessor {
 	private int size;
 
 	public MorphologicalProcessor() {

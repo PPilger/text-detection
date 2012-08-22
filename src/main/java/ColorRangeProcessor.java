@@ -26,13 +26,13 @@ public class ColorRangeProcessor implements ImageProcessor {
 	}
 
 	@Override
-	public void process(ImageCollection images) {
-		IplImage processed = images.getProcessed();
-		IplImage temp = images.getTemp();
+	public void process(Image image) {
+		IplImage processed = image.getImg();
+		IplImage temp = image.getTemp();
 		
-		IplImage red = cvCloneImage(images.getRed());
-		IplImage green = cvCloneImage(images.getGreen());
-		IplImage blue = cvCloneImage(images.getBlue());
+		IplImage red = cvCloneImage(image.getRed());
+		IplImage green = cvCloneImage(image.getGreen());
+		IplImage blue = cvCloneImage(image.getBlue());
 
 		cvInRangeS(red, cvScalarAll(rMin), cvScalarAll(rMax), red);
 		cvInRangeS(green, cvScalarAll(gMin), cvScalarAll(gMax), green);

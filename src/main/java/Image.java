@@ -8,7 +8,8 @@ import java.util.*;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class Image {
-	/*private IplImage color;
+	private IplImage color;
+	private IplImage result;
 	private IplImage gray;
 	private IplImage img;
 	private IplImage temp;
@@ -17,65 +18,117 @@ public class Image {
 	private IplImage blue;
 	private IplImage rgRatio;
 	private IplImage rbRatio;
-	private IplImage gbRatio;*/
+	private IplImage gbRatio;
 	
-	private ImageCollection images;
 	private ImageDisplay detectedFeaturesDisplay;
 	private ImageDisplay linkedFeaturesDisplay;
 
 	public Image(String filename) {
-		IplImage img = cvLoadImage(filename);
-		this.images = new ImageCollection(img);
+		this(cvLoadImage(filename));
 	}
 
 	public Image(IplImage img) {
-		this.images = new ImageCollection(img);
-		/*this.color = img;
-		
-		this.gray = IplImage.create(color.cvSize(), IPL_DEPTH_8U, 1);
-		cvCvtColor(color, gray, CV_BGR2GRAY);
+		if(img.nChannels() != 1) {
+			this.color = img;
+			this.result = color.clone();
+			
+			this.gray = IplImage.create(color.cvSize(), IPL_DEPTH_8U, 1);
+			cvCvtColor(color, gray, CV_BGR2GRAY);
+		} else {
+			this.color = img;
+			this.result = color.clone();
+			this.gray = color.clone();
+		}
 		
 		this.img = gray.clone();
 		this.temp = gray.clone();
-		
-		images.put("color", color);
-		images.put("gray", gray);
-		images.put("processed", cvCloneImage(gray));
-		images.put("temp", cvCloneImage(gray));
-		
-		IplImage red = cvCloneImage(gray);
-		IplImage green = cvCloneImage(gray);
-		IplImage blue = cvCloneImage(gray);
-		
+	}
+	
+	public void initRGB() {
+		this.red = gray.clone();
+		this.green = gray.clone();
+		this.blue = gray.clone();
 		cvSplit(color, blue, green, red, null);
-
-		images.put("red", red);
-		images.put("green", green);
-		images.put("blue", blue);
-
-		IplImage rgRatio = IplImage.create(gray.cvSize(), IPL_DEPTH_32F, 1);
-		IplImage rbRatio = cvCloneImage(rgRatio);
-		IplImage gbRatio = cvCloneImage(rgRatio);
+	}
+	
+	public void initRatios() {
+		this.rgRatio = IplImage.create(gray.cvSize(), IPL_DEPTH_32F, 1);
+		this.rbRatio = cvCloneImage(rgRatio);
+		this.gbRatio = cvCloneImage(rgRatio);
 
 		cvDiv(red, green, rgRatio, 1);
 		cvDiv(red, blue, rbRatio, 1);
 		cvDiv(green, blue, gbRatio, 1);
-
-		images.put("rgRatio", rgRatio);
-		images.put("rbRatio", rbRatio);
-		images.put("gbRatio", gbRatio);*/
 	}
 	
-	public ImageCollection getImageCollection() {
-		return images;
+	public IplImage getColor() {
+		return color;
+	}
+
+	public IplImage getResult() {
+		return result;
+	}
+
+	public IplImage getGray() {
+		return gray;
+	}
+
+	public IplImage getImg() {
+		return img;
+	}
+
+	public IplImage getTemp() {
+		return temp;
+	}
+
+	public IplImage getRed() {
+		if(red == null) {
+			initRGB();
+		}
+		return red;
+	}
+
+	public IplImage getGreen() {
+		if(green == null) {
+			initRGB();
+		}
+		return green;
+	}
+
+	public IplImage getBlue() {
+		if(blue == null) {
+			initRGB();
+		}
+		return blue;
+	}
+
+	public IplImage getRgRatio() {
+		if(rgRatio == null) {
+			initRatios();
+		}
+		return rgRatio;
+	}
+
+	public IplImage getRbRatio() {
+		if(rbRatio == null) {
+			initRatios();
+		}
+		return rbRatio;
+	}
+
+	public IplImage getGbRatio() {
+		if(gbRatio == null) {
+			initRatios();
+		}
+		return gbRatio;
 	}
 
 	public void save(String filename) {
-		cvSaveImage(filename, images.getResult());
+		cvSaveImage(filename, result);
 	}
 
 	public void process(ImageProcessor processor) {
-		processor.process(images);
+		processor.process(this);
 	}
 
 	public void setImageDisplay(ImageDisplay detectedFeaturesDisplay,
@@ -86,14 +139,10 @@ public class Image {
 
 	public FeatureSet findText(FeatureDetector detector,
 			FeatureLinker linker) {
-		IplImage input = images.getProcessed();
-		IplImage result = images.getResult();
-		
-		
 		// detect features in the image
 		List<Feature> features;
 		{
-			features = detector.findFeatures(input);
+			features = detector.findFeatures(img);
 
 			System.out.println("number of features detected: "
 					+ features.size());

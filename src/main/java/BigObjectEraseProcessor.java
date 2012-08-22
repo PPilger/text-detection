@@ -5,7 +5,7 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import com.googlecode.javacv.cpp.opencv_core.*;
 
 
-public class BigObjectEraseProcessor extends SingleImageProcessor {
+public class BigObjectEraseProcessor extends SimpleImageProcessor {
 	private int size;
 
 	public BigObjectEraseProcessor(int size) {
