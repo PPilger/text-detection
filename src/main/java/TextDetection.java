@@ -8,8 +8,8 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		britishIsles();
-		//portolanAtlas();
+		//britishIsles();
+		portolanAtlas();
 	}
 
 	public static void portolanAtlas() {

@@ -17,7 +17,7 @@ public class SmallObjectErasorProcessor extends SimpleImageProcessor {
 
 	@Override
 	public void process(IplImage img, IplImage temp) {
-		CvMemStorage mem = CvMemStorage.create();
+		CvMemStorage mem = cvCreateMemStorage(0);
 		CvSeq contour = new CvSeq();
 		
 		cvConvert(img, temp);

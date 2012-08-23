@@ -17,7 +17,7 @@ public class RemoveLinesProcessor extends SimpleImageProcessor {
 	public void process(IplImage img, IplImage temp) {
 		cvSetZero(temp);
 
-		CvMemStorage mem = CvMemStorage.create();
+		CvMemStorage mem = cvCreateMemStorage(0);
 		CvSeq lines = cvHoughLines2(img, mem, CV_HOUGH_STANDARD, 0.5,
 				Angle180.degToRad(0.5), threshold, 0, 0);
 

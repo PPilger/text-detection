@@ -3,6 +3,7 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 		
 		// find contours
 		{
-			CvMemStorage mem = CvMemStorage.create();
+			CvMemStorage mem = cvCreateMemStorage(0);
 			CvSeq contour = new CvSeq();
 			IplImage temp = cvCloneImage(img);
 			
@@ -48,7 +49,6 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 			Iterator<ContourFeature> iter = contourFeatures.iterator();
 			while(iter.hasNext()) {
 				ContourFeature f0 = iter.next();
-				
 				boolean inside = false;
 				for(ContourFeature f1 : contourFeatures) {
 					if(f0.insideOf(f1)) {
@@ -62,7 +62,7 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 				}
 			}
 		}
-
+		
 		return new ArrayList<Feature>(contourFeatures);
 	}
 }

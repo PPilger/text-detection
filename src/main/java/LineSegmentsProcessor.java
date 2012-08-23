@@ -16,7 +16,7 @@ public class LineSegmentsProcessor extends SimpleImageProcessor {
 
 	@Override
 	public void process(IplImage img, IplImage temp) {
-		CvMemStorage mem = CvMemStorage.create();
+		CvMemStorage mem = cvCreateMemStorage(0);
 		CvSeq lines = cvHoughLines2(img, mem, CV_HOUGH_PROBABILISTIC,
 				0.5, Angle180.degToRad(0.5), threshold, minLength, maxGap);
 

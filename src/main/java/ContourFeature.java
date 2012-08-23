@@ -5,7 +5,7 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class ContourFeature extends Feature {
 	private CvContour contour;
-
+	
 	public static ContourFeature create(CvContour contour) {
 		CvMemStorage mem = cvCreateMemStorage(0);
 		CvBox2D box = cvMinAreaRect2(contour, mem);
@@ -20,15 +20,13 @@ public class ContourFeature extends Feature {
 
 	public boolean insideOf(ContourFeature other) {
 		CvPoint ipoint = new CvPoint(cvGetSeqElem(contour, 0));
-
-		int result = other.pointPolygonTest(ipoint);
-		//CvPoint2D32f dpoint = cvPoint2D32f(ipoint.x(), ipoint.y());
-		//int result = cvPointPolygonTest(other.contour, dpoint, 0);
+		CvPoint2D32f dpoint = cvPoint2D32f(ipoint.x(), ipoint.y());
+		double result = cvPointPolygonTest(other.contour, dpoint, 0);
 		return result > 0;
 	}
 
 	// OPENCV-implementation of cvPointPolygonTest for integers
-	private int pointPolygonTest(CvPoint point) {
+	/*private int pointPolygonTest(CvPoint point) {
 		// the fastest "pure integer" branch
 		int px = point.x(), py = point.y();
 		int v0x, v0y;
@@ -68,7 +66,7 @@ public class ContourFeature extends Feature {
 		}
 
 		return counter % 2 == 0 ? -1 : 1;
-	}
+	}*/
 
 	@Override
 	public void draw(IplImage img, CvScalar color) {
