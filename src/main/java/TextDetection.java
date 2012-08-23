@@ -1,6 +1,8 @@
 import java.io.File;
 import java.util.List;
 
+import static com.googlecode.javacv.cpp.opencv_photo.*;
+
 public class TextDetection {
 
 	/**
@@ -11,12 +13,14 @@ public class TextDetection {
 		//britishIsles();
 		portolanAtlas();
 	}
+	
 
 	public static void portolanAtlas() {
 		Image image = new Image("samples" + File.separator
 				+ "PORTOLAN_ATLAS_S.jpg");
-		ImageDisplay display = new ImageDisplay("output", 1200, 800);
-
+		ImageDisplay display = new ImageDisplay("output1", 1200, 800);
+		ImageDisplay display2 = new ImageDisplay("output2", 1200, 800);
+		
 		Image lines = new Image(image.getGray());
 		{
 
@@ -40,12 +44,8 @@ public class TextDetection {
 			image.process(new SmallObjectErasorProcessor(10));
 			//display.show(image.getImg());
 			image.process(new ThicknessProcessor(1, 7));
-			//img.process(new CloseProcessor(3));
-			//display.show(image.getImg());
 			
 			image.process(new EraseProcessor(lines.getImg()));
-			
-			//display.show(image.getImg());
 
 			// img.process(new RGRatioDisplayProcessor("1", 1200, 800, 0.5));
 			// img.process(new RBRatioDisplayProcessor("1", 1200, 800, 0.5));
@@ -57,48 +57,76 @@ public class TextDetection {
 			// 2,
 			// true));
 
-			image.process(new FirstDerivateEraseProcessor(120, 3));
-			image.process(new SecondDerivateEraseProcessor(130, 3));
+			image.process(new FirstDerivateEraseProcessor(120, 9));
+			image.process(new SecondDerivateEraseProcessor(130, 9));
 
-			image.process(new CloseProcessor(3));
-			image.process(new ThicknessProcessor(1, 7));
+			//image.process(new CloseProcessor(5));
+			display.show(image.getImg());
+			
+			/*Image bla = new Image(image.getImg());
+			{
+				bla.process(new InvertProcessor());
+				for(int i = 0; i < 4; i++) {
+					display2.show(bla.getImg());
+					bla.process(new ObstacleRemoveProcessor(3, 7, 25));
+				}
+				bla.process(new InvertProcessor());
 
-			image.process(new RemoveLinesProcessor(100));
+				bla.process(new OpenProcessor(3));
+			}
+			image.process(new MaskProcessor(bla.getImg()));
+
+			for(int i = 0; i < 4; i++) {
+				display2.show(image.getImg());
+				image.process(new ObstacleRemoveProcessor(3, 3, 25));
+			}*/
+			
+			image.process(new VarianceProcessor(11,50));
+			display2.show(image.getImg());
+			image.process(new ObstacleRemoveProcessor(3, 3, 25));
+			display2.show(image.getImg());
 
 			image.process(new DilateProcessor(3));
 			image.process(new CloseProcessor(3));
+
+			display2.show(image.getImg());
+			
+			//image.process(new DilateProcessor(3));
+			//display.show(image.getColor());
+			//cvInpaint(image.getColor(), image.getImg(), image.getColor(), 20, CV_INPAINT_TELEA);
+			//display2.show(image.getColor());
 		}
 
-		FeatureDetector detector = new ContourBasedFeatureDetector(15, 1000000,
+		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
 				1, 5000);
-		FeatureLinker linker = new AreaBasedFeatureLinker(1, 800);
+		FeatureLinker linker = new AreaBasedFeatureLinker(1, 300);
 
-		//image.setImageDisplay(display, display);
+		image.setImageDisplay(display, display);
 		image.findText(detector, linker);
 		image.save("Portolan Atlas.jpg");
 	}
 
 	public static void britishIsles() {
-		Image img = new Image("samples" + File.separator + "British Isles.png");
+		Image image = new Image("samples" + File.separator + "British Isles.png");
 
-		img.process(new ThresholdProcessor(207));
-		img.process(new InvertProcessor());
-		img.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
-		img.process(new ThicknessProcessor(1, 5));
-		img.process(new RemoveLinesProcessor(60));
-		img.process(new DilateProcessor(3));
-		img.process(new CloseProcessor(3));
+		image.process(new ThresholdProcessor(207));
+		image.process(new InvertProcessor());
+		image.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
+		image.process(new ThicknessProcessor(1, 5));
+		image.process(new RemoveLinesProcessor(60));
+		image.process(new DilateProcessor(3));
+		image.process(new CloseProcessor(3));
 
 		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
 				100, 5000);
-		FeatureLinker linker = new AreaBasedFeatureLinker(1, 800);
+		FeatureLinker linker = new AreaBasedFeatureLinker(1, 1000);
 
 		//ImageDisplay display = new ImageDisplay("output", 1200, 800);
 		//img.setImageDisplay(display, display);
 
-		FeatureSet features = img.findText(detector, linker);
+		FeatureSet features = image.findText(detector, linker);
 		
 		features.save("Features.js");
-		img.save("British Isles.png");
+		image.save("British Isles.png");
 	}
 }

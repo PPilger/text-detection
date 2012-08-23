@@ -1,6 +1,5 @@
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
-
 public class EraseProcessor extends SimpleImageProcessor {
 	private IplImage mask;
 
