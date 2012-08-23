@@ -142,7 +142,9 @@ public class Image {
 		// detect features in the image
 		List<Feature> features;
 		{
+			long t0 = System.currentTimeMillis();
 			features = detector.findFeatures(img);
+			System.out.println(System.currentTimeMillis() - t0);
 
 			System.out.println("number of features detected: "
 					+ features.size());

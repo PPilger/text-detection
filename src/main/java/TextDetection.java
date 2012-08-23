@@ -26,26 +26,26 @@ public class TextDetection {
 			lines.process(new SmallObjectErasorProcessor(20));
 			lines.process(new LineSegmentsProcessor(40, 50, 800));
 
-			display.show(lines.getImg(), image.getGray());
+			//display.show(lines.getImg(), image.getGray());
 		}
 		
 		{
 			image.process(new ThresholdProcessor(165));
 			image.process(new InvertProcessor());
 			
-			display.show(image.getImg());
+			//display.show(image.getImg());
 			image.process(new CloseProcessor(3));
 			image.process(new BigObjectEraseProcessor(11));
-			display.show(image.getImg());
+			//display.show(image.getImg());
 			image.process(new SmallObjectErasorProcessor(10));
-			display.show(image.getImg());
+			//display.show(image.getImg());
 			image.process(new ThicknessProcessor(1, 7));
 			//img.process(new CloseProcessor(3));
-			display.show(image.getImg());
+			//display.show(image.getImg());
 			
 			image.process(new EraseProcessor(lines.getImg()));
 			
-			display.show(image.getImg());
+			//display.show(image.getImg());
 
 			// img.process(new RGRatioDisplayProcessor("1", 1200, 800, 0.5));
 			// img.process(new RBRatioDisplayProcessor("1", 1200, 800, 0.5));
@@ -73,7 +73,7 @@ public class TextDetection {
 				1, 5000);
 		FeatureLinker linker = new AreaBasedFeatureLinker(1, 800);
 
-		image.setImageDisplay(display, display);
+		//image.setImageDisplay(display, display);
 		image.findText(detector, linker);
 		image.save("Portolan Atlas.jpg");
 	}
