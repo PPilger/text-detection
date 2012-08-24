@@ -6,12 +6,10 @@ import com.googlecode.javacv.cpp.opencv_core.*;
 public class ObstacleRemoveProcessor extends SimpleImageProcessor {
 	private int size;
 	private int min;
-	private int max;
 
-	public ObstacleRemoveProcessor(int size, int min, int max) {
+	public ObstacleRemoveProcessor(int size, int min) {
 		this.size = size;
 		this.min = min;
-		this.max = max;
 	}
 
 	@Override
@@ -23,8 +21,6 @@ public class ObstacleRemoveProcessor extends SimpleImageProcessor {
 
 		cvAnd(temp, img, temp, null);
 		cvCmpS(temp, min, img, CV_CMP_GE);
-		//cvCmpS(temp, max, temp, CV_CMP_LE);
-		//cvAnd(temp, img, img, null);
 	}
 
 }

@@ -30,6 +30,11 @@ public class TextDetection {
 			lines.process(new SmallObjectErasorProcessor(20));
 			lines.process(new LineSegmentsProcessor(40, 50, 800));
 
+
+			/*lines.process(new DilateProcessor(3));
+			display.show(image.getColor());
+			cvInpaint(image.getColor(), lines.getImg(), image.getColor(), 20, CV_INPAINT_NS);
+			display2.show(image.getColor());*/
 			//display.show(lines.getImg(), image.getGray());
 		}
 		
@@ -61,7 +66,7 @@ public class TextDetection {
 			image.process(new SecondDerivateEraseProcessor(130, 9));
 
 			//image.process(new CloseProcessor(5));
-			display.show(image.getImg());
+			//display.show(image.getImg());
 			
 			/*Image bla = new Image(image.getImg());
 			{
@@ -82,14 +87,14 @@ public class TextDetection {
 			}*/
 			
 			image.process(new VarianceProcessor(11,50));
-			display2.show(image.getImg());
-			image.process(new ObstacleRemoveProcessor(3, 3, 25));
-			display2.show(image.getImg());
+			//display2.show(image.getImg());
+			image.process(new ObstacleRemoveProcessor(3, 3));
+			//display2.show(image.getImg());
 
 			image.process(new DilateProcessor(3));
 			image.process(new CloseProcessor(3));
 
-			display2.show(image.getImg());
+			display.show(image.getImg());
 			
 			//image.process(new DilateProcessor(3));
 			//display.show(image.getColor());
@@ -99,9 +104,10 @@ public class TextDetection {
 
 		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
 				1, 5000);
-		FeatureLinker linker = new AreaBasedFeatureLinker(1, 300);
+		FeatureLinker linker = new DirectionBasedFeatureLinker(25, 10, 5);
+		//linker = new AreaBasedFeatureLinker(300);
 
-		image.setImageDisplay(display, display);
+		//image.setImageDisplay(display, display);
 		image.findText(detector, linker);
 		image.save("Portolan Atlas.jpg");
 	}
@@ -119,7 +125,7 @@ public class TextDetection {
 
 		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
 				100, 5000);
-		FeatureLinker linker = new AreaBasedFeatureLinker(1, 1000);
+		FeatureLinker linker = new AreaBasedFeatureLinker(1000);
 
 		//ImageDisplay display = new ImageDisplay("output", 1200, 800);
 		//img.setImageDisplay(display, display);

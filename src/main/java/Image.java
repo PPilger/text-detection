@@ -160,7 +160,7 @@ public class Image {
 		// link features together
 		FeatureSet featureSet;
 		{
-			featureSet = linker.linkFeatures(features, result);
+			featureSet = linker.linkFeatures(features, img);
 
 			System.out.println("number of features after linking: "
 					+ featureSet.size());
