@@ -25,6 +25,40 @@ public class Box2D {
 		return corners;
 	}
 
+	public Vector2D min() {
+		double xmin = corners[0].x;
+		double ymin = corners[0].y;
+		
+		for(Vector2D corner : corners) {
+			if(corner.x < xmin) {
+				xmin = corner.x;
+			}
+
+			if(corner.y < ymin) {
+				ymin = corner.y;
+			}
+		}
+		
+		return new Vector2D(xmin, ymin);
+	}
+
+	public Vector2D max() {
+		double xmax = 0;
+		double ymax = 0;
+		
+		for(Vector2D corner : corners) {
+			if(xmax < corner.x) {
+				xmax = corner.x;
+			}
+
+			if(ymax < corner.y) {
+				ymax = corner.y;
+			}
+		}
+		
+		return new Vector2D(xmax, ymax);
+	}
+
 	private boolean inside(double value, double bound0, double bound1) {
 		return Math.min(bound0, bound1) < value
 				&& value < Math.max(bound0, bound1);

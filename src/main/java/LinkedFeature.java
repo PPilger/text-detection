@@ -8,6 +8,7 @@ import com.googlecode.javacpp.PointerPointer;
 
 public class LinkedFeature extends Feature {
 	private static CvMemStorage mem = cvCreateMemStorage(0);
+	private static List<Feature> subFeatures;
 
 	public static LinkedFeature create(List<Feature> subFeatures) {
 		int[] coords = new int[8 * subFeatures.size()];
@@ -35,10 +36,17 @@ public class LinkedFeature extends Feature {
 				coords.length / 2, CV_FRONT);
 
 		CvBox2D box = cvMinAreaRect2(seq, mem);
-		return new LinkedFeature(box);
+		return new LinkedFeature(subFeatures, box);
 	}
 	
-	private LinkedFeature(CvBox2D box) {
+	private LinkedFeature(List<Feature> subFeatures, CvBox2D box) {
 		super(box);
+		this.subFeatures = subFeatures;
+	}
+	
+	public void fill(IplImage img, CvScalar color) {
+		for(Feature f : subFeatures) {
+			f.fill(img, color);
+		}
 	}
 }

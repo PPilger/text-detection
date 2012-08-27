@@ -104,10 +104,10 @@ public class TextDetection {
 
 		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
 				1, 5000);
-		FeatureLinker linker = new DirectionBasedFeatureLinker(25, 10, 5);
+		FeatureLinker linker = new DirectionBasedFeatureLinker(25, 11, 10, 5);
 		//linker = new AreaBasedFeatureLinker(300);
 
-		//image.setImageDisplay(display, display);
+		image.setImageDisplay(display, display);
 		image.findText(detector, linker);
 		image.save("Portolan Atlas.jpg");
 	}

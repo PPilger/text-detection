@@ -3,7 +3,7 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 import java.util.Formatter;
 import java.util.Locale;
 
-public class Feature implements Comparable<Feature> {
+public abstract class Feature implements Comparable<Feature> {
 	private Vector2D position;
 	private double width;
 	private double height;
@@ -137,6 +137,8 @@ public class Feature implements Comparable<Feature> {
 		cvDrawCircle(img, pos, 1, color, 2, 0, 0);
 		box.draw(img, color);
 	}
+	
+	public abstract void fill(IplImage img, CvScalar color);
 
 	public String toJSON() {
 		String corner0 = box.corners[0].toJSON();
