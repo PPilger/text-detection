@@ -7,50 +7,17 @@ import java.util.*;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class DirectionBasedFeatureLinker extends FeatureLinker {
-	private int dilSize;
-	
-	private CvMat[] filters;
-	private int[] filterSums;
-	private double[] angles;
-	
+public class DirectionBasedLinkingRule implements LinkingRule {
 	private HashMap<Feature, double[]> hists;
+	private double minLinkRating;
+	private double minFeatureRating;
 
-	public DirectionBasedFeatureLinker(int size, int dilSize, int numFilters,
-			int width) {
-		this.dilSize = dilSize;
-
-		this.filters = new CvMat[numFilters];
-		this.filterSums = new int[numFilters];
-		this.angles = new double[numFilters];
-
-		for (int i = 0; i < numFilters; i++) {
-			filters[i] = CvMat.create(size, size, CV_32FC1);
-			cvSetZero(filters[i]);
-		}
-
-		double r = size / 2;
-		int c = (int) Math.round(r);
-		for (int i = 0; i < numFilters; i++) {
-			double angle = i / (double) numFilters * Math.PI;
-			double sin = Math.sin(angle);
-			double cos = Math.cos(angle);
-
-			int x = (int) Math.round(cos * r);
-			int y = (int) Math.round(sin * r);
-
-			cvDrawLine(filters[i], cvPoint(c + x, c + y),
-					cvPoint(c - x, c - y), CvScalar.ONE, width, 8, 0);
-			angles[i] = angle;
-		}
-
-		for (int i = 0; i < numFilters; i++) {
-			filterSums[i] = (int) cvSum(filters[i]).blue();
-		}
-	}
-
-	@Override
-	public FeatureSet linkFeatures(List<Feature> features, IplImage img) {
+	public DirectionBasedLinkingRule(List<Feature> features, IplImage img,
+			int filterSize, int dilateSize, int numAngles, int lineWidth,
+			double minLinkRating, double minFeatureRating) {
+		this.minLinkRating = minLinkRating;
+		this.minFeatureRating = minFeatureRating;
+		
 		IplImage input;
 		IplImage direction;
 		IplImage max;
@@ -76,6 +43,36 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 			mask = IplImage.create(width, height, IPL_DEPTH_8U, 1);
 		}
 
+		// create filter kernels
+		CvMat[] filters;
+		{
+			filters = new CvMat[numAngles];
+			for (int i = 0; i < numAngles; i++) {
+				filters[i] = CvMat.create(filterSize, filterSize, CV_32FC1);
+				cvSetZero(filters[i]);
+			}
+
+			double r = filterSize / 2;
+			int c = (int) Math.round(r);
+			for (int i = 0; i < numAngles; i++) {
+				double angle = i / (double) numAngles * Math.PI;
+				double sin = Math.sin(angle);
+				double cos = Math.cos(angle);
+
+				int x = (int) Math.round(cos * r);
+				int y = (int) Math.round(sin * r);
+
+				filters[i] = CvMat.create(filterSize, filterSize, CV_32FC1);
+				cvSetZero(filters[i]);
+
+				cvDrawLine(filters[i], cvPoint(c + x, c + y),
+						cvPoint(c - x, c - y), CvScalar.ONE, lineWidth, 8, 0);
+
+				double sum = cvSum(filters[i]).blue();
+				cvScale(filters[i], filters[i], 1 / sum, 0);
+			}
+		}
+
 		// get the best angle for each pixel
 		// the best angle is the one with the greatest value after filtering
 		// the filters are stored in the array filters
@@ -83,11 +80,11 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 			IplImage filtered = temp32f;
 			for (int i = 0; i < filters.length; i++) {
 				CvMat filter = filters[i];
-				int sum = filterSums[i];
+				// int sum = filterSums[i];
 
 				cvFilter2D(input, filtered, filter, cvPoint(-1, -1));
 
-				cvScale(filtered, filtered, 1.0 / sum, 0);
+				// cvScale(filtered, filtered, 1.0 / sum, 0);
 
 				cvCmp(max, filtered, mask, CV_CMP_LT);
 				cvSet(direction, cvScalarAll(i), mask);
@@ -107,7 +104,7 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 			IplImage maxDil = max.clone();
 			IplImage dil = temp32f;
 
-			DilateProcessor processor = new DilateProcessor(dilSize);
+			DilateProcessor processor = new DilateProcessor(dilateSize);
 
 			cvSetZero(direction);
 			for (int i = 0; i < filters.length; i++) {
@@ -123,25 +120,22 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 				cvMax(maxDil, dil, maxDil);
 			}
 
-			//cvShowImage("max", maxDil);
-			//cvWaitKey();
+			// cvShowImage("max", maxDil);
+			// cvWaitKey();
 		}
 
 		// debug output
-		// outputDirections(img, direction, mask, temp32f);
+		outputDirections(img, direction, mask, temp32f, numAngles);
 
 		hists = new HashMap<Feature, double[]>();
-		int[] hist = new int[filters.length];
-
 		for (Feature feature : features) {
-			CvMat subDirection;
-			CvMat subMask;
-
 			// create a mask of the feature
 			cvSetZero(mask);
 			feature.fill(mask, CvScalar.WHITE);
 
 			// set sub-images of direction and mask
+			CvMat subDirection;
+			CvMat subMask;
 			{
 				Vector2D fmin = feature.box().min();
 				Vector2D fmax = feature.box().max();
@@ -151,7 +145,7 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 				int ymin = (int) Math
 						.min(Math.max(fmin.y, 0), img.height() - 1);
 				int ymax = (int) Math
-						.min(Math.max(fmin.y, 0), img.height() - 1);
+						.min(Math.max(fmax.y, 0), img.height() - 1);
 				int width = xmax - xmin;
 				int height = ymax - ymin;
 
@@ -165,7 +159,7 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 			}
 
 			// set histogram
-			Arrays.fill(hist, 0);
+			double[] hist = new double[filters.length];
 			for (int i = 0; i < subDirection.rows(); i++) {
 				for (int j = 0; j < subDirection.cols(); j++) {
 					if (cvGetReal2D(subMask, i, j) != 0) {
@@ -175,26 +169,24 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 				}
 			}
 
+			// System.out.println(Arrays.toString(hist));
+
 			// calculate sum
-			int sum = 0;
+			double sum = 0;
 			for (int i = 0; i < hist.length; i++) {
 				sum += hist[i];
 			}
 
 			// calculate percentages
-			double[] percentages = new double[hist.length];
 			for (int i = 0; i < hist.length; i++) {
-				percentages[i] = hist[i] / (double) sum;
+				hist[i] = hist[i] / sum;
 			}
 
-			hists.put(feature, percentages);
+			hists.put(feature, hist);
 
-			// System.out.println(Arrays.toString(ownHist));
 			// cvShowImage("mask", mask);
 			// cvWaitKey();
 		}
-
-		return super.linkFeatures(features, img);
 	}
 
 	@Override
@@ -202,26 +194,43 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 		double[] hist0 = hists.get(f0);
 		double[] hist1 = hists.get(f1);
 
-		double bestVal = 0;
-
-		for (int i = 0; i < hist0.length; i++) {
-			double val = Math.min(hist0[i], hist1[i]);
-			if (bestVal < val) {
-				bestVal = val;
+		// revoke links between features that are not in one line
+		{
+			Angle180 angle = new Angle180(f0.position(), f1.position());
+			int i = (int) Math.round(angle.getRadians() * hist0.length / Math.PI);
+			
+			if (i == hist0.length) {
+				i = 0;
+			}
+			
+			double val = Math.max(hist0[i], hist1[i]);
+			if (val < minLinkRating) {
+				return false;
+			}
+		}
+		
+		// revoke links where the features don't have the same direction
+		{
+			double bestVal = 0;
+	
+			for (int i = 0; i < hist0.length; i++) {
+				double val = Math.min(hist0[i], hist1[i]);
+				if (bestVal < val) {
+					bestVal = val;
+				}
+			}
+	
+			if (bestVal < minFeatureRating) {
+				return false;
 			}
 		}
 
-		if (bestVal > 0.2) {
-			
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	private void outputFilteredImages(IplImage img, IplImage direction,
-			IplImage mask, IplImage temp32f) {
-		for (int i = 0; i < filters.length; i++) {
+			IplImage mask, IplImage temp32f, int numAngles) {
+		for (int i = 0; i < numAngles; i++) {
 			cvCmpS(direction, i, mask, CV_CMP_EQ);
 			cvAnd(mask, img, mask, null);
 			cvSetZero(temp32f);
@@ -233,7 +242,7 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 	}
 
 	private void outputDirections(IplImage img, IplImage direction,
-			IplImage mask, IplImage temp32f) {
+			IplImage mask, IplImage temp32f, int numAngles) {
 		IplImage angle = temp32f;
 		int size3 = 11;
 		int border3 = 6;
@@ -242,9 +251,11 @@ public class DirectionBasedFeatureLinker extends FeatureLinker {
 
 		// get angle-map
 		cvSetZero(angle);
-		for (int i = 0; i < angles.length; i++) {
+		for (int i = 0; i < numAngles; i++) {
+			double a = i / (double) numAngles * Math.PI;
+
 			cvCmpS(direction, i, mask, CV_CMP_EQ);
-			cvSet(angle, cvScalarAll(angles[i]), mask);
+			cvSet(angle, cvScalarAll(a), mask);
 		}
 
 		// average angles over the displayed area

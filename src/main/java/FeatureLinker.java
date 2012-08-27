@@ -9,12 +9,35 @@ import java.util.Stack;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public abstract class FeatureLinker {
+public class FeatureLinker {
+	private List<LinkingRuleFactory> factories;
+	private List<LinkingRule> linkingRules;
 
-	public FeatureSet linkFeatures(List<Feature> features, IplImage img) {
+	public FeatureLinker() {
+		this.factories = new ArrayList<LinkingRuleFactory>();
+		this.linkingRules = new ArrayList<LinkingRule>();
+	}
+
+	public FeatureLinker(LinkingRuleFactory... factories) {
+		this.factories = Arrays.asList(factories);
+		this.linkingRules = new ArrayList<LinkingRule>();
+	}
+
+	public void addRuleFactory(LinkingRuleFactory... factories) {
+		for (LinkingRuleFactory l : factories) {
+			this.factories.add(l);
+		}
+	}
+
+	public FeatureSet link(List<Feature> features, IplImage img) {
 		FeatureSet featureSet = new FeatureSet();
 		Map<Feature, List<Feature>> adjacencyList = new HashMap<Feature, List<Feature>>();
 
+		// initialize the linking rules
+		for(LinkingRuleFactory factory : factories) {
+			linkingRules.add(factory.create(features, img));
+		}
+		
 		// initialize the adjacency list
 		for (Feature f : features) {
 			adjacencyList.put(f, new ArrayList<Feature>());
@@ -63,5 +86,13 @@ public abstract class FeatureLinker {
 		return featureSet;
 	}
 
-	public abstract boolean link(Feature f0, Feature f1);
+	private boolean link(Feature f0, Feature f1) {
+		for (LinkingRule l : linkingRules) {
+			if (!l.link(f0, f1)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }
