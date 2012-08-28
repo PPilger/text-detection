@@ -102,11 +102,11 @@ public class TextDetection {
 			//display2.show(image.getColor());
 		}
 
-		FeatureDetector detector = new ContourBasedFeatureDetector(1, 1000000,
+		FeatureDetector detector = new ContourBasedFeatureDetector(15, 1000000,
 				1, 5000);
 		FeatureLinker linker = new FeatureLinker();
-		linker.addRuleFactory(new DirectionBasedLinkingRuleFactory(25, 61, 10, 5, 0.3, 0.3));
 		linker.addRuleFactory(new DistanceBasedLinkingRuleFactory(20));
+		linker.addRuleFactory(new DirectionBasedLinkingRuleFactory(51, 1, 8, 1, 0.3, 0.3));//25,61, 7
 
 		image.setImageDisplay(display, display);
 		image.findText(detector, linker);

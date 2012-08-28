@@ -19,7 +19,7 @@ public class Image {
 	private IplImage rgRatio;
 	private IplImage rbRatio;
 	private IplImage gbRatio;
-	
+
 	private ImageDisplay detectedFeaturesDisplay;
 	private ImageDisplay linkedFeaturesDisplay;
 
@@ -28,10 +28,10 @@ public class Image {
 	}
 
 	public Image(IplImage img) {
-		if(img.nChannels() != 1) {
+		if (img.nChannels() != 1) {
 			this.color = img;
 			this.result = color.clone();
-			
+
 			this.gray = IplImage.create(color.cvSize(), IPL_DEPTH_8U, 1);
 			cvCvtColor(color, gray, CV_BGR2GRAY);
 		} else {
@@ -39,18 +39,18 @@ public class Image {
 			this.result = color.clone();
 			this.gray = color.clone();
 		}
-		
+
 		this.img = gray.clone();
 		this.temp = gray.clone();
 	}
-	
+
 	public void initRGB() {
 		this.red = gray.clone();
 		this.green = gray.clone();
 		this.blue = gray.clone();
 		cvSplit(color, blue, green, red, null);
 	}
-	
+
 	public void initRatios() {
 		this.rgRatio = IplImage.create(gray.cvSize(), IPL_DEPTH_32F, 1);
 		this.rbRatio = cvCloneImage(rgRatio);
@@ -60,7 +60,7 @@ public class Image {
 		cvDiv(red, blue, rbRatio, 1);
 		cvDiv(green, blue, gbRatio, 1);
 	}
-	
+
 	public IplImage getColor() {
 		return color;
 	}
@@ -82,42 +82,42 @@ public class Image {
 	}
 
 	public IplImage getRed() {
-		if(red == null) {
+		if (red == null) {
 			initRGB();
 		}
 		return red;
 	}
 
 	public IplImage getGreen() {
-		if(green == null) {
+		if (green == null) {
 			initRGB();
 		}
 		return green;
 	}
 
 	public IplImage getBlue() {
-		if(blue == null) {
+		if (blue == null) {
 			initRGB();
 		}
 		return blue;
 	}
 
 	public IplImage getRgRatio() {
-		if(rgRatio == null) {
+		if (rgRatio == null) {
 			initRatios();
 		}
 		return rgRatio;
 	}
 
 	public IplImage getRbRatio() {
-		if(rbRatio == null) {
+		if (rbRatio == null) {
 			initRatios();
 		}
 		return rbRatio;
 	}
 
 	public IplImage getGbRatio() {
-		if(gbRatio == null) {
+		if (gbRatio == null) {
 			initRatios();
 		}
 		return gbRatio;
@@ -125,6 +125,22 @@ public class Image {
 
 	public void save(String filename) {
 		cvSaveImage(filename, result);
+	}
+
+	public static CvRect clip(IplImage img, Vector2D min, Vector2D max) {
+		int xmin = Image.clipX(img, min.x);
+		int xmax = Image.clipX(img, max.x);
+		int ymin = Image.clipY(img, min.y);
+		int ymax = Image.clipY(img, max.y);
+		return cvRect(xmin, ymin, xmax - xmin, ymax - ymin);
+	}
+
+	public static int clipX(IplImage img, double x) {
+		return (int) Math.min(Math.max(x, 0), img.width() - 1);
+	}
+
+	public static int clipY(IplImage img, double y) {
+		return (int) Math.min(Math.max(y, 0), img.height() - 1);
 	}
 
 	public void process(ImageProcessor processor) {
@@ -137,8 +153,7 @@ public class Image {
 		this.linkedFeaturesDisplay = linkedFeaturesDisplay;
 	}
 
-	public FeatureSet findText(FeatureDetector detector,
-			FeatureLinker linker) {
+	public FeatureSet findText(FeatureDetector detector, FeatureLinker linker) {
 		// detect features in the image
 		List<Feature> features;
 		{
