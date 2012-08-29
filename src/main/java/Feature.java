@@ -132,13 +132,13 @@ public abstract class Feature implements Comparable<Feature> {
 		return box.distance(other.box);
 	}
 
-	public void draw(IplImage img, CvScalar color) {
+	public void draw(CvArr img, CvScalar color) {
 		CvPoint pos = cvPosition();
 		cvDrawCircle(img, pos, 1, color, 2, 0, 0);
 		box.draw(img, color);
 	}
 	
-	public abstract void fill(IplImage img, CvScalar color);
+	public abstract void fill(CvArr img, CvScalar color);
 
 	public String toJSON() {
 		String corner0 = box.corners[0].toJSON();

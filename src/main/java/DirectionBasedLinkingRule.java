@@ -18,6 +18,14 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 	private IplImage temp8u;
 	private IplImage temp32f;
 
+	private int border;
+	private IplImage bigImg0;
+	private IplImage bigImg1;
+	private IplImage bigImg2;
+	private CvMat subImg0;
+	private CvMat subImg1;
+	private CvMat subImg2;
+
 	IplConvKernel[] strels;
 
 	public DirectionBasedLinkingRule(List<Feature> features, IplImage img,
@@ -35,7 +43,7 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 			int height = img.height();
 
 			this.img = img;
-			
+
 			input = IplImage.create(width, height, IPL_DEPTH_32F, 1);
 			cvSet(input, CvScalar.ONE);
 			cvMul(input, img, input, 1 / 255.0);
@@ -49,6 +57,23 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 			temp8u = IplImage.create(width, height, IPL_DEPTH_8U, 1);
 			temp32f = IplImage.create(width, height, IPL_DEPTH_32F, 1);
 			mask = IplImage.create(width, height, IPL_DEPTH_8U, 1);
+
+			CvRect rect = cvRect(filterSize / 2 + 1, filterSize / 2 + 1, width,
+					height);
+
+			border = filterSize / 2 + 2;
+			width = width + 2 * border;
+			height = height + 2 * border;
+			bigImg0 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
+			bigImg1 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
+			bigImg2 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
+			subImg0 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
+			subImg1 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
+			subImg2 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
+
+			cvGetSubRect(bigImg0, subImg0, rect);
+			cvGetSubRect(bigImg1, subImg1, rect);
+			cvGetSubRect(bigImg2, subImg2, rect);
 		}
 
 		// create filter kernels
@@ -56,11 +81,6 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 		{
 			filters = new CvMat[numAngles];
 			strels = new IplConvKernel[numAngles];
-
-			for (int i = 0; i < numAngles; i++) {
-				filters[i] = CvMat.create(filterSize, filterSize, CV_32FC1);
-				cvSetZero(filters[i]);
-			}
 
 			double r = filterSize / 2;
 			int c = (int) Math.round(r);
@@ -72,11 +92,12 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 				int x = (int) Math.round(cos * r);
 				int y = (int) Math.round(sin * r);
 
-				filters[i] = CvMat.create(filterSize, filterSize, CV_32FC1);
+				filters[i] = CvMat.create(filterSize, filterSize,
+						CV_32FC1);
 				cvSetZero(filters[i]);
 
-				cvDrawLine(filters[i], cvPoint(c + x, c + y),
-						cvPoint(c - x, c - y), CvScalar.ONE, lineWidth, 8, 0);
+				cvDrawLine(filters[i], cvPoint(c - x, c - y), cvPoint(c + x, c + y),
+						CvScalar.ONE, lineWidth, 8, 0);
 
 				double sum = cvSum(filters[i]).blue();
 				cvScale(filters[i], filters[i], 1 / sum, 0);
@@ -95,21 +116,18 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 		// the filters are stored in the array filters
 		{
 			IplImage filtered = temp32f;
-			for (int i = 0; i < filters.length; i++) {
+			for (int i = 0; i < numAngles; i++) {
 				CvMat filter = filters[i];
-				// int sum = filterSums[i];
 
 				cvFilter2D(input, filtered, filter, cvPoint(-1, -1));
-
-				// cvScale(filtered, filtered, 1.0 / sum, 0);
 
 				cvCmp(max, filtered, mask, CV_CMP_LT);
 				cvSet(direction, cvScalarAll(i), mask);
 				cvMax(max, filtered, max);
 			}
 
-			// cvShowImage("max", max);
-			// cvWaitKey();
+			//cvShowImage("max", max);
+			//cvWaitKey();
 		}
 
 		// debug output
@@ -124,13 +142,14 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 			DilateProcessor processor = new DilateProcessor(dilateSize);
 
 			cvSetZero(direction);
-			for (int i = 0; i < filters.length; i++) {
+			for (int i = 0; i < numAngles; i++) {
 				cvCmpS(temp, i, mask, CV_CMP_EQ);
 				cvSetZero(dil);
 				cvSet(dil, CvScalar.ONE, mask);
 				cvMul(max, dil, dil, 1);
 
 				processor.process(dil, null);
+				// cvDilate(dil, dil, strels[i], 1);
 
 				cvCmp(maxDil, dil, mask, CV_CMP_LE);
 				cvSet(direction, cvScalarAll(i), mask);
@@ -176,10 +195,9 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 			}
 
 			// set histogram
-			Histogram hist = new Histogram(subDirection, subMask,
-					filters.length);
+			Histogram hist = new Histogram(subDirection, subMask, numAngles);
 			/*
-			 * double[] hist = new double[filters.length]; for (int i = 0; i <
+			 * double[] hist = new double[numAngles]; for (int i = 0; i <
 			 * subDirection.rows(); i++) { for (int j = 0; j <
 			 * subDirection.cols(); j++) { if (cvGetReal2D(subMask, i, j) != 0)
 			 * { int val = (int) cvGetReal2D(subDirection, i, j); hist[val]++; }
@@ -248,32 +266,71 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 			if (bestVal < minFeatureRating) {
 				return false;
 			}
+
+			/*
+			 * int max0 = hist0.max(); int max1 = hist1.max();
+			 * 
+			 * int diff = max0 - max1; diff = diff < hist0.size()/2 ? diff :
+			 * hist0.size() - diff;
+			 * 
+			 * if(diff > 1) { return false; }
+			 * 
+			 * double val0 = hist0.get(max0); double val1 = hist1.get(max1);
+			 * 
+			 * if(val0 >= val1){ idx = max0; } else { idx = max1; } angle = idx
+			 * * Math.PI / hist0.size();
+			 */
 		}
 
 		//
 		{
 			LinkedFeature lf = LinkedFeature.create(Arrays.asList(f0, f1));
-			CvRect rect = Image.clip(direction, lf.box().min(), lf.box().max());
-			int width = rect.width();
-			int height = rect.height();
 
-			CvMat imgSub = cvCreateMatHeader(width, height, CV_8UC1);
-			CvMat dirSub = cvCreateMatHeader(width, height, CV_8UC1);
-			CvMat maskSub = cvCreateMatHeader(width, height, CV_8UC1);
-			CvMat tempSub = cvCreateMatHeader(width, height, CV_8UC1);
-			cvGetSubRect(img, imgSub, rect);
-			cvGetSubRect(direction, dirSub, rect);
-			cvGetSubRect(mask, maskSub, rect);
-			cvGetSubRect(temp8u, tempSub, rect);
+			cvSetZero(bigImg0);
+			f0.fill(subImg0, CvScalar.WHITE);
+
+			cvSetZero(bigImg1);
+			f1.fill(subImg1, CvScalar.WHITE);
+
+			cvCmpS(direction, idx, temp8u, CV_CMP_EQ);
+			cvAnd(subImg0, temp8u, subImg0, null);
+			cvAnd(subImg1, temp8u, subImg1, null);
+
+			CvRect rectS;
+			CvRect rectB;
+			{
+				Vector2D min = lf.box().min();
+				Vector2D max = lf.box().max();
+				rectS = Image.clip(img, min, max);
+
+				int x = (int) Math.round(min.x);
+				int y = (int) Math.round(min.y);
+				rectB = cvRect(x, y, rectS.width() + 2 * border, rectS.height()
+						+ 2 * border);
+			}
+
+			cvSetImageROI(bigImg0, rectB);
+			cvSetImageROI(bigImg1, rectB);
+			cvSetImageROI(bigImg2, rectB);
 
 			IplConvKernel strel = strels[idx];
-			cvMorphologyEx(imgSub, maskSub, tempSub, strel, CV_MOP_BLACKHAT, 1);
+			cvMorphologyEx(bigImg0, bigImg0, bigImg2, strel, CV_MOP_CLOSE, 1);
+			cvMorphologyEx(bigImg1, bigImg1, bigImg2, strel, CV_MOP_CLOSE, 1);
 
-			
-			/*cvSet(maskSub, CvScalar.WHITE, maskSub);
-			cvShowImage("img", imgSub);
-			cvShowImage("mask", maskSub);
-			cvWaitKey();*/
+			cvOr(bigImg0, bigImg1, bigImg0, null);
+
+			cvMorphologyEx(bigImg0, bigImg0, bigImg2, strel, CV_MOP_BLACKHAT, 1);
+
+			cvResetImageROI(bigImg0);
+			cvResetImageROI(bigImg1);
+			cvResetImageROI(bigImg2);
+
+			CvMat dirSub = cvCreateMatHeader(rectS.width(), rectS.height(),
+					CV_8UC1);
+			CvMat maskSub = cvCreateMatHeader(rectS.width(), rectS.height(),
+					CV_8UC1);
+			cvGetSubRect(direction, dirSub, rectS);
+			cvGetSubRect(subImg0, maskSub, rectS);
 
 			Histogram hist = new Histogram(dirSub, maskSub, hist0.size());
 			int max = hist.max();

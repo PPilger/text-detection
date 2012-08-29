@@ -8,7 +8,7 @@ import com.googlecode.javacpp.PointerPointer;
 
 public class LinkedFeature extends Feature {
 	private static CvMemStorage mem = cvCreateMemStorage(0);
-	private static List<Feature> subFeatures;
+	private List<Feature> subFeatures;
 
 	public static LinkedFeature create(List<Feature> subFeatures) {
 		int[] coords = new int[8 * subFeatures.size()];
@@ -44,7 +44,7 @@ public class LinkedFeature extends Feature {
 		this.subFeatures = subFeatures;
 	}
 	
-	public void fill(IplImage img, CvScalar color) {
+	public void fill(CvArr img, CvScalar color) {
 		for(Feature f : subFeatures) {
 			f.fill(img, color);
 		}

@@ -136,11 +136,11 @@ public class Image {
 	}
 
 	public static int clipX(IplImage img, double x) {
-		return (int) Math.min(Math.max(x, 0), img.width() - 1);
+		return (int) Math.round(Math.min(Math.max(x, 0), img.width() - 1));
 	}
 
 	public static int clipY(IplImage img, double y) {
-		return (int) Math.min(Math.max(y, 0), img.height() - 1);
+		return (int) Math.round(Math.min(Math.max(y, 0), img.height() - 1));
 	}
 
 	public void process(ImageProcessor processor) {

@@ -69,13 +69,13 @@ public class ContourFeature extends Feature {
 	}*/
 
 	@Override
-	public void draw(IplImage img, CvScalar color) {
+	public void draw(CvArr img, CvScalar color) {
 		cvDrawContours(img, contour, color, color, -1, 1, 0);
 		cvDrawCircle(img, cvPosition(), 1, color, 2, 0, 0);
 	}
 
 	@Override
-	public void fill(IplImage img, CvScalar color) {
+	public void fill(CvArr img, CvScalar color) {
 		cvDrawContours(img, contour, color, color, -1, -1, 0);
 	}
 }

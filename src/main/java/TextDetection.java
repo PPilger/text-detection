@@ -11,9 +11,34 @@ public class TextDetection {
 	 */
 	public static void main(String[] args) throws InterruptedException {
 		//britishIsles();
-		portolanAtlas();
+		//portolanAtlas();
+		mooskirchen();
 	}
 	
+	public static void mooskirchen() {
+		Image image = new Image("samples" + File.separator + "British Isles.png");
+
+		image.process(new ThresholdProcessor(207));
+		image.process(new InvertProcessor());
+		image.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
+		image.process(new ThicknessProcessor(1, 5));
+		image.process(new RemoveLinesProcessor(60));
+		image.process(new DilateProcessor(3));
+		image.process(new CloseProcessor(3));
+
+		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
+				100, 5000);
+		FeatureLinker linker = new FeatureLinker();
+		linker.addRuleFactory(new AreaBasedLinkingRuleFactory(1000));
+
+		//ImageDisplay display = new ImageDisplay("output", 1200, 800);
+		//image.setImageDisplay(display, display);
+
+		FeatureSet features = image.findText(detector, linker);
+		
+		features.save("Features.js");
+		image.save("British Isles.png");
+	}
 
 	public static void portolanAtlas() {
 		Image image = new Image("samples" + File.separator
@@ -106,9 +131,9 @@ public class TextDetection {
 				1, 5000);
 		FeatureLinker linker = new FeatureLinker();
 		linker.addRuleFactory(new DistanceBasedLinkingRuleFactory(20));
-		linker.addRuleFactory(new DirectionBasedLinkingRuleFactory(51, 1, 8, 1, 0.3, 0.3));//25,61, 7
+		linker.addRuleFactory(new DirectionBasedLinkingRuleFactory(51, 1, 8, 1, 0.3, 0.3));//51
 
-		image.setImageDisplay(display, display);
+		image.setImageDisplay(null, display);
 		image.findText(detector, linker);
 		image.save("Portolan Atlas.jpg");
 	}

@@ -196,7 +196,7 @@ public class Box2D {
 		return distance;
 	}
 
-	public void draw(IplImage img, CvScalar color) {
+	public void draw(CvArr img, CvScalar color) {
 		CvPoint pp0 = cvPoint((int) corners[0].x, (int) corners[0].y);
 		CvPoint pp1 = cvPoint((int) corners[1].x, (int) corners[1].y);
 		CvPoint pp2 = cvPoint((int) corners[2].x, (int) corners[2].y);
