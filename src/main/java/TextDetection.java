@@ -1,3 +1,28 @@
+import feature.AreaBasedLinkingRule;
+import feature.ContourBasedFeatureDetector;
+import feature.DirectionBasedLinkingRule;
+import feature.DistanceBasedLinkingRule;
+import feature.FeatureDetector;
+import feature.FeatureLinker;
+import feature.FeatureSet;
+import image.BigObjectEraseProcessor;
+import image.CloseProcessor;
+import image.ColorEraseProcessor;
+import image.DilateProcessor;
+import image.EraseProcessor;
+import image.FirstDerivateEraseProcessor;
+import image.Image;
+import image.ImageDisplay;
+import image.InvertProcessor;
+import image.LineSegmentsProcessor;
+import image.ObstacleRemoveProcessor;
+import image.RemoveLinesProcessor;
+import image.SecondDerivateEraseProcessor;
+import image.SmallObjectErasorProcessor;
+import image.ThicknessProcessor;
+import image.ThresholdProcessor;
+import image.VarianceProcessor;
+
 import java.io.File;
 import java.util.List;
 
