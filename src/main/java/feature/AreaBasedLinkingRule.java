@@ -1,17 +1,19 @@
 package feature;
 import java.util.*;
 
-public class AreaBasedLinkingRule extends LinkingRule {
-	private double maxAreaGrowth;
+import math.Interval;
 
-	public AreaBasedLinkingRule(double maxAreaGrowth) {
-		this.maxAreaGrowth = maxAreaGrowth;
+public class AreaBasedLinkingRule extends LinkingRule {
+	private Interval<Double> areaGrowth;
+
+	public AreaBasedLinkingRule(Interval<Double> areaGrowth) {
+		this.areaGrowth = areaGrowth;
 	}
 
 	@Override
 	public boolean link(Feature f0, Feature f1) {
 		LinkedFeature lf = LinkedFeature.create(Arrays.asList(f0, f1));
-		double areaGrowth = lf.area()-f0.area()-f1.area();
-		return areaGrowth < maxAreaGrowth;
+		double growth = lf.area()-f0.area()-f1.area();
+		return areaGrowth.isValid(growth);
 	}
 }

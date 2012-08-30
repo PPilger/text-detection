@@ -10,7 +10,6 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class Image {
 	private IplImage color;
-	private IplImage result;
 	private IplImage gray;
 	private IplImage img;
 	private IplImage temp;
@@ -28,13 +27,10 @@ public class Image {
 	public Image(IplImage img) {
 		if (img.nChannels() != 1) {
 			this.color = img;
-			this.result = color.clone();
-
 			this.gray = IplImage.create(color.cvSize(), IPL_DEPTH_8U, 1);
 			cvCvtColor(color, gray, CV_BGR2GRAY);
 		} else {
 			this.color = img;
-			this.result = color.clone();
 			this.gray = color.clone();
 		}
 
@@ -62,11 +58,7 @@ public class Image {
 	public IplImage getColor() {
 		return color;
 	}
-
-	public IplImage getResult() {
-		return result;
-	}
-
+	
 	public IplImage getGray() {
 		return gray;
 	}
@@ -120,9 +112,9 @@ public class Image {
 		}
 		return gbRatio;
 	}
-
-	public void save(String filename) {
-		cvSaveImage(filename, result);
+	
+	public static void write(IplImage img, String filename) {
+		cvSaveImage(filename, img);
 	}
 
 	public static CvRect clip(IplImage img, Vector2D min, Vector2D max) {

@@ -23,7 +23,7 @@ public class FeatureSet extends ArrayList<Feature> {
 		}
 	}
 
-	public void save(String filename) {
+	public void write(String filename) {
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(filename));

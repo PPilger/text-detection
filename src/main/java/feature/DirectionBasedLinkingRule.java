@@ -8,6 +8,8 @@ import image.Image;
 
 import java.util.*;
 
+import math.Interval;
+import math.Line2D;
 import math.Vector2D;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
@@ -18,8 +20,7 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 	private int dilateSize;
 	private int numAngles;
 	private int lineWidth;
-	private double minLinkRating;
-	private double minFeatureRating;
+	private Interval<Double> featureRating;
 
 	private HashMap<Feature, Histogram> hists;
 	
@@ -40,13 +41,12 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 	IplConvKernel[] strels;
 
 	public DirectionBasedLinkingRule(int filterSize, int dilateSize, int numAngles, int lineWidth,
-			double minLinkRating, double minFeatureRating) {
+			Interval<Double> featureRating) {
 		this.filterSize = filterSize;
 		this.dilateSize = dilateSize;
 		this.numAngles = numAngles;
 		this.lineWidth = lineWidth;
-		this.minLinkRating = minLinkRating;
-		this.minFeatureRating = minFeatureRating;
+		this.featureRating = featureRating;
 	}
 	
 
@@ -123,7 +123,7 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 
 				// create strel for linking
 				int[] temp = new int[filterSize * filterSize];
-				drawLine(temp, filterSize, c - x, c - y, c + x, c + y);
+				Line2D.draw(temp, filterSize, c - x, c - y, c + x, c + y);
 				strels[i] = cvCreateStructuringElementEx(filterSize,
 						filterSize, filterSize / 2, filterSize / 2,
 						CV_SHAPE_CUSTOM, temp);
@@ -268,7 +268,7 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 				}
 			}
 
-			if (bestVal < minFeatureRating) {
+			if (!featureRating.isValid(bestVal)) {
 				return false;
 			}
 
@@ -345,32 +345,6 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 		}
 
 		return true;
-	}
-
-	private void drawLine(int[] img, int width, int x0, int y0, int x1, int y1) {
-		int dx = Math.abs(x1 - x0);
-		int dy = Math.abs(y1 - y0);
-		int sx;
-		int sy;
-
-		sx = x0 < x1 ? 1 : -1;
-		sy = y0 < y1 ? 1 : -1;
-
-		int err = dx - dy;
-
-		img[y0 * width + x0] = 1;
-		while (x0 != x1 || y0 != y1) {
-			int e2 = 2 * err;
-			if (e2 > -dy) {
-				err = err - dy;
-				x0 = x0 + sx;
-			}
-			if (e2 < dx) {
-				err = err + dx;
-				y0 = y0 + sy;
-			}
-			img[y0 * width + x0] = 1;
-		}
 	}
 
 	private void outputDirections(IplImage img, IplImage direction,

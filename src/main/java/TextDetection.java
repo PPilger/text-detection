@@ -5,6 +5,7 @@ import feature.DistanceBasedLinkingRule;
 import feature.FeatureDetector;
 import feature.FeatureLinker;
 import feature.FeatureSet;
+import feature.FixedDirectionLinkingRule;
 import image.BigObjectEraseProcessor;
 import image.CloseProcessor;
 import image.ColorEraseProcessor;
@@ -13,6 +14,7 @@ import image.EraseProcessor;
 import image.FirstDerivateEraseProcessor;
 import image.Image;
 import image.ImageDisplay;
+import image.ImageWriter;
 import image.InvertProcessor;
 import image.LineSegmentsProcessor;
 import image.ObstacleRemoveProcessor;
@@ -26,6 +28,10 @@ import image.VarianceProcessor;
 import java.io.File;
 import java.util.List;
 
+import math.Interval;
+import math.Maximum;
+import math.Minimum;
+
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 
 import static com.googlecode.javacv.cpp.opencv_photo.*;
@@ -37,8 +43,8 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		//britishIsles();
-		//portolanAtlas();
+		// britishIsles();
+		// portolanAtlas();
 		mooskirchen();
 	}
 
@@ -66,23 +72,26 @@ public class TextDetection {
 			features = detector.findFeatures(image.getImg());
 			System.out.println("number of features detected: "
 					+ features.size());
-			features.draw(image.getResult(), CvScalar.BLACK);
-			display.show(image.getResult());
+			features.draw(image.getColor(), CvScalar.BLACK);
+			display.show(image.getColor());
 		}
 
 		{
 			FeatureLinker linker = new FeatureLinker();
-			linker.addRule(new AreaBasedLinkingRule(500));
-
+			linker.addRule(new DistanceBasedLinkingRule(
+					new Maximum<Double>(61.)));
+			linker.addRule(new FixedDirectionLinkingRule(new Maximum<Integer>(
+					61), 0, new Maximum<Integer>(1000), new Minimum<Integer>(10)));
+			
 			features = linker.link(features, image.getImg());
 			System.out.println("number of features after linking: "
 					+ features.size());
-			features.draw(image.getResult(), CvScalar.GREEN);
+			features.draw(image.getColor(), CvScalar.GREEN);
 		}
-		display.show(image.getResult());
+		display.show(image.getColor());
 
-		features.save("Mooskirchen Features.js");
-		image.save("Mooskirchen.png");
+		features.write("Mooskirchen Features.js");
+		Image.write(image.getColor(), "Mooskirchen.png");
 	}
 
 	public static void portolanAtlas() {
@@ -173,25 +182,25 @@ public class TextDetection {
 		FeatureDetector detector = new ContourBasedFeatureDetector(15, 1000000,
 				1, 5000);
 		FeatureLinker linker = new FeatureLinker();
-		linker.addRule(new DistanceBasedLinkingRule(20));
+		linker.addRule(new DistanceBasedLinkingRule(new Maximum<Double>(20.)));
 		linker.addRule(new DirectionBasedLinkingRule(51, 1, 8, 1,
-				0.3, 0.3));// 51
+				new Minimum<Double>(.3)));// 51
 
 		FeatureSet features;
 
 		features = detector.findFeatures(image.getImg());
 		System.out.println("number of features detected: " + features.size());
-		features.draw(image.getResult(), CvScalar.BLACK);
-		display.show(image.getResult());
+		features.draw(image.getColor(), CvScalar.BLACK);
+		display.show(image.getColor());
 
 		features = linker.link(features, image.getImg());
 		System.out.println("number of features after linking: "
 				+ features.size());
-		features.draw(image.getResult(), CvScalar.GREEN);
-		display.show(image.getResult());
+		features.draw(image.getColor(), CvScalar.GREEN);
+		display.show(image.getColor());
 
-		features.save("Portolan Atlas Features.js");
-		image.save("Portolan Atlas.jpg");
+		features.write("Portolan Atlas Features.js");
+		Image.write(image.getColor(), "Portolan Atlas.jpg");
 	}
 
 	public static void britishIsles() {
@@ -209,23 +218,23 @@ public class TextDetection {
 		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
 				100, 5000);
 		FeatureLinker linker = new FeatureLinker();
-		linker.addRule(new AreaBasedLinkingRule(1000));
+		linker.addRule(new AreaBasedLinkingRule(new Maximum<Double>(1000.)));
 
 		FeatureSet features;
 
 		features = detector.findFeatures(image.getImg());
 		System.out.println("number of features detected: " + features.size());
-		features.draw(image.getResult(), CvScalar.BLACK);
+		features.draw(image.getColor(), CvScalar.BLACK);
 
 		features = linker.link(features, image.getImg());
 		System.out.println("number of features after linking: "
 				+ features.size());
-		features.draw(image.getResult(), CvScalar.GREEN);
+		features.draw(image.getColor(), CvScalar.GREEN);
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
-		display.show(image.getResult());
+		display.show(image.getColor());
 
-		features.save("British Isles Features.js");
-		image.save("British Isles.png");
+		features.write("British Isles Features.js");
+		Image.write(image.getColor(), "British Isles.png");
 	}
 }
