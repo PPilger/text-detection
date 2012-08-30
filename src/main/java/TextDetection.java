@@ -16,28 +16,35 @@ public class TextDetection {
 	}
 	
 	public static void mooskirchen() {
-		Image image = new Image("samples" + File.separator + "British Isles.png");
+		Image image = new Image("samples" + File.separator + "Mooskirchen_Grazer_Feld_S.jpg");
 
-		image.process(new ThresholdProcessor(207));
+		ImageDisplay display = new ImageDisplay("output", 1200, 800);
+		ImageDisplay display2 = new ImageDisplay("output2", 1200, 800);
+		ImageDisplay display3 = new ImageDisplay("output3", 1200, 800);
+
+		image.process(new ThresholdProcessor(75));//75
 		image.process(new InvertProcessor());
-		image.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
-		image.process(new ThicknessProcessor(1, 5));
-		image.process(new RemoveLinesProcessor(60));
+		display.show(image.getImg());
+		image.process(new SmallObjectErasorProcessor(35));
+		image.process(new ThicknessProcessor(2, 100));
 		image.process(new DilateProcessor(3));
-		image.process(new CloseProcessor(3));
+		//image.process(new SmallObjectErasorProcessor(35));
+		display.show(image.getImg());
+		//image.process(new DilateProcessor(3));
+		//image.process(new CloseProcessor(3));
 
-		FeatureDetector detector = new ContourBasedFeatureDetector(20, 1000000,
+		FeatureDetector detector = new ContourBasedFeatureDetector(35, 1000000,
 				100, 5000);
 		FeatureLinker linker = new FeatureLinker();
-		linker.addRuleFactory(new AreaBasedLinkingRuleFactory(1000));
+		linker.addRuleFactory(new AreaBasedLinkingRuleFactory(500));
 
-		//ImageDisplay display = new ImageDisplay("output", 1200, 800);
-		//image.setImageDisplay(display, display);
+		
+		image.setImageDisplay(display2, display3);
 
 		FeatureSet features = image.findText(detector, linker);
-		
-		features.save("Features.js");
-		image.save("British Isles.png");
+
+		features.save("Mooskirchen Features.js");
+		image.save("Mooskirchen.png");
 	}
 
 	public static void portolanAtlas() {
@@ -134,7 +141,10 @@ public class TextDetection {
 		linker.addRuleFactory(new DirectionBasedLinkingRuleFactory(51, 1, 8, 1, 0.3, 0.3));//51
 
 		image.setImageDisplay(null, display);
-		image.findText(detector, linker);
+		
+		FeatureSet features = image.findText(detector, linker);
+		
+		features.save("Portolan Atlas Features.js");
 		image.save("Portolan Atlas.jpg");
 	}
 
@@ -159,7 +169,7 @@ public class TextDetection {
 
 		FeatureSet features = image.findText(detector, linker);
 		
-		features.save("Features.js");
+		features.save("British Isles Features.js");
 		image.save("British Isles.png");
 	}
 }
