@@ -50,7 +50,7 @@ public class TextDetection {
 
 	public static void mooskirchen() {
 		Image image = new Image("samples" + File.separator
-				+ "Mooskirchen_Grazer_Feld_S.jpg");
+				+ "Mooskirchen_Grazer_Feld.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 		ImageDisplay display2 = new ImageDisplay("output2", 1200, 800);
@@ -91,7 +91,7 @@ public class TextDetection {
 		display.show(image.getColor());
 
 		features.write("Mooskirchen Features.js");
-		Image.write(image.getColor(), "Mooskirchen.png");
+		Image.write(image.getColor(), "Mooskirchen.jpg");
 	}
 
 	public static void portolanAtlas() {
