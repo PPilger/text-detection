@@ -1,39 +1,23 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class FeatureSet implements Iterable<Feature> {
-	private List<Feature> features;
-
+public class FeatureSet extends ArrayList<Feature> {
 	public FeatureSet() {
-		features = new ArrayList<Feature>();
 	}
 	
-	public FeatureSet(List<Feature> features) {
-		this.features = features;
-	}
-
-	public void add(Feature f) {
-		features.add(f);
-	}
-	
-	public Feature get(int index) {
-		return features.get(index);
-	}
-
-	public int size() {
-		return features.size();
+	public FeatureSet(Collection<? extends Feature> features) {
+		super(features);
 	}
 
 	public void draw(IplImage img, CvScalar color) {
-		for (Feature f : features) {
+		for (Feature f : this) {
 			f.draw(img, color);
 		}
 	}
@@ -45,7 +29,7 @@ public class FeatureSet implements Iterable<Feature> {
 
 			writer.write('[');
 
-			Iterator<Feature> iter = features.iterator();
+			Iterator<Feature> iter = iterator();
 			if (iter.hasNext()) {
 				writer.write(iter.next().toJSON());
 				while (iter.hasNext()) {
@@ -67,10 +51,5 @@ public class FeatureSet implements Iterable<Feature> {
 				}
 			}
 		}
-	}
-
-	@Override
-	public Iterator<Feature> iterator() {
-		return features.iterator();
 	}
 }
