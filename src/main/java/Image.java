@@ -3,8 +3,6 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
-import java.util.*;
-
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class Image {
@@ -19,9 +17,6 @@ public class Image {
 	private IplImage rgRatio;
 	private IplImage rbRatio;
 	private IplImage gbRatio;
-
-	private ImageDisplay detectedFeaturesDisplay;
-	private ImageDisplay linkedFeaturesDisplay;
 
 	public Image(String filename) {
 		this(cvLoadImage(filename));
@@ -145,48 +140,5 @@ public class Image {
 
 	public void process(ImageProcessor processor) {
 		processor.process(this);
-	}
-
-	public void setImageDisplay(ImageDisplay detectedFeaturesDisplay,
-			ImageDisplay linkedFeaturesDisplay) {
-		this.detectedFeaturesDisplay = detectedFeaturesDisplay;
-		this.linkedFeaturesDisplay = linkedFeaturesDisplay;
-	}
-
-	public FeatureSet findText(FeatureDetector detector, FeatureLinker linker) {
-		// detect features in the image
-		List<Feature> features;
-		{
-			features = detector.findFeatures(img);
-
-			System.out.println("number of features detected: "
-					+ features.size());
-
-			for (Feature f : features) {
-				f.draw(result, CvScalar.BLACK);
-				f.box().draw(result, CvScalar.BLACK);
-			}
-
-			if (detectedFeaturesDisplay != null) {
-				detectedFeaturesDisplay.show(result);
-			}
-		}
-
-		// link features together
-		FeatureSet featureSet;
-		{
-			featureSet = linker.link(features, img);
-
-			System.out.println("number of features after linking: "
-					+ featureSet.size());
-
-			featureSet.draw(result, CvScalar.GREEN);
-
-			if (linkedFeaturesDisplay != null) {
-				linkedFeaturesDisplay.show(result);
-			}
-		}
-
-		return featureSet;
 	}
 }

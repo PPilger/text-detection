@@ -1,17 +1,22 @@
 import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvSaveImage;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvShowImage;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvWaitKey;
+import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
 import java.util.*;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class DirectionBasedLinkingRule implements LinkingRule {
-	private HashMap<Feature, Histogram> hists;
+public class DirectionBasedLinkingRule extends LinkingRule {
+	// parameters
+	private int filterSize;
+	private int dilateSize;
+	private int numAngles;
+	private int lineWidth;
 	private double minLinkRating;
 	private double minFeatureRating;
+
+	private HashMap<Feature, Histogram> hists;
+	
 	private IplImage img;
 	private IplImage direction;
 	private IplImage mask;
@@ -28,12 +33,20 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 
 	IplConvKernel[] strels;
 
-	public DirectionBasedLinkingRule(List<Feature> features, IplImage img,
-			int filterSize, int dilateSize, int numAngles, int lineWidth,
+	public DirectionBasedLinkingRule(int filterSize, int dilateSize, int numAngles, int lineWidth,
 			double minLinkRating, double minFeatureRating) {
+		this.filterSize = filterSize;
+		this.dilateSize = dilateSize;
+		this.numAngles = numAngles;
+		this.lineWidth = lineWidth;
 		this.minLinkRating = minLinkRating;
 		this.minFeatureRating = minFeatureRating;
+	}
+	
 
+
+	@Override
+	public void initialize(FeatureSet features, IplImage img) {
 		IplImage input;
 		IplImage max;
 
@@ -130,9 +143,6 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 			//cvWaitKey();
 		}
 
-		// debug output
-		// outputFilteredImages(img, direction, mask, temp32f);
-
 		// Dilate angles to privilege better angles
 		{
 			IplImage temp = direction.clone();
@@ -224,7 +234,7 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 		Histogram hist0 = hists.get(f0);
 		Histogram hist1 = hists.get(f1);
 
-		double angle = 0;
+		//double angle = 0;
 		int idx = 0;
 
 		{
@@ -238,19 +248,8 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 				}
 			}
 
-			angle = idx * Math.PI / hist0.size();
+			//angle = idx * Math.PI / hist0.size();
 		}
-
-		/*
-		 * // revoke links between features that are not in one line { Angle180
-		 * angle = new Angle180(f0.position(), f1.position()); int i = (int)
-		 * Math.round(angle.getRadians() * hist0.length / Math.PI);
-		 * 
-		 * if (i == hist0.length) { i = 0; }
-		 * 
-		 * double val = Math.max(hist0[i], hist1[i]); if (val < minLinkRating) {
-		 * return false; } }
-		 */
 
 		// revoke links where the features don't have the same direction
 		{
@@ -365,19 +364,6 @@ public class DirectionBasedLinkingRule implements LinkingRule {
 				y0 = y0 + sy;
 			}
 			img[y0 * width + x0] = 1;
-		}
-	}
-
-	private void outputFilteredImages(IplImage img, IplImage direction,
-			IplImage mask, IplImage temp32f, int numAngles) {
-		for (int i = 0; i < numAngles; i++) {
-			cvCmpS(direction, i, mask, CV_CMP_EQ);
-			cvAnd(mask, img, mask, null);
-			cvSetZero(temp32f);
-			cvSet(temp32f, CvScalar.ONE, mask);
-
-			cvShowImage("map", temp32f);
-			cvWaitKey();
 		}
 	}
 

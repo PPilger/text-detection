@@ -15,9 +15,17 @@ public class FeatureSet implements Iterable<Feature> {
 	public FeatureSet() {
 		features = new ArrayList<Feature>();
 	}
+	
+	public FeatureSet(List<Feature> features) {
+		this.features = features;
+	}
 
 	public void add(Feature f) {
 		features.add(f);
+	}
+	
+	public Feature get(int index) {
+		return features.get(index);
 	}
 
 	public int size() {

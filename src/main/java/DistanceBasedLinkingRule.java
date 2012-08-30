@@ -1,4 +1,4 @@
-public class DistanceBasedLinkingRule implements LinkingRule {
+public class DistanceBasedLinkingRule extends LinkingRule {
 	private double maxDistance;
 
 	public DistanceBasedLinkingRule(double maxDistance) {

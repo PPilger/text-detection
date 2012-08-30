@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class AreaBasedLinkingRule implements LinkingRule {
+public class AreaBasedLinkingRule extends LinkingRule {
 	private double maxAreaGrowth;
 
 	public AreaBasedLinkingRule(double maxAreaGrowth) {

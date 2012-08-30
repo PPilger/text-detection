@@ -10,32 +10,29 @@ import java.util.Stack;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class FeatureLinker {
-	private List<LinkingRuleFactory> factories;
 	private List<LinkingRule> linkingRules;
 
 	public FeatureLinker() {
-		this.factories = new ArrayList<LinkingRuleFactory>();
 		this.linkingRules = new ArrayList<LinkingRule>();
 	}
 
-	public FeatureLinker(LinkingRuleFactory... factories) {
-		this.factories = Arrays.asList(factories);
-		this.linkingRules = new ArrayList<LinkingRule>();
+	public FeatureLinker(LinkingRule... linkingRules) {
+		this.linkingRules = Arrays.asList(linkingRules);
 	}
 
-	public void addRuleFactory(LinkingRuleFactory... factories) {
-		for (LinkingRuleFactory l : factories) {
-			this.factories.add(l);
+	public void addRule(LinkingRule... linkingRules) {
+		for (LinkingRule l : linkingRules) {
+			this.linkingRules.add(l);
 		}
 	}
 
-	public FeatureSet link(List<Feature> features, IplImage img) {
+	public FeatureSet link(FeatureSet features, IplImage img) {
 		FeatureSet featureSet = new FeatureSet();
 		Map<Feature, List<Feature>> adjacencyList = new HashMap<Feature, List<Feature>>();
 
 		// initialize the linking rules
-		for(LinkingRuleFactory factory : factories) {
-			linkingRules.add(factory.create(features, img));
+		for(LinkingRule linkingRule : linkingRules) {
+			linkingRule.initialize(features, img);
 		}
 		
 		// initialize the adjacency list

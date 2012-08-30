@@ -23,7 +23,7 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 	}
 
 	@Override
-	public List<Feature> findFeatures(IplImage img) {
+	public FeatureSet findFeatures(IplImage img) {
 		List<ContourFeature> contourFeatures = new ArrayList<ContourFeature>();
 		
 		// find contours
@@ -63,6 +63,6 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 			}
 		}
 		
-		return new ArrayList<Feature>(contourFeatures);
+		return new FeatureSet(new ArrayList<Feature>(contourFeatures));
 	}
 }
