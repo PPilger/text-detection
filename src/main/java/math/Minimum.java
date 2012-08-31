@@ -1,11 +1,17 @@
 package math;
 
-public class Minimum<T extends Number> extends Interval<T> {
+public class Minimum<T extends Number> implements Validator<T> {
+	private T min;
+	
 	public Minimum(T min) {
-		super(min, min);
+		this.min = min;
+	}
+	
+	public T getMin() {
+		return min;
 	}
 
 	public boolean isValid(T value) {
-		return getMin().doubleValue() <= value.doubleValue();
+		return min.doubleValue() <= value.doubleValue();
 	}
 }

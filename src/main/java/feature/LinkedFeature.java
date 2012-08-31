@@ -1,4 +1,5 @@
 package feature;
+
 import static com.googlecode.javacpp.Loader.sizeof;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;

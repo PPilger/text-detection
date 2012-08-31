@@ -1,12 +1,14 @@
 package feature;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+
+import static application.TextDetection.*;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -38,6 +40,7 @@ public class FeatureLinker {
 		}
 
 		// fill the adjacency list
+		start();
 		for (int j = 0; j < features.size(); j++) {
 			for (int k = j + 1; k < features.size(); k++) {
 				Feature f0 = features.get(j);
@@ -49,15 +52,18 @@ public class FeatureLinker {
 				}
 			}
 		}
+		stop("adjacency list");
 
 		// find all connected components of the graph
 		Set<Feature> marked = new HashSet<Feature>();
+		Stack<Feature> stack = new Stack<Feature>();
+		
+		start();
 		for (Feature start : features) {
 			if (!marked.contains(start)) {
 				List<Feature> component = new ArrayList<Feature>();
 
 				// breadth first search
-				Stack<Feature> stack = new Stack<Feature>();
 				stack.push(start);
 				marked.add(start);
 
@@ -76,6 +82,7 @@ public class FeatureLinker {
 				featureSet.add(LinkedFeature.create(component));
 			}
 		}
+		stop("connecting");
 
 		return featureSet;
 	}
@@ -83,8 +90,10 @@ public class FeatureLinker {
 	private boolean link(Feature f0, Feature f1) {
 		for (LinkingRule l : linkingRules) {
 			if (!l.link(f0, f1)) {
+				count(l.getClass().toString() + " invalid");
 				return false;
 			}
+			count(l.getClass().toString() + " valid");
 		}
 		
 		return true;

@@ -1,18 +1,16 @@
 package feature;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
-import image.DilateProcessor;
 import image.Image;
 
 import java.util.*;
 
 import math.Angle180;
-import math.Interval;
 import math.Line2D;
 import math.Maximum;
+import math.Validator;
 import math.Vector2D;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
@@ -21,8 +19,8 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 	// parameters
 	private Maximum<Integer> distance; // odd
 	private double angle;
-	private Interval<Integer> width;
-	private Interval<Integer> height;
+	private Validator<Integer> width;
+	private Validator<Integer> height;
 
 	private IplImage img;
 
@@ -39,7 +37,7 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 	IplConvKernel strel;
 
 	public FixedDirectionLinkingRule(Maximum<Integer> distance, double angle,
-			Interval<Integer> width, Interval<Integer> height) {
+			Validator<Integer> width, Validator<Integer> height) {
 		this.distance = distance;
 		this.angle = angle;
 		this.width = width;
@@ -169,7 +167,7 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 		if(width.isValid(bbox.width()) && height.isValid(bbox.height())) {
 			return true;
 		}
-		
+
 		return false;
 	}
 }

@@ -1,6 +1,6 @@
 package math;
 
-public class Interval<T extends Number> {
+public class Interval<T extends Number> implements Validator<T> {
 	private T min;
 	private T max;
 

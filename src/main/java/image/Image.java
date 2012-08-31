@@ -38,6 +38,40 @@ public class Image {
 		this.temp = gray.clone();
 	}
 
+	public void setROI(int x, int y, int width, int height) {
+		setROI(x, y, width, height);
+	}
+
+	public void setROI(CvRect rect) {
+		cvSetImageROI(color, rect);
+		cvSetImageROI(gray, rect);
+		cvSetImageROI(img, rect);
+		cvSetImageROI(temp, rect);
+		if (red != null) {
+			cvSetImageROI(red, rect);
+			cvSetImageROI(green, rect);
+			cvSetImageROI(blue, rect);
+		}
+		if (rgRatio != null){
+			cvSetImageROI(rgRatio, rect);
+			cvSetImageROI(rbRatio, rect);
+			cvSetImageROI(gbRatio, rect);
+		}
+	}
+	
+	public void resetROI() {
+		cvResetImageROI(color);
+		cvResetImageROI(gray);
+		cvResetImageROI(img);
+		cvResetImageROI(temp);
+		cvResetImageROI(red);
+		cvResetImageROI(green);
+		cvResetImageROI(blue);
+		cvResetImageROI(rgRatio);
+		cvResetImageROI(rbRatio);
+		cvResetImageROI(gbRatio);
+	}
+
 	public void initRGB() {
 		this.red = gray.clone();
 		this.green = gray.clone();
@@ -46,6 +80,9 @@ public class Image {
 	}
 
 	public void initRatios() {
+		if(red == null) {
+			initRGB();
+		}
 		this.rgRatio = IplImage.create(gray.cvSize(), IPL_DEPTH_32F, 1);
 		this.rbRatio = cvCloneImage(rgRatio);
 		this.gbRatio = cvCloneImage(rgRatio);
@@ -58,7 +95,7 @@ public class Image {
 	public IplImage getColor() {
 		return color;
 	}
-	
+
 	public IplImage getGray() {
 		return gray;
 	}
@@ -112,7 +149,7 @@ public class Image {
 		}
 		return gbRatio;
 	}
-	
+
 	public static void write(IplImage img, String filename) {
 		cvSaveImage(filename, img);
 	}

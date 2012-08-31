@@ -1,4 +1,5 @@
 package feature;
+
 import static com.googlecode.javacv.cpp.opencv_core.cvGetReal2D;
 
 import com.googlecode.javacv.cpp.opencv_core.CvMat;

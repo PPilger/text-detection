@@ -1,12 +1,13 @@
 package feature;
+
 import java.util.*;
 
-import math.Interval;
+import math.Validator;
 
 public class AreaBasedLinkingRule extends LinkingRule {
-	private Interval<Double> areaGrowth;
+	private Validator<Double> areaGrowth;
 
-	public AreaBasedLinkingRule(Interval<Double> areaGrowth) {
+	public AreaBasedLinkingRule(Validator<Double> areaGrowth) {
 		this.areaGrowth = areaGrowth;
 	}
 

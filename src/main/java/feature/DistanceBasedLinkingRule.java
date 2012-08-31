@@ -1,11 +1,11 @@
 package feature;
 
-import math.Interval;
+import math.Validator;
 
 public class DistanceBasedLinkingRule extends LinkingRule {
-	private Interval<Double> distance;
+	private Validator<Double> distance;
 
-	public DistanceBasedLinkingRule(Interval<Double> distance) {
+	public DistanceBasedLinkingRule(Validator<Double> distance) {
 		this.distance = distance;
 	}
 

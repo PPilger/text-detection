@@ -16,6 +16,38 @@ public class FeatureSet extends ArrayList<Feature> {
 	public FeatureSet(Collection<? extends Feature> features) {
 		super(features);
 	}
+	
+	public int remove(FeatureRule rule) {
+		int count = 0;
+		
+		Iterator<Feature> iter = iterator();
+		while(iter.hasNext()) {
+			Feature f = iter.next();
+			
+			if(!rule.isValid(f)) {
+				iter.remove();
+				count++;
+			}
+		}
+		
+		return count;
+	}
+	
+	public FeatureSet split(FeatureRule rule) {
+		FeatureSet result = new FeatureSet();
+		
+		Iterator<Feature> iter = iterator();
+		while(iter.hasNext()) {
+			Feature f = iter.next();
+			
+			if(!rule.isValid(f)) {
+				iter.remove();
+				result.add(f);
+			}
+		}
+		
+		return result;
+	}
 
 	public void draw(IplImage img, CvScalar color) {
 		for (Feature f : this) {

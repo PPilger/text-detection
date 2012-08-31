@@ -1,4 +1,5 @@
 package feature;
+
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
@@ -8,8 +9,8 @@ import image.Image;
 
 import java.util.*;
 
-import math.Interval;
 import math.Line2D;
+import math.Validator;
 import math.Vector2D;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
@@ -20,7 +21,7 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 	private int dilateSize;
 	private int numAngles;
 	private int lineWidth;
-	private Interval<Double> featureRating;
+	private Validator<Double> featureRating;
 
 	private HashMap<Feature, Histogram> hists;
 	
@@ -41,7 +42,7 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 	IplConvKernel[] strels;
 
 	public DirectionBasedLinkingRule(int filterSize, int dilateSize, int numAngles, int lineWidth,
-			Interval<Double> featureRating) {
+			Validator<Double> featureRating) {
 		this.filterSize = filterSize;
 		this.dilateSize = dilateSize;
 		this.numAngles = numAngles;
