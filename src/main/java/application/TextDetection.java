@@ -61,7 +61,7 @@ public class TextDetection {
 
 	public static void mooskirchen() {
 		Image image = new Image("samples" + File.separator
-				+ "Mooskirchen_Grazer_Feld.jpg");
+				+ "Mooskirchen_Grazer_Feld_M.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 
@@ -82,7 +82,8 @@ public class TextDetection {
 			rule = new AreaFeatureRule(new Interval<Double>(100., 5000.));
 
 			FeatureDetector detector = new ContourBasedFeatureDetector(
-					new Interval<Integer>(35, 1000000), rule);
+					new Interval<Integer>(35, 1000000),
+					new Maximum<Double>(61.), rule);
 
 			features = detector.findFeatures(image.getImg());
 			System.out.println("number of features detected: "
@@ -113,7 +114,7 @@ public class TextDetection {
 		other.draw(image.getColor(), CvScalar.RED);
 
 		features.draw(image.getColor(), CvScalar.GREEN);
-		display.show(image.getColor());
+		// display.show(image.getColor());
 
 		features.write("Mooskirchen Features.js");
 		Image.write(image.getColor(), "Mooskirchen.jpg");
@@ -205,8 +206,8 @@ public class TextDetection {
 		}
 
 		FeatureDetector detector = new ContourBasedFeatureDetector(
-				new Interval<Integer>(15, 1000000), new AreaFeatureRule(
-						new Interval<Double>(1., 5000.)));
+				new Interval<Integer>(15, 1000000), new Maximum<Double>(20.),
+				new AreaFeatureRule(new Interval<Double>(1., 5000.)));
 		FeatureLinker linker = new FeatureLinker();
 		linker.addRule(new DistanceBasedLinkingRule(new Maximum<Double>(20.)));
 		linker.addRule(new DirectionBasedLinkingRule(51, 1, 8, 1,
@@ -242,8 +243,8 @@ public class TextDetection {
 		image.process(new CloseProcessor(3));
 
 		FeatureDetector detector = new ContourBasedFeatureDetector(
-				new Interval<Integer>(20, 1000000), new AreaFeatureRule(
-						new Interval<Double>(100., 5000.)));
+				new Interval<Integer>(20, 1000000), new Maximum<Double>(200.),
+				new AreaFeatureRule(new Interval<Double>(100., 5000.)));
 		FeatureLinker linker = new FeatureLinker();
 		linker.addRule(new AreaBasedLinkingRule(new Maximum<Double>(1000.)));
 

@@ -5,6 +5,8 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.cvBoxPoints;
 
 public class Box2D {
 	public Vector2D[] corners;
+	public Vector2D min;
+	public Vector2D max;
 
 	public Box2D(double x, double y, double width, double height, double angle) {
 		this(new CvBox2D(cvPoint2D32f(x, y), cvSize2D32f(width, height),
@@ -21,10 +23,28 @@ public class Box2D {
 		corners[1] = new Vector2D(coords[2], coords[3]);
 		corners[2] = new Vector2D(coords[4], coords[5]);
 		corners[3] = new Vector2D(coords[6], coords[7]);
-	}
 
-	public Vector2D[] corners() {
-		return corners;
+		double xmin = corners[0].x;
+		double ymin = corners[0].y;
+		double xmax = 0;
+		double ymax = 0;
+		
+		for(Vector2D corner : corners) {
+			if(corner.x < xmin) {
+				xmin = corner.x;
+			} else if(xmax < corner.x) {
+				xmax = corner.x;
+			}
+
+			if(corner.y < ymin) {
+				ymin = corner.y;
+			} else if(ymax < corner.y) {
+				ymax = corner.y;
+			}
+		}
+		
+		min = new Vector2D(xmin, ymin);
+		max = new Vector2D(xmax, ymax);
 	}
 
 	public Vector2D min() {

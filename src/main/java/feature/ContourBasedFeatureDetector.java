@@ -10,16 +10,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import math.Maximum;
 import math.Validator;
 
 import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 
 public class ContourBasedFeatureDetector implements FeatureDetector {
 	private Validator<Integer> perimeter;
+	private Maximum<Double> distance;
 	private FeatureRule[] rules;
 
-	public ContourBasedFeatureDetector(Validator<Integer> perimeter, FeatureRule... rules) {
+	public ContourBasedFeatureDetector(Validator<Integer> perimeter, Maximum<Double> distance, FeatureRule... rules) {
 		this.perimeter = perimeter;
+		this.distance = distance;
 		this.rules = rules;
 	}
 
@@ -69,6 +72,8 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 		}
 		stop("remove enclosed features");
 		
-		return new FeatureSet(new ArrayList<Feature>(contourFeatures));
+		FeatureSet result = new FeatureSet(distance.getMax(), img.width(), img.height());
+		result.add(contourFeatures);
+		return result;
 	}
 }

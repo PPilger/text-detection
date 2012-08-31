@@ -20,19 +20,11 @@ public class LinkedFeature extends Feature {
 		int i = 0;
 		for (Feature f : subFeatures) {
 			Box2D box = f.box();
-			for (Vector2D corner : box.corners()) {
+			for (Vector2D corner : box.corners) {
 				coords[i] = (int) Math.round(corner.x);
 				coords[i + 1] = (int) Math.round(corner.y);
 				i+=2;
 			}
-
-			/*CvBox2D box = f.cvBox();
-			float[] values = new float[8];
-			cvBoxPoints(box, values);
-
-			for (int j = 0; j < 8; j++) {
-				coords[i * 8 + j] = Math.round(values[j]);
-			}*/
 		}
 
 		CvSeq seq = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq.class),

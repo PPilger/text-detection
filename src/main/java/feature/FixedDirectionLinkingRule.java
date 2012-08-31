@@ -8,6 +8,7 @@ import image.Image;
 import java.util.*;
 
 import math.Angle180;
+import math.Box2D;
 import math.Line2D;
 import math.Maximum;
 import math.Validator;
@@ -27,11 +28,11 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 	private int border;
 	private IplImage bigImg0;
 	private IplImage bigImg1;
-	private IplImage bigImg2;
 	private CvMat subImg0;
 	private CvMat subImg1;
-	private CvMat subImg2;
 
+	private Map<Feature, CvMat> drawnFeatures;
+	
 	private IplImage rotationImage;
 
 	IplConvKernel strel;
@@ -51,7 +52,7 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 		this.img = img;
 
 		int maxDistance = distance.getMax();
-		
+
 		// initialize images
 		{
 			int width = img.width();
@@ -68,14 +69,11 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 			height = height + 2 * border;
 			bigImg0 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
 			bigImg1 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
-			bigImg2 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
 			subImg0 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
 			subImg1 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
-			subImg2 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
 
 			cvGetSubRect(bigImg0, subImg0, rect);
 			cvGetSubRect(bigImg1, subImg1, rect);
-			cvGetSubRect(bigImg2, subImg2, rect);
 		}
 
 		// create structuring element
@@ -93,12 +91,12 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 			strel = cvCreateStructuringElementEx(maxDistance, maxDistance, r,
 					r, CV_SHAPE_CUSTOM, temp);
 		}
+		
+		
 	}
 
 	@Override
 	public boolean link(Feature f0, Feature f1) {
-		LinkedFeature lf = LinkedFeature.create(Arrays.asList(f0, f1));
-
 		cvSetZero(bigImg0);
 		f0.fill(subImg0, CvScalar.WHITE);
 
@@ -108,26 +106,31 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 		CvRect rectS;
 		CvRect rectB;
 		{
-			Vector2D min = lf.box().min();
-			Vector2D max = lf.box().max();
-			rectS = Image.clip(img, min, max);
+			Box2D box0 = f0.box();
+			Box2D box1 = f1.box();
 
-			int x = (int) Math.round(min.x);
-			int y = (int) Math.round(min.y);
+			double xmin = Math.min(box0.min.x, box1.min.x);
+			double ymin = Math.min(box0.min.y, box1.min.y);
+			double xmax = Math.max(box0.max.x, box1.max.x);
+			double ymax = Math.max(box0.max.y, box1.max.y);
+
+			rectS = Image.clip(img, xmin, ymin, xmax, ymax);
+
+			int x = (int) Math.round(xmin);
+			int y = (int) Math.round(ymin);
 			rectB = cvRect(x, y, rectS.width() + 2 * border, rectS.height() + 2
 					* border);
 		}
 
 		cvSetImageROI(bigImg0, rectB);
 		cvSetImageROI(bigImg1, rectB);
-		cvSetImageROI(bigImg2, rectB);
 
 		cvMorphologyEx(bigImg0, bigImg0, null, strel, CV_MOP_CLOSE, 1);
 		cvMorphologyEx(bigImg1, bigImg1, null, strel, CV_MOP_CLOSE, 1);
 
 		cvOr(bigImg0, bigImg1, bigImg0, null);
 
-		cvMorphologyEx(bigImg0, bigImg0, bigImg2, strel, CV_MOP_BLACKHAT, 1);
+		cvMorphologyEx(bigImg0, bigImg0, bigImg1, strel, CV_MOP_BLACKHAT, 1);
 
 		double sqrt2 = 1.5;
 		int size = Math.max(rectS.width(), rectS.height());
@@ -161,10 +164,9 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 
 		cvResetImageROI(bigImg0);
 		cvResetImageROI(bigImg1);
-		cvResetImageROI(bigImg2);
 		cvResetImageROI(rotationImage);
 
-		if(width.isValid(bbox.width()) && height.isValid(bbox.height())) {
+		if (width.isValid(bbox.width()) && height.isValid(bbox.height())) {
 			return true;
 		}
 

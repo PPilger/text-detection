@@ -26,14 +26,13 @@ public class FeatureLinker {
 	}
 
 	public FeatureSet link(FeatureSet features, IplImage img) {
-		FeatureSet featureSet = new FeatureSet();
 		Map<Feature, List<Feature>> adjacencyList = new HashMap<Feature, List<Feature>>();
 
 		// initialize the linking rules
-		for(LinkingRule linkingRule : linkingRules) {
+		for (LinkingRule linkingRule : linkingRules) {
 			linkingRule.initialize(features, img);
 		}
-		
+
 		// initialize the adjacency list
 		for (Feature f : features) {
 			adjacencyList.put(f, new ArrayList<Feature>());
@@ -41,50 +40,61 @@ public class FeatureLinker {
 
 		// fill the adjacency list
 		start();
-		for (int j = 0; j < features.size(); j++) {
-			for (int k = j + 1; k < features.size(); k++) {
-				Feature f0 = features.get(j);
-				Feature f1 = features.get(k);
+		{
+			// for (int i = 0; i < features.size(); i++) {
+			// for (int j = i + 1; j < features.size(); j++) {
+			Set<Feature> marked = new HashSet<Feature>();
+			for (Feature f0 : features) {
+				marked.add(f0);
+				for (Feature f1 : features.getNeighbours(f0)) {
+					if (!marked.contains(f1)) {
+						// Feature f0 = features.get(i);
+						// Feature f1 = features.get(j);
 
-				if (link(f0, f1)) {
-					adjacencyList.get(f0).add(f1);
-					adjacencyList.get(f1).add(f0);
+						if (link(f0, f1)) {
+							adjacencyList.get(f0).add(f1);
+							adjacencyList.get(f1).add(f0);
+						}
+					}
 				}
 			}
 		}
 		stop("adjacency list");
 
-		// find all connected components of the graph
-		Set<Feature> marked = new HashSet<Feature>();
-		Stack<Feature> stack = new Stack<Feature>();
-		
 		start();
-		for (Feature start : features) {
-			if (!marked.contains(start)) {
-				List<Feature> component = new ArrayList<Feature>();
+		// find all connected components of the graph
+		FeatureSet result = new FeatureSet(features);
+		{
+			Set<Feature> marked = new HashSet<Feature>();
+			Stack<Feature> stack = new Stack<Feature>();
 
-				// breadth first search
-				stack.push(start);
-				marked.add(start);
+			for (Feature start : features) {
+				if (!marked.contains(start)) {
+					List<Feature> component = new ArrayList<Feature>();
 
-				while (!stack.isEmpty()) {
-					Feature feature = stack.pop();
-					component.add(feature);
+					// breadth first search
+					stack.push(start);
+					marked.add(start);
 
-					for (Feature neighbour : adjacencyList.get(feature)) {
-						if (!marked.contains(neighbour)) {
-							marked.add(neighbour);
-							stack.push(neighbour);
+					while (!stack.isEmpty()) {
+						Feature feature = stack.pop();
+						component.add(feature);
+
+						for (Feature neighbour : adjacencyList.get(feature)) {
+							if (!marked.contains(neighbour)) {
+								marked.add(neighbour);
+								stack.push(neighbour);
+							}
 						}
 					}
-				}
 
-				featureSet.add(LinkedFeature.create(component));
+					result.add(LinkedFeature.create(component));
+				}
 			}
 		}
 		stop("connecting");
 
-		return featureSet;
+		return result;
 	}
 
 	private boolean link(Feature f0, Feature f1) {
@@ -95,7 +105,7 @@ public class FeatureLinker {
 			}
 			count(l.getClass().toString() + " valid");
 		}
-		
+
 		return true;
 	}
 }

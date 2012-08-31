@@ -162,6 +162,14 @@ public class Image {
 		return cvRect(xmin, ymin, xmax - xmin, ymax - ymin);
 	}
 
+	public static CvRect clip(IplImage img, double xmin, double ymin, double xmax, double ymax) {
+		int xminI = Image.clipX(img, xmin);
+		int xmaxI = Image.clipX(img, xmax);
+		int yminI = Image.clipY(img, ymin);
+		int ymaxI = Image.clipY(img, ymax);
+		return cvRect(xminI, yminI, xmaxI - xminI, ymaxI - yminI);
+	}
+
 	public static int clipX(IplImage img, double x) {
 		return (int) Math.round(Math.min(Math.max(x, 0), img.width() - 1));
 	}
