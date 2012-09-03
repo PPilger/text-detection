@@ -1,175 +1,51 @@
 package feature;
 
-import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_imgproc.*;
-
-import image.Image;
-
-import java.util.*;
-
-import math.Angle180;
-import math.Box2D;
-import math.Line2D;
-import math.Maximum;
+import math.RotationMatrix2D;
 import math.Validator;
 import math.Vector2D;
 
-import com.googlecode.javacv.cpp.opencv_core.IplImage;
-
 public class FixedDirectionLinkingRule extends LinkingRule {
 	// parameters
-	private Maximum<Integer> distance; // odd
-	private double angle;
+	private RotationMatrix2D matrix;
 	private Validator<Integer> width;
 	private Validator<Integer> height;
 
-	private IplImage img;
-
-	private int border;
-	private IplImage bigImg0;
-	private IplImage bigImg1;
-	private CvMat subImg0;
-	private CvMat subImg1;
-
-	private Map<Feature, CvMat> drawnFeatures;
-	
-	private IplImage rotationImage;
-
-	IplConvKernel strel;
-
-	public FixedDirectionLinkingRule(Maximum<Integer> distance, double angle,
+	public FixedDirectionLinkingRule(double angle,
 			Validator<Integer> width, Validator<Integer> height) {
-		this.distance = distance;
-		this.angle = angle;
+		this.matrix = new RotationMatrix2D(angle);
 		this.width = width;
 		this.height = height;
-
-		this.border = distance.getMax() / 2 + 2;
-	}
-
-	@Override
-	public void initialize(FeatureSet features, IplImage img) {
-		this.img = img;
-
-		int maxDistance = distance.getMax();
-
-		// initialize images
-		{
-			int width = img.width();
-			int height = img.height();
-
-			CvRect rect = cvRect(maxDistance / 2 + 1, maxDistance / 2 + 1,
-					width, height);
-
-			int size = Math.max(width, height);
-			rotationImage = IplImage.create((int) Math.ceil(size * 1.5) + 1,
-					(int) Math.ceil(size * 1.5) + 1, IPL_DEPTH_8U, 1);
-
-			width = width + 2 * border;
-			height = height + 2 * border;
-			bigImg0 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
-			bigImg1 = IplImage.create(width, height, IPL_DEPTH_8U, 1);
-			subImg0 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
-			subImg1 = CvMat.createHeader(width, height, IPL_DEPTH_8U, 1);
-
-			cvGetSubRect(bigImg0, subImg0, rect);
-			cvGetSubRect(bigImg1, subImg1, rect);
-		}
-
-		// create structuring element
-		{
-			int r = maxDistance / 2;
-
-			double sin = Math.sin(angle);
-			double cos = Math.cos(angle);
-
-			int x = (int) Math.round(cos * r);
-			int y = (int) Math.round(sin * r);
-
-			int[] temp = new int[maxDistance * maxDistance];
-			Line2D.draw(temp, maxDistance, r - x, r - y, r + x, r + y);
-			strel = cvCreateStructuringElementEx(maxDistance, maxDistance, r,
-					r, CV_SHAPE_CUSTOM, temp);
-		}
-		
-		
 	}
 
 	@Override
 	public boolean link(Feature f0, Feature f1) {
-		cvSetZero(bigImg0);
-		f0.fill(subImg0, CvScalar.WHITE);
-
-		cvSetZero(bigImg1);
-		f1.fill(subImg1, CvScalar.WHITE);
-
-		CvRect rectS;
-		CvRect rectB;
-		{
-			Box2D box0 = f0.box();
-			Box2D box1 = f1.box();
-
-			double xmin = Math.min(box0.min.x, box1.min.x);
-			double ymin = Math.min(box0.min.y, box1.min.y);
-			double xmax = Math.max(box0.max.x, box1.max.x);
-			double ymax = Math.max(box0.max.y, box1.max.y);
-
-			rectS = Image.clip(img, xmin, ymin, xmax, ymax);
-
-			int x = (int) Math.round(xmin);
-			int y = (int) Math.round(ymin);
-			rectB = cvRect(x, y, rectS.width() + 2 * border, rectS.height() + 2
-					* border);
+		Vector2D min0 = matrix.rotate(f0.box().min);
+		Vector2D min1 = matrix.rotate(f1.box().min);
+		Vector2D max0 = matrix.rotate(f0.box().max);
+		Vector2D max1 = matrix.rotate(f1.box().max);
+		
+		int w;
+		if(max0.x <= min1.x || max1.x <= min0.x) {
+			w = (int) Math.round(Math.max(min0.x, min1.x) - Math.min(max0.x, max1.x));
+		} else {
+			w = 0;
+		}
+		
+		if(!width.isValid(w)) {
+			return false;
 		}
 
-		cvSetImageROI(bigImg0, rectB);
-		cvSetImageROI(bigImg1, rectB);
-
-		cvMorphologyEx(bigImg0, bigImg0, null, strel, CV_MOP_CLOSE, 1);
-		cvMorphologyEx(bigImg1, bigImg1, null, strel, CV_MOP_CLOSE, 1);
-
-		cvOr(bigImg0, bigImg1, bigImg0, null);
-
-		cvMorphologyEx(bigImg0, bigImg0, bigImg1, strel, CV_MOP_BLACKHAT, 1);
-
-		double sqrt2 = 1.5;
-		int size = Math.max(rectS.width(), rectS.height());
-		int s = (int) Math.ceil(size * sqrt2);
-		int ds = s - size;
-		if ((ds & 0x1) != 0) {
-			s++;
-			ds++;
+		int h;
+		if(max0.y <= min1.y || max1.y <= min0.y) {
+			h = 0;
+		} else {
+			h = (int) Math.round(Math.min(max0.y, max1.y) - Math.max(min0.y, min1.y)); 
 		}
 
-		cvSetImageROI(rotationImage,
-				cvRect(ds / 2, ds / 2, rectS.width(), rectS.height()));
-		cvSetImageROI(
-				bigImg0,
-				cvRect(rectB.x() + border, rectB.y() + border, rectS.width(),
-						rectS.height()));
-
-		cvConvert(bigImg0, rotationImage);
-
-		cvSetImageROI(rotationImage, cvRect(0, 0, s, s));
-
-		CvPoint2D32f center = cvPoint2D32f(s / 2.0, s / 2.0);
-		CvMat rotationMatrix = cvCreateMat(2, 3, CV_32F);
-		cv2DRotationMatrix(center, Angle180.radToDeg(angle), 1, rotationMatrix);
-		cvWarpAffine(rotationImage, rotationImage, rotationMatrix, CV_INTER_NN,
-				CvScalar.ZERO);
-
-		CvRect bbox = cvBoundingRect(rotationImage, 0);
-
-		cvSetZero(rotationImage);
-
-		cvResetImageROI(bigImg0);
-		cvResetImageROI(bigImg1);
-		cvResetImageROI(rotationImage);
-
-		if (width.isValid(bbox.width()) && height.isValid(bbox.height())) {
-			return true;
+		if (!height.isValid(h)) {
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 }

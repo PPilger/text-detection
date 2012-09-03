@@ -61,7 +61,7 @@ public class TextDetection {
 
 	public static void mooskirchen() {
 		Image image = new Image("samples" + File.separator
-				+ "Mooskirchen_Grazer_Feld_M.jpg");
+				+ "Mooskirchen_Grazer_Feld.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 
@@ -83,13 +83,14 @@ public class TextDetection {
 
 			FeatureDetector detector = new ContourBasedFeatureDetector(
 					new Interval<Integer>(35, 1000000),
-					new Maximum<Double>(61.), rule);
+					new Maximum<Double>(81.), rule);
 
 			features = detector.findFeatures(image.getImg());
 			System.out.println("number of features detected: "
 					+ features.size());
 		}
 		stop("detection");
+
 		features.draw(image.getColor(), CvScalar.BLACK);
 		// display.show(image.getColor());
 
@@ -97,11 +98,10 @@ public class TextDetection {
 		{
 			FeatureLinker linker = new FeatureLinker();
 			linker.addRule(new DistanceBasedLinkingRule(
-					new Maximum<Double>(61.)));
+					new Maximum<Double>(81.)));
 
-			linker.addRule(new FixedDirectionLinkingRule(new Maximum<Integer>(
-					61), 0, new Maximum<Integer>(1000),
-					new Minimum<Integer>(10)));
+			linker.addRule(new FixedDirectionLinkingRule(0,
+					new Valid<Integer>(), new Minimum<Integer>(20)));
 
 			features = linker.link(features, image.getImg());
 			System.out.println("number of features after linking: "
@@ -109,12 +109,14 @@ public class TextDetection {
 		}
 		stop("linking");
 
-		FeatureSet other = features.split(new AreaFeatureRule(
-				new Minimum<Double>(3000.)));
-		other.draw(image.getColor(), CvScalar.RED);
+		features.remove(new AreaFeatureRule(new Maximum<Double>(3000.)));
+		features.remove(new SizeFeatureRule(new Maximum<Double>(30.),
+				new Maximum<Double>(30.)));
+		System.out.println("number of features after removing: "
+				+ features.size());
 
 		features.draw(image.getColor(), CvScalar.GREEN);
-		// display.show(image.getColor());
+		display.show(image.getColor());
 
 		features.write("Mooskirchen Features.js");
 		Image.write(image.getColor(), "Mooskirchen.jpg");

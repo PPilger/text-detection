@@ -117,6 +117,22 @@ public class FeatureSet implements Iterable<Feature> {
 		while (iter.hasNext()) {
 			Feature f = iter.next();
 
+			if (rule.isValid(f)) {
+				iter.remove();
+				count++;
+			}
+		}
+
+		return count;
+	}
+	
+	public int dontRemove(FeatureRule rule) {
+		int count = 0;
+
+		Iterator<Feature> iter = iterator();
+		while (iter.hasNext()) {
+			Feature f = iter.next();
+
 			if (!rule.isValid(f)) {
 				iter.remove();
 				count++;
