@@ -1,5 +1,6 @@
 package feature;
 
+import math.Box2D;
 import math.RotationMatrix2D;
 import math.Validator;
 import math.Vector2D;
@@ -19,10 +20,24 @@ public class FixedDirectionLinkingRule extends LinkingRule {
 
 	@Override
 	public boolean link(Feature f0, Feature f1) {
-		Vector2D min0 = matrix.rotate(f0.box().min);
-		Vector2D min1 = matrix.rotate(f1.box().min);
-		Vector2D max0 = matrix.rotate(f0.box().max);
-		Vector2D max1 = matrix.rotate(f1.box().max);
+		Vector2D min0;
+		Vector2D max0;
+		Vector2D min1;
+		Vector2D max1;
+		
+		{
+			Vector2D center = f0.position().center(f1.position());
+			
+			Box2D box = f0.box();
+			Vector2D[] bounds = Vector2D.bounds(matrix.rotate(box.corners, center));
+			min0 = bounds[0];
+			max0 = bounds[1];
+			
+			box = f1.box();
+			bounds = Vector2D.bounds(matrix.rotate(box.corners, center));
+			min1 = bounds[0];
+			max1 = bounds[1];
+		}
 		
 		int w;
 		if(max0.x <= min1.x || max1.x <= min0.x) {

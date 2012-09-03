@@ -17,17 +17,15 @@ import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 
 public class ContourBasedFeatureDetector implements FeatureDetector {
 	private Validator<Integer> perimeter;
-	private Maximum<Double> distance;
 	private FeatureRule[] rules;
 
-	public ContourBasedFeatureDetector(Validator<Integer> perimeter, Maximum<Double> distance, FeatureRule... rules) {
+	public ContourBasedFeatureDetector(Validator<Integer> perimeter, FeatureRule... rules) {
 		this.perimeter = perimeter;
-		this.distance = distance;
 		this.rules = rules;
 	}
 
 	@Override
-	public FeatureSet findFeatures(IplImage img) {
+	public int findFeatures(IplImage img, FeatureSet features) {
 		List<ContourFeature> contourFeatures = new ArrayList<ContourFeature>();
 		
 		start();
@@ -72,8 +70,8 @@ public class ContourBasedFeatureDetector implements FeatureDetector {
 		}
 		stop("remove enclosed features");
 		
-		FeatureSet result = new FeatureSet(distance.getMax(), img.width(), img.height());
-		result.add(contourFeatures);
-		return result;
+		features.add(contourFeatures);
+		
+		return contourFeatures.size();
 	}
 }

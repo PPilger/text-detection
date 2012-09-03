@@ -37,6 +37,14 @@ public class Image {
 		this.img = gray.clone();
 		this.temp = gray.clone();
 	}
+	
+	public int getWidth() {
+		return img.width();
+	}
+	
+	public int getHeight() {
+		return img.height();
+	}
 
 	public void setROI(int x, int y, int width, int height) {
 		setROI(x, y, width, height);

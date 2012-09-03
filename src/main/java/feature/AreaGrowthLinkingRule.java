@@ -4,10 +4,10 @@ import java.util.*;
 
 import math.Validator;
 
-public class AreaBasedLinkingRule extends LinkingRule {
+public class AreaGrowthLinkingRule extends LinkingRule {
 	private Validator<Double> areaGrowth;
 
-	public AreaBasedLinkingRule(Validator<Double> areaGrowth) {
+	public AreaGrowthLinkingRule(Validator<Double> areaGrowth) {
 		this.areaGrowth = areaGrowth;
 	}
 

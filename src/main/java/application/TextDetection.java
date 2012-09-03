@@ -24,8 +24,8 @@ public class TextDetection {
 	 */
 	public static void main(String[] args) throws InterruptedException {
 		// britishIsles();
-		// portolanAtlas();
-		mooskirchen();
+		portolanAtlas();
+		// mooskirchen();
 
 		System.out.println(counter);
 	}
@@ -76,18 +76,17 @@ public class TextDetection {
 		// display.show(image.getImg());
 
 		start();
-		FeatureSet features;
+		FeatureSet features = new FeatureSet(81, image.getWidth(),
+				image.getHeight());
 		{
 			FeatureRule rule;
 			rule = new AreaFeatureRule(new Interval<Double>(100., 5000.));
 
 			FeatureDetector detector = new ContourBasedFeatureDetector(
-					new Interval<Integer>(35, 1000000),
-					new Maximum<Double>(81.), rule);
+					new Interval<Integer>(35, 1000000), rule);
 
-			features = detector.findFeatures(image.getImg());
-			System.out.println("number of features detected: "
-					+ features.size());
+			int num = detector.findFeatures(image.getImg(), features);
+			System.out.println("number of features detected: " + num);
 		}
 		stop("detection");
 
@@ -150,50 +149,19 @@ public class TextDetection {
 			image.process(new ThresholdProcessor(165));
 			image.process(new InvertProcessor());
 
-			// display.show(image.getImg());
 			image.process(new CloseProcessor(3));
 			image.process(new BigObjectEraseProcessor(11));
-			// display.show(image.getImg());
 			image.process(new SmallObjectErasorProcessor(10));
-			// display.show(image.getImg());
+
 			image.process(new ThicknessProcessor(1, 7));
 
 			image.process(new EraseProcessor(lines.getImg()));
 
-			// img.process(new RGRatioDisplayProcessor("1", 1200, 800, 0.5));
-			// img.process(new RBRatioDisplayProcessor("1", 1200, 800, 0.5));
-			// img.process(new GBRatioDisplayProcessor("1", 1200, 800, 0.5));
-
-			// img.process(new RGBRatioEraseProcessor(0.9, 3, 1, 3, 1, 3, 2,
-			// true));
-			// img.process(new RGBRatioEraseProcessor(0.9, 3, 0.8, 3, 0.95, 3,
-			// 2,
-			// true));
-
 			image.process(new FirstDerivateEraseProcessor(120, 9));
 			image.process(new SecondDerivateEraseProcessor(130, 9));
 
-			// image.process(new CloseProcessor(5));
-			// display.show(image.getImg());
-
-			/*
-			 * Image bla = new Image(image.getImg()); { bla.process(new
-			 * InvertProcessor()); for(int i = 0; i < 4; i++) {
-			 * display2.show(bla.getImg()); bla.process(new
-			 * ObstacleRemoveProcessor(3, 7, 25)); } bla.process(new
-			 * InvertProcessor());
-			 * 
-			 * bla.process(new OpenProcessor(3)); } image.process(new
-			 * MaskProcessor(bla.getImg()));
-			 * 
-			 * for(int i = 0; i < 4; i++) { display2.show(image.getImg());
-			 * image.process(new ObstacleRemoveProcessor(3, 3, 25)); }
-			 */
-
 			image.process(new VarianceProcessor(11, 50));
-			// display2.show(image.getImg());
 			image.process(new ObstacleRemoveProcessor(3, 3));
-			// display2.show(image.getImg());
 
 			image.process(new DilateProcessor(3));
 			image.process(new CloseProcessor(3));
@@ -207,24 +175,41 @@ public class TextDetection {
 			// display2.show(image.getColor());
 		}
 
-		FeatureDetector detector = new ContourBasedFeatureDetector(
-				new Interval<Integer>(15, 1000000), new Maximum<Double>(20.),
-				new AreaFeatureRule(new Interval<Double>(1., 5000.)));
-		FeatureLinker linker = new FeatureLinker();
-		linker.addRule(new DistanceBasedLinkingRule(new Maximum<Double>(20.)));
-		linker.addRule(new DirectionBasedLinkingRule(51, 1, 8, 1,
-				new Minimum<Double>(.3)));// 51
+		FeatureSet features = new FeatureSet(20, image.getWidth(),
+				image.getHeight());
 
-		FeatureSet features;
+		{
+			FeatureRule rule;
+			rule = new AreaFeatureRule(new Interval<Double>(1., 5000.));
 
-		features = detector.findFeatures(image.getImg());
-		System.out.println("number of features detected: " + features.size());
+			FeatureDetector detector = new ContourBasedFeatureDetector(
+					new Interval<Integer>(15, 1000000), rule);
+
+			int num = detector.findFeatures(image.getImg(), features);
+			System.out.println("number of features detected: " + num);
+		}
+		//features.dontRemove(new LocationFeatureRule(new Interval<Integer>(780,
+		//		800), new Interval<Integer>(650, 680)));
+
 		features.draw(image.getColor(), CvScalar.BLACK);
 		display.show(image.getColor());
 
-		features = linker.link(features, image.getImg());
-		System.out.println("number of features after linking: "
-				+ features.size());
+		start();
+		{
+			FeatureLinker linker = new FeatureLinker();
+
+			linker.addRule(new DistanceBasedLinkingRule(
+					new Maximum<Double>(20.)));
+			linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(400.)));
+			linker.addRule(new DirectionBasedLinkingRule(51, 1, 8, 1,
+					new Minimum<Double>(.3), new Valid<Integer>(), new Minimum<Integer>(3)));
+
+			features = linker.link(features, image.getImg());
+			System.out.println("number of features after linking: "
+					+ features.size());
+		}
+		stop("linking");
+		
 		features.draw(image.getColor(), CvScalar.GREEN);
 		display.show(image.getColor());
 
@@ -244,21 +229,30 @@ public class TextDetection {
 		image.process(new DilateProcessor(3));
 		image.process(new CloseProcessor(3));
 
-		FeatureDetector detector = new ContourBasedFeatureDetector(
-				new Interval<Integer>(20, 1000000), new Maximum<Double>(200.),
-				new AreaFeatureRule(new Interval<Double>(100., 5000.)));
-		FeatureLinker linker = new FeatureLinker();
-		linker.addRule(new AreaBasedLinkingRule(new Maximum<Double>(1000.)));
+		FeatureSet features = new FeatureSet(200, image.getWidth(),
+				image.getHeight());
 
-		FeatureSet features;
+		{
+			FeatureRule rule;
+			rule = new AreaFeatureRule(new Interval<Double>(100., 5000.));
 
-		features = detector.findFeatures(image.getImg());
-		System.out.println("number of features detected: " + features.size());
+			FeatureDetector detector = new ContourBasedFeatureDetector(
+					new Interval<Integer>(20, 1000000), rule);
+
+			int num = detector.findFeatures(image.getImg(), features);
+			System.out.println("number of features detected: " + num);
+		}
 		features.draw(image.getColor(), CvScalar.BLACK);
 
-		features = linker.link(features, image.getImg());
-		System.out.println("number of features after linking: "
-				+ features.size());
+		{
+			FeatureLinker linker = new FeatureLinker();
+
+			linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(1000.)));
+
+			features = linker.link(features, image.getImg());
+			System.out.println("number of features after linking: "
+					+ features.size());
+		}
 		features.draw(image.getColor(), CvScalar.GREEN);
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);

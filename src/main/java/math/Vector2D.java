@@ -1,5 +1,6 @@
 package math;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 public class Vector2D {
@@ -29,6 +30,40 @@ public class Vector2D {
 
 	public Vector2D div(double scalar) {
 		return mul(1 / scalar);
+	}
+
+	public Vector2D center(Vector2D other) {
+		return new Vector2D((x + other.x) / 2, (y + other.y) / 2);
+	}
+
+	public static Vector2D[] bounds(Vector2D... points) {
+		double xmin = points[0].x;
+		double xmax = points[0].x;
+		double ymin = points[0].y;
+		double ymax = points[0].y;
+
+		for (int i = 1; i < points.length; i++) {
+			Vector2D p = points[i];
+			if (p.x < xmin) {
+				xmin = p.x;
+			} else if (p.x > xmax) {
+				xmax = p.x;
+			}
+
+			if (p.y < ymin) {
+				ymin = p.y;
+			} else if (p.y > ymax) {
+				ymax = p.y;
+			}
+		}
+
+		Vector2D[] bounds = { new Vector2D(xmin, ymin),
+				new Vector2D(xmax, ymax) };
+		return bounds;
+	}
+
+	public Vector2D max(Vector2D other) {
+		return new Vector2D(Math.max(x, other.x), Math.max(y, other.y));
 	}
 
 	public double dot(Vector2D vector) {
@@ -76,7 +111,7 @@ public class Vector2D {
 			return false;
 		return true;
 	}
-	
+
 	public String toJSON() {
 		return String.format(Locale.US, "{\"x\": %.2f, \"y\": %.2f}", x, y);
 	}
