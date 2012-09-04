@@ -61,7 +61,7 @@ public class TextDetection {
 
 	public static void mooskirchen() {
 		Image image = new Image("samples" + File.separator
-				+ "Mooskirchen_Grazer_Feld.jpg");
+				+ "Mooskirchen_Grazer_Feld_S.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 

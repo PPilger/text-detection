@@ -1,12 +1,22 @@
 package feature;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+
+import math.AngleIterable;
+import math.Maximum;
+import math.Rotation2D;
+import math.Validator;
+import math.Vector2D;
 
 import static application.TextDetection.*;
 
@@ -62,7 +72,17 @@ public class FeatureLinker {
 		stop("adjacency list");
 
 		start();
+		FeatureSet result = link(features, adjacencyList);
+		stop("connecting");
+		
+		return result;
+	}
+
+	public FeatureSet link(FeatureSet features,
+			Map<Feature, List<Feature>> adjacencyList) {
+
 		// find all connected components of the graph
+
 		FeatureSet result = new FeatureSet(features);
 		{
 			Set<Feature> marked = new HashSet<Feature>();
@@ -72,9 +92,9 @@ public class FeatureLinker {
 				if (!marked.contains(start)) {
 					List<Feature> component = new ArrayList<Feature>();
 
-					// breadth first search
-					stack.push(start);
+					// breadth first search stack.push(start);
 					marked.add(start);
+					stack.push(start);
 
 					while (!stack.isEmpty()) {
 						Feature feature = stack.pop();
@@ -92,8 +112,7 @@ public class FeatureLinker {
 				}
 			}
 		}
-		stop("connecting");
-
+		
 		return result;
 	}
 

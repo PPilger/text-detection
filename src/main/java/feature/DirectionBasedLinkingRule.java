@@ -11,7 +11,7 @@ import java.util.*;
 
 import math.Angle180;
 import math.Box2D;
-import math.RotationMatrix2D;
+import math.Rotation2D;
 import math.Validator;
 import math.Vector2D;
 
@@ -220,8 +220,8 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 
 		//
 		{
-			RotationMatrix2D matrix = new RotationMatrix2D(-angle);
-			RotationMatrix2D inv = new RotationMatrix2D(angle);
+			Rotation2D matrix = new Rotation2D(-angle);
+			Rotation2D inv = new Rotation2D(angle);
 
 			Vector2D min0;
 			Vector2D max0;

@@ -13,9 +13,9 @@ import com.googlecode.javacpp.PointerPointer;
 
 public class LinkedFeature extends Feature {
 	private static CvMemStorage mem = cvCreateMemStorage(0);
-	private List<Feature> subFeatures;
+	private Collection<Feature> subFeatures;
 
-	public static LinkedFeature create(List<Feature> subFeatures) {
+	public static LinkedFeature create(Collection<Feature> subFeatures) {
 		int[] coords = new int[8 * subFeatures.size()];
 		int i = 0;
 		for (Feature f : subFeatures) {
@@ -36,7 +36,7 @@ public class LinkedFeature extends Feature {
 		return new LinkedFeature(subFeatures, box);
 	}
 	
-	private LinkedFeature(List<Feature> subFeatures, CvBox2D box) {
+	private LinkedFeature(Collection<Feature> subFeatures, CvBox2D box) {
 		super(box);
 		this.subFeatures = subFeatures;
 	}

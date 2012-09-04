@@ -1,19 +1,19 @@
 package feature;
 
 import math.Box2D;
-import math.RotationMatrix2D;
+import math.Rotation2D;
 import math.Validator;
 import math.Vector2D;
 
 public class FixedDirectionLinkingRule extends LinkingRule {
 	// parameters
-	private RotationMatrix2D matrix;
+	private Rotation2D matrix;
 	private Validator<Integer> width;
 	private Validator<Integer> height;
 
 	public FixedDirectionLinkingRule(double angle,
 			Validator<Integer> width, Validator<Integer> height) {
-		this.matrix = new RotationMatrix2D(angle);
+		this.matrix = new Rotation2D(angle);
 		this.width = width;
 		this.height = height;
 	}
