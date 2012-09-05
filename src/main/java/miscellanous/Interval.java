@@ -1,4 +1,4 @@
-package math;
+package miscellanous;
 
 public class Interval<T extends Number> implements Validator<T> {
 	private T min;

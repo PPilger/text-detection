@@ -2,7 +2,7 @@ package feature;
 
 import java.util.*;
 
-import math.Validator;
+import miscellanous.Validator;
 
 public class AreaGrowthLinkingRule extends LinkingRule {
 	private Validator<Double> areaGrowth;

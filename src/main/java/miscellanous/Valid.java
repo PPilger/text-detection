@@ -1,4 +1,5 @@
-package math;
+package miscellanous;
+
 
 public class Valid<T extends Number> implements Validator<T> {
 	

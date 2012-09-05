@@ -1,12 +1,22 @@
-package math;
+package miscellanous;
 
 import java.util.Iterator;
 
 public class AngleIterable implements Iterable<Double> {
 	private int numAngles;
+	private double min;
+	private double step;
 	
 	public AngleIterable(int numAngles) {
 		this.numAngles = numAngles;
+		this.min = 0;
+		this.step = Math.PI / numAngles;
+	}
+	
+	public AngleIterable(int numAngles, Interval<Double> range) {
+		this.numAngles = numAngles;
+		this.min = range.getMin();
+		this.step = (range.getMax() - min) / (numAngles - 1);
 	}
 
 	@Override
@@ -21,7 +31,7 @@ public class AngleIterable implements Iterable<Double> {
 
 			@Override
 			public Double next() {
-				double value = i * Math.PI / (double) numAngles;
+				double value = min + i * step;
 				i++;
 				return value;
 			}

@@ -1,13 +1,13 @@
 package feature;
 
-import math.Validator;
 import math.Vector2D;
+import miscellanous.Validator;
 
-public class LocationFeatureRule implements FeatureRule {
+public class PositionFeatureRule implements FeatureRule {
 	private Validator<Integer> x;
 	private Validator<Integer> y;
 	
-	public LocationFeatureRule(Validator<Integer> x, Validator<Integer> y) {
+	public PositionFeatureRule(Validator<Integer> x, Validator<Integer> y) {
 		this.x = x;
 		this.y = y;
 	}

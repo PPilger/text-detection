@@ -11,6 +11,10 @@ import java.util.Map.Entry;
 import java.util.Stack;
 
 import math.*;
+import miscellanous.Interval;
+import miscellanous.Maximum;
+import miscellanous.Minimum;
+import miscellanous.Valid;
 
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 
@@ -82,7 +86,7 @@ public class TextDetection {
 			FeatureRule rule;
 			rule = new AreaFeatureRule(new Interval<Double>(100., 5000.));
 
-			FeatureDetector detector = new ContourBasedFeatureDetector(
+			FeatureDetector detector = new ContourFeatureDetector(
 					new Interval<Integer>(35, 1000000), rule);
 
 			int num = detector.findFeatures(image.getImg(), features);
@@ -96,8 +100,7 @@ public class TextDetection {
 		start();
 		{
 			FeatureLinker linker = new FeatureLinker();
-			linker.addRule(new DistanceBasedLinkingRule(
-					new Maximum<Double>(81.)));
+			linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(81.)));
 
 			linker.addRule(new FixedDirectionLinkingRule(0,
 					new Valid<Integer>(), new Minimum<Integer>(20)));
@@ -166,7 +169,7 @@ public class TextDetection {
 			image.process(new DilateProcessor(3));
 			image.process(new CloseProcessor(3));
 
-			display.show(image.getImg());
+			// display.show(image.getImg());
 
 			// image.process(new DilateProcessor(3));
 			// display.show(image.getColor());
@@ -175,41 +178,89 @@ public class TextDetection {
 			// display2.show(image.getColor());
 		}
 
-		FeatureSet features = new FeatureSet(20, image.getWidth(),
-				image.getHeight());
-
+		Image bigImage = new Image(image.getColor());
 		{
-			FeatureRule rule;
-			rule = new AreaFeatureRule(new Interval<Double>(1., 5000.));
+			bigImage.process(new ThresholdProcessor(140));
+			bigImage.process(new InvertProcessor());
+			bigImage.process(new CloseProcessor());
 
-			FeatureDetector detector = new ContourBasedFeatureDetector(
-					new Interval<Integer>(15, 1000000), rule);
-
-			int num = detector.findFeatures(image.getImg(), features);
-			System.out.println("number of features detected: " + num);
+			display.show(bigImage.getImg());
 		}
-		//features.dontRemove(new LocationFeatureRule(new Interval<Integer>(780,
-		//		800), new Interval<Integer>(650, 680)));
-
-		features.draw(image.getColor(), CvScalar.BLACK);
-		display.show(image.getColor());
-
-		start();
-		{
-			FeatureLinker linker = new FeatureLinker();
-
-			linker.addRule(new DistanceBasedLinkingRule(
-					new Maximum<Double>(20.)));
-			linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(400.)));
-			linker.addRule(new DirectionBasedLinkingRule(51, 1, 8, 1,
-					new Minimum<Double>(.3), new Valid<Integer>(), new Minimum<Integer>(3)));
-
-			features = linker.link(features, image.getImg());
-			System.out.println("number of features after linking: "
-					+ features.size());
-		}
-		stop("linking");
 		
+		//detect small text
+		FeatureSet smallFeatures;
+		{
+			smallFeatures = new FeatureSet(25, image.getWidth(),
+					image.getHeight());
+			
+			{
+				FeatureRule rule;
+				rule = new AreaFeatureRule(new Interval<Double>(1., 5000.));
+
+				FeatureDetector detector = new ContourFeatureDetector(
+						new Interval<Integer>(15, 1000000), rule);
+
+				int num = detector.findFeatures(image.getImg(), smallFeatures);
+				System.out.println("number of features detected: " + num);
+			}
+
+			{
+				FeatureLinker linker = new BestDirectionFeatureLinker(16,
+						new Maximum<Double>(10.));
+
+				linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(
+						22.)));
+				linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(
+						400.)));
+
+				smallFeatures = linker.link(smallFeatures, image.getImg());
+
+				System.out.println("number of features after linking: "
+						+ smallFeatures.size());
+			}
+		}
+
+		//detect big text
+		FeatureSet bigFeatures;
+		{
+			bigFeatures = new FeatureSet(70, image.getWidth(), image.getHeight());
+
+			{
+				FeatureRule rule;
+				rule = new AreaFeatureRule(new Interval<Double>(1., 5000.));
+
+				FeatureDetector detector = new ContourFeatureDetector(
+						new Interval<Integer>(30, 240), rule);
+
+				int num = detector.findFeatures(bigImage.getImg(), bigFeatures);
+				System.out.println("number of features detected: " + num);
+			}
+			bigFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(16.),
+					new Valid<Double>()));
+			bigFeatures.dontRemove(new AreaFeatureRule(new Interval<Double>(70.,
+					1800.)));
+
+			{
+				FeatureLinker linker = new BestDirectionFeatureLinker(1,
+						new Maximum<Double>(25.));
+
+				linker.addRule(new CenterDistanceLinkingRule(
+						new Interval<Double>(40., 70.)));
+
+				bigFeatures = linker.link(bigFeatures, bigImage.getImg());
+
+				System.out.println("number of features after linking: "
+						+ bigFeatures.size());
+			}
+			bigFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(100.),
+					new Minimum<Double>(16.)));
+		}
+		
+		//merge big and small features
+		FeatureSet features = smallFeatures;
+		
+		
+
 		features.draw(image.getColor(), CvScalar.GREEN);
 		display.show(image.getColor());
 
@@ -236,7 +287,7 @@ public class TextDetection {
 			FeatureRule rule;
 			rule = new AreaFeatureRule(new Interval<Double>(100., 5000.));
 
-			FeatureDetector detector = new ContourBasedFeatureDetector(
+			FeatureDetector detector = new ContourFeatureDetector(
 					new Interval<Integer>(20, 1000000), rule);
 
 			int num = detector.findFeatures(image.getImg(), features);

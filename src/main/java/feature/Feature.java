@@ -1,4 +1,5 @@
 package feature;
+
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
 import java.util.Formatter;
@@ -8,7 +9,7 @@ import math.Angle180;
 import math.Box2D;
 import math.Vector2D;
 
-public abstract class Feature implements Comparable<Feature> {
+public abstract class Feature {
 	private Vector2D position;
 	private double width;
 	private double height;
@@ -86,9 +87,49 @@ public abstract class Feature implements Comparable<Feature> {
 		return angle;
 	}
 
-	@Override
-	public int compareTo(Feature o) {
-		return (int) Math.signum(height() - o.height());
+	public CvPoint cvPosition() {
+		return cvPoint((int) Math.round(position.x),
+				(int) Math.round(position.y));
+	}
+
+	public double distance(Feature other) {
+		return box.distance(other.box);
+	}
+	
+	public double overlappingArea(Feature other) {
+		return 0;
+	}
+
+	public int[] getCorners() {
+		int[] corners = new int[box.corners.length * 2];
+		
+		int i = 0;
+		for (Vector2D corner : box.corners) {
+			corners[i] = (int) Math.round(corner.x);
+			corners[i + 1] = (int) Math.round(corner.y);
+			i+=2;
+		}
+		
+		return corners;
+	}
+
+	public void draw(CvArr img, CvScalar color) {
+		CvPoint pos = cvPosition();
+		cvDrawCircle(img, pos, 1, color, 2, 0, 0);
+		box.draw(img, color);
+	}
+
+	public abstract void fill(CvArr img, CvScalar color);
+
+	public String toJSON() {
+		String corner0 = box.corners[0].toJSON();
+		String corner1 = box.corners[1].toJSON();
+		String corner2 = box.corners[2].toJSON();
+		String corner3 = box.corners[3].toJSON();
+
+		return String.format(Locale.US,
+				"{\"angle\": %.2f, \"corners\": [%s, %s, %s, %s]}",
+				angle.getDegrees(), corner0, corner1, corner2, corner3);
 	}
 
 	@Override
@@ -126,34 +167,6 @@ public abstract class Feature implements Comparable<Feature> {
 				.doubleToLongBits(other.width))
 			return false;
 		return true;
-	}
-
-	public CvPoint cvPosition() {
-		return cvPoint((int) Math.round(position.x),
-				(int) Math.round(position.y));
-	}
-
-	public double distance(Feature other) {
-		return box.distance(other.box);
-	}
-
-	public void draw(CvArr img, CvScalar color) {
-		CvPoint pos = cvPosition();
-		cvDrawCircle(img, pos, 1, color, 2, 0, 0);
-		box.draw(img, color);
-	}
-	
-	public abstract void fill(CvArr img, CvScalar color);
-
-	public String toJSON() {
-		String corner0 = box.corners[0].toJSON();
-		String corner1 = box.corners[1].toJSON();
-		String corner2 = box.corners[2].toJSON();
-		String corner3 = box.corners[3].toJSON();
-
-		return String.format(Locale.US,
-				"{\"angle\": %.2f, \"corners\": [%s, %s, %s, %s]}",
-				angle.getDegrees(), corner0, corner1, corner2, corner3);
 	}
 
 	public String toString() {

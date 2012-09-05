@@ -1,4 +1,4 @@
-package math;
+package miscellanous;
 
 public class Minimum<T extends Number> implements Validator<T> {
 	private T min;

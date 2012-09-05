@@ -1,4 +1,4 @@
-package math;
+package miscellanous;
 
 public class Maximum<T extends Number> implements Validator<T> {
 	private T max;

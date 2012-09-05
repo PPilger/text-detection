@@ -1,6 +1,6 @@
 package feature;
 
-import math.Validator;
+import miscellanous.Validator;
 
 public class AreaFeatureRule implements FeatureRule {
 	private Validator<Double> area;

@@ -9,24 +9,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import math.AngleIterable;
-import math.Maximum;
 import math.Rotation2D;
-import math.Validator;
 import math.Vector2D;
+import miscellanous.AngleIterable;
+import miscellanous.DoubleIterable;
+import miscellanous.Interval;
+import miscellanous.Validator;
 
-public class AngleBasedFeatureLinker extends FeatureLinker {
+public class BestDirectionFeatureLinker extends FeatureLinker {
+	private Iterable<Double> angles;
+	private Validator<Double> centerVariance;
+	
+	public BestDirectionFeatureLinker(int numDirections, Validator<Double> centerVariance) {
+		this.angles = new AngleIterable(numDirections);
+		this.centerVariance = centerVariance;
+	}
+	
+	public BestDirectionFeatureLinker(int numDirections, Interval<Double> directionRange, Validator<Double> centerVariance) {
+		this.angles = new AngleIterable(numDirections, directionRange);
+		this.centerVariance = centerVariance;
+	}
+	
+	public BestDirectionFeatureLinker(Validator<Double> centerVariance, double... angles) {
+		this.angles = new DoubleIterable(angles);
+		this.centerVariance = centerVariance;
+	}
 
 	@Override
 	public FeatureSet link(FeatureSet features,
 			Map<Feature, List<Feature>> adjacencyList) {
 		FeatureSet result = new FeatureSet(features);
 		{
-
-			int numAngles = 16;
-			Validator<Double> distance = new Maximum<Double>(10.);
-
-			AngleIterable angles = new AngleIterable(numAngles);
 
 			Map<Double, Map<Feature, Vector2D>> anglePositions = new HashMap<Double, Map<Feature, Vector2D>>();
 
@@ -81,7 +94,7 @@ public class AngleBasedFeatureLinker extends FeatureLinker {
 							}
 						}
 
-						if (!distance.isValid(upperY - lowerY)) {
+						if (!centerVariance.isValid(upperY - lowerY)) {
 							break;
 						}
 						component.add(feature);
@@ -99,7 +112,7 @@ public class AngleBasedFeatureLinker extends FeatureLinker {
 									l = pos.y;
 								}
 
-								if (distance.isValid(u - l)) {
+								if (centerVariance.isValid(u - l)) {
 									todo.add(neighbour);
 								}
 							}

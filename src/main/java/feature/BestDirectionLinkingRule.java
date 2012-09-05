@@ -12,12 +12,12 @@ import java.util.*;
 import math.Angle180;
 import math.Box2D;
 import math.Rotation2D;
-import math.Validator;
 import math.Vector2D;
+import miscellanous.Validator;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class DirectionBasedLinkingRule extends LinkingRule {
+public class BestDirectionLinkingRule extends LinkingRule {
 	// parameters
 	private int filterSize;
 	private int dilateSize;
@@ -32,7 +32,7 @@ public class DirectionBasedLinkingRule extends LinkingRule {
 	private IplImage direction;
 	private IplImage mask;
 
-	public DirectionBasedLinkingRule(int filterSize, int dilateSize,
+	public BestDirectionLinkingRule(int filterSize, int dilateSize,
 			int numAngles, int lineWidth, Validator<Double> featureRating,
 			Validator<Integer> width, Validator<Integer> height) {
 		this.filterSize = filterSize;

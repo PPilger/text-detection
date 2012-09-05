@@ -2,8 +2,8 @@ package feature;
 
 import math.Box2D;
 import math.Rotation2D;
-import math.Validator;
 import math.Vector2D;
+import miscellanous.Validator;
 
 public class FixedDirectionLinkingRule extends LinkingRule {
 	// parameters

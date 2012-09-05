@@ -1,6 +1,6 @@
 package feature;
 
-import math.Validator;
+import miscellanous.Validator;
 
 public class SizeFeatureRule implements FeatureRule {
 	private Validator<Double> width;

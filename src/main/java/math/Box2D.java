@@ -97,26 +97,19 @@ public class Box2D {
 			return false;
 		}
 
-		double x;
-		if (Double.isInfinite(k0)) {
-			x = p0.x;
-			double y = k1 * x + d1;
-
-			if (!inside(y, p0.y, p1.y)) {
-				return false;
-			}
+		if (Double.isInfinite(k0) || Double.isInfinite(k1)) {
+			double y = k1 * p0.x + d1;
+			
+			return inside(y, p0.y, q0.y) && inside(y, p1.y, q1.y);
 		} else if (Double.isInfinite(k1)) {
-			x = p1.x;
-			double y = k0 * x + d0;
+			double y = k0 * p1.x + d0;
 
-			if (!inside(y, p0.y, p1.y)) {
-				return false;
-			}
+			return inside(y, p0.y, q0.y) && inside(y, p1.y, q1.y);
 		} else {
-			x = (d1 - d0) / (k0 - k1);
+			double x = (d1 - d0) / (k0 - k1);
+			
+			return inside(x, p0.x, q0.x) && inside(x, p1.x, q1.x);
 		}
-
-		return inside(x, p0.x, q0.x) && inside(x, p1.x, q1.x);
 	}
 
 	public double distance(Box2D other) {

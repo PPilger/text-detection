@@ -12,11 +12,11 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
-import math.AngleIterable;
-import math.Maximum;
 import math.Rotation2D;
-import math.Validator;
 import math.Vector2D;
+import miscellanous.AngleIterable;
+import miscellanous.Maximum;
+import miscellanous.Validator;
 
 import static application.TextDetection.*;
 

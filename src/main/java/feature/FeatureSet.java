@@ -16,22 +16,22 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class FeatureSet implements Iterable<Feature> {
 	private double distance;
-	private int height;
-	private int width;
+	private int rows;
+	private int cols;
 	private Collection<Feature> allFeatures;
 	private Collection<Feature>[][] featureMap;
 
 	@SuppressWarnings("unchecked")
 	public FeatureSet(double distance, int width, int height) {
 		this.distance = distance;
-		this.height = (int) Math.ceil(height / (double) distance);
-		this.width = (int) Math.ceil(width / (double) distance);
+		this.rows = (int) Math.ceil(height / (double) distance);
+		this.cols = (int) Math.ceil(width / (double) distance);
 
 		this.allFeatures = new HashSet<Feature>();
-		this.featureMap = (Collection<Feature>[][]) new Collection[this.height][this.width];
+		this.featureMap = (Collection<Feature>[][]) new Collection[this.rows][this.cols];
 
-		for (int i = 0; i < this.height; i++) {
-			for (int j = 0; j < this.width; j++) {
+		for (int i = 0; i < this.rows; i++) {
+			for (int j = 0; j < this.cols; j++) {
 				featureMap[i][j] = new ArrayList<Feature>();
 			}
 		}
@@ -40,14 +40,14 @@ public class FeatureSet implements Iterable<Feature> {
 	@SuppressWarnings("unchecked")
 	public FeatureSet(FeatureSet other) {
 		this.distance = other.distance;
-		this.height = other.height;
-		this.width = other.width;
+		this.rows = other.rows;
+		this.cols = other.cols;
 
 		this.allFeatures = new HashSet<Feature>();
-		this.featureMap = (Collection<Feature>[][]) new Collection[this.height][this.width];
+		this.featureMap = (Collection<Feature>[][]) new Collection[this.rows][this.cols];
 
-		for (int i = 0; i < this.height; i++) {
-			for (int j = 0; j < this.width; j++) {
+		for (int i = 0; i < this.rows; i++) {
+			for (int j = 0; j < this.cols; j++) {
 				featureMap[i][j] = new ArrayList<Feature>();
 			}
 		}
@@ -57,12 +57,12 @@ public class FeatureSet implements Iterable<Feature> {
 		return distance;
 	}
 
-	public int getWidth() {
-		return width;
+	public int getCols() {
+		return cols;
 	}
 
-	public int getHeight() {
-		return height;
+	public int getRows() {
+		return rows;
 	}
 
 	public int size() {
@@ -93,12 +93,17 @@ public class FeatureSet implements Iterable<Feature> {
 	}
 
 	public void add(FeatureSet features) {
-		allFeatures.addAll(features.allFeatures);
+		if (distance == features.distance && rows == features.rows
+				&& cols == features.cols) {
+			allFeatures.addAll(features.allFeatures);
 
-		for (int i = 0; i <= height; i++) {
-			for (int j = 0; j <= width; j++) {
-				featureMap[i][j].addAll(features.featureMap[i][j]);
+			for (int i = 0; i <= rows; i++) {
+				for (int j = 0; j <= cols; j++) {
+					featureMap[i][j].addAll(features.featureMap[i][j]);
+				}
 			}
+		} else {
+			add(features.allFeatures);
 		}
 	}
 
@@ -125,7 +130,7 @@ public class FeatureSet implements Iterable<Feature> {
 
 		return count;
 	}
-	
+
 	public int dontRemove(FeatureRule rule) {
 		int count = 0;
 
@@ -143,7 +148,7 @@ public class FeatureSet implements Iterable<Feature> {
 	}
 
 	public FeatureSet split(FeatureRule rule) {
-		FeatureSet result = new FeatureSet(distance, width, height);
+		FeatureSet result = new FeatureSet(distance, cols, rows);
 
 		Iterator<Feature> iter = iterator();
 		while (iter.hasNext()) {
@@ -258,8 +263,8 @@ public class FeatureSet implements Iterable<Feature> {
 
 		xmin = xmin >= 0 ? xmin : 0;
 		ymin = ymin >= 0 ? ymin : 0;
-		xmax = xmax < width ? xmax : (width - 1);
-		ymax = ymax < height ? ymax : (height - 1);
+		xmax = xmax < cols ? xmax : (cols - 1);
+		ymax = ymax < rows ? ymax : (rows - 1);
 
 		for (int i = ymin; i <= ymax; i++) {
 			for (int j = xmin; j <= xmax; j++) {
