@@ -27,9 +27,9 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		// britishIsles();
-		portolanAtlas();
-		// mooskirchen();
+		 britishIsles();
+		//portolanAtlas();
+		//mooskirchen();
 
 		System.out.println(counter);
 	}
@@ -65,7 +65,7 @@ public class TextDetection {
 
 	public static void mooskirchen() {
 		Image image = new Image("samples" + File.separator
-				+ "Mooskirchen_Grazer_Feld_S.jpg");
+				+ "Mooskirchen_Grazer_Feld.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 
@@ -257,7 +257,7 @@ public class TextDetection {
 		}
 		
 		//merge big and small features
-		FeatureSet features = smallFeatures;
+		FeatureSet features = bigFeatures;
 		
 		
 
@@ -270,17 +270,21 @@ public class TextDetection {
 
 	public static void britishIsles() {
 		Image image = new Image("samples" + File.separator
-				+ "British Isles.png");
+				+ "British Isles.jpg");
 
-		image.process(new ThresholdProcessor(207));
+		ImageDisplay display = new ImageDisplay("output", 1200, 800);
+		
+		image.process(new ThresholdProcessor(190));//207
 		image.process(new InvertProcessor());
+		display.show(image.getImg());
 		image.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
 		image.process(new ThicknessProcessor(1, 5));
-		image.process(new RemoveLinesProcessor(60));
+		//image.process(new RemoveLinesProcessor(60));
 		image.process(new DilateProcessor(3));
 		image.process(new CloseProcessor(3));
+		display.show(image.getImg());
 
-		FeatureSet features = new FeatureSet(200, image.getWidth(),
+		FeatureSet features = new FeatureSet(30, image.getWidth(),
 				image.getHeight());
 
 		{
@@ -294,22 +298,26 @@ public class TextDetection {
 			System.out.println("number of features detected: " + num);
 		}
 		features.draw(image.getColor(), CvScalar.BLACK);
+		display.show(image.getColor());
 
 		{
 			FeatureLinker linker = new FeatureLinker();
 
 			linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(1000.)));
+			linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(10.)));
 
 			features = linker.link(features, image.getImg());
 			System.out.println("number of features after linking: "
 					+ features.size());
 		}
+		features.remove(new SizeFeatureRule(new Maximum<Double>(40.), new Maximum<Double>(20.)));
+		System.out.println("number of features after removing: "
+				+ features.size());
 		features.draw(image.getColor(), CvScalar.GREEN);
 
-		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 		display.show(image.getColor());
 
 		features.write("British Isles Features.js");
-		Image.write(image.getColor(), "British Isles.png");
+		Image.write(image.getColor(), "British Isles.jpg");
 	}
 }

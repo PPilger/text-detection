@@ -55,4 +55,17 @@ public class Rotation2D {
 			points[i + 1] = (int) Math.round(y);
 		}
 	}
+	
+	public void rotate(int[] points) {
+		for (int i = 0; i < points.length; i += 2) {
+			int px = points[i];
+			int py = points[i + 1];
+			
+			double x = px * c00 + py * c01;
+			double y = px * c10 + py * c11;
+			
+			points[i] = (int) Math.round(x);
+			points[i + 1] = (int) Math.round(y);
+		}
+	}
 }

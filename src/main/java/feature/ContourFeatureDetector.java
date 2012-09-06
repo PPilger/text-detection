@@ -37,7 +37,7 @@ public class ContourFeatureDetector implements FeatureDetector {
 			
 			cvFindContours(temp, mem, contour, sizeof(CvContour.class),
 					CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
-			for (; contour != null; contour = contour.h_next()) {
+			for (; contour != null && !contour.isNull(); contour = contour.h_next()) {
 				if (perimeter.isValid(contour.total())) {
 					ContourFeature feature = ContourFeature.create(new CvContour(contour));
 					
