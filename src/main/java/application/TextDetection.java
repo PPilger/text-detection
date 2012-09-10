@@ -4,6 +4,7 @@ import feature.*;
 import image.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import miscellanous.Valid;
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 
 import static com.googlecode.javacv.cpp.opencv_photo.*;
+import static com.googlecode.javacv.cpp.opencv_core.*;
 
 public class TextDetection {
 
@@ -27,8 +29,8 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		//britishIsles();
-		portolanAtlas();
+		britishIsles();
+		//portolanAtlas();
 		//mooskirchen();
 
 		System.out.println(counter);
@@ -126,7 +128,7 @@ public class TextDetection {
 
 	public static void portolanAtlas() {
 		Image image = new Image("samples" + File.separator
-				+ "PORTOLAN_ATLAS_S.jpg");
+				+ "PORTOLAN_ATLAS.jpg");
 		ImageDisplay display = new ImageDisplay("output1", 1200, 800);
 		ImageDisplay display2 = new ImageDisplay("output2", 1200, 800);
 
@@ -135,9 +137,12 @@ public class TextDetection {
 
 			lines.process(new ThresholdProcessor(165));
 			lines.process(new InvertProcessor());
-			lines.process(new BigObjectEraseProcessor(3));
+			//Image.write(lines.getImg(), "lines3.jpg");
+			lines.process(new BigObjectEraseProcessor(4));
+			//Image.write(lines.getImg(), "lines2.jpg");
 			lines.process(new SmallObjectErasorProcessor(20));
-			lines.process(new LineSegmentsProcessor(40, 50, 800));
+			Image.write(lines.getImg(), "lines1.jpg");
+			lines.process(new LineSegmentsProcessor(90, 256, 64));//40,50,800
 
 			/*
 			 * lines.process(new DilateProcessor(3));
@@ -145,13 +150,12 @@ public class TextDetection {
 			 * lines.getImg(), image.getColor(), 20, CV_INPAINT_NS);
 			 * display2.show(image.getColor());
 			 */
-			// display.show(lines.getImg(), image.getGray());
 		}
 
 		{
 			image.process(new ThresholdProcessor(165));
 			image.process(new InvertProcessor());
-
+			
 			image.process(new CloseProcessor(3));
 			image.process(new BigObjectEraseProcessor(11));
 			image.process(new SmallObjectErasorProcessor(10));
@@ -169,7 +173,7 @@ public class TextDetection {
 			image.process(new DilateProcessor(3));
 			image.process(new CloseProcessor(3));
 
-			//display.show(image.getImg());
+			display.show(image.getImg());
 
 			// image.process(new DilateProcessor(3));
 			// display.show(image.getColor());
@@ -183,8 +187,6 @@ public class TextDetection {
 			bigImage.process(new ThresholdProcessor(140));
 			bigImage.process(new InvertProcessor());
 			bigImage.process(new CloseProcessor());
-
-			//display.show(bigImage.getImg());
 		}
 		
 		//detect small text
@@ -218,6 +220,8 @@ public class TextDetection {
 				System.out.println("number of features after linking: "
 						+ smallFeatures.size());
 			}
+			smallFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(30.),
+					new Minimum<Double>(8.)));
 		}
 
 		//detect big text
@@ -260,6 +264,8 @@ public class TextDetection {
 		FeatureSet features = smallFeatures;
 
 		features.merge(bigFeatures);
+		System.out.println("number of features after merging: "
+				+ features.size());
 		
 		features.draw(image.getColor(), CvScalar.BLUE);
 		display.show(image.getColor());
@@ -270,19 +276,17 @@ public class TextDetection {
 
 	public static void britishIsles() {
 		Image image = new Image("samples" + File.separator
-				+ "British Isles.jpg");
+				+ "British Isles S.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 		
 		image.process(new ThresholdProcessor(190));//207
 		image.process(new InvertProcessor());
-		display.show(image.getImg());
 		image.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
 		image.process(new ThicknessProcessor(1, 5));
 		//image.process(new RemoveLinesProcessor(60));
 		image.process(new DilateProcessor(3));
 		image.process(new CloseProcessor(3));
-		display.show(image.getImg());
 
 		FeatureSet features = new FeatureSet(30, image.getWidth(),
 				image.getHeight());
@@ -297,8 +301,6 @@ public class TextDetection {
 			int num = detector.findFeatures(image.getImg(), features);
 			System.out.println("number of features detected: " + num);
 		}
-		features.draw(image.getColor(), CvScalar.BLACK);
-		display.show(image.getColor());
 
 		{
 			FeatureLinker linker = new FeatureLinker();
@@ -313,11 +315,16 @@ public class TextDetection {
 		features.remove(new SizeFeatureRule(new Maximum<Double>(40.), new Maximum<Double>(20.)));
 		System.out.println("number of features after removing: "
 				+ features.size());
-		features.draw(image.getColor(), CvScalar.GREEN);
 
+		for(Feature f : features) {
+			f.write(image.getColor(), "British Isles", 10);
+		}
+		
+		features.draw(image.getColor(), CvScalar.GREEN);
 		display.show(image.getColor());
 
 		features.write("British Isles Features.js");
 		Image.write(image.getColor(), "British Isles.jpg");
+		
 	}
 }

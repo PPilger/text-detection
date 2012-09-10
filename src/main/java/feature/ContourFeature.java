@@ -69,7 +69,6 @@ public class ContourFeature extends Feature {
 	public void draw(CvArr img, CvScalar color) {
 		cvDrawContours(img, contour, color, color, -1, 1, 0);
 		cvDrawCircle(img, getCvCenter(), 1, color, 2, 0, 0);
-		super.draw(img, color);
 	}
 
 	@Override

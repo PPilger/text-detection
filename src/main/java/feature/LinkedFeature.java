@@ -6,8 +6,6 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
 import java.util.Collection;
 
-import math.Vector;
-
 import com.googlecode.javacpp.PointerPointer;
 
 public class LinkedFeature extends Feature {
@@ -32,15 +30,6 @@ public class LinkedFeature extends Feature {
 
 			i += corners.length;
 		}
-		/*int[] coords = new int[8 * subFeatures.size()];
-		int i = 0;
-		for (Feature f : subFeatures) {
-		for (Vector corner : f.getCorners()) {
-		coords[i] = (int) Math.round(corner.x);
-		coords[i + 1] = (int) Math.round(corner.y);
-		i+=2;
-		}
-		}*/
 
 		CvSeq seq = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq.class),
 				sizeof(CvPoint.class), mem);
@@ -57,10 +46,10 @@ public class LinkedFeature extends Feature {
 	}
 
 	public void draw(CvArr img, CvScalar color) {
-		super.draw(img, color);
 		for (Feature f : subFeatures) {
 			f.draw(img, CvScalar.BLACK);
 		}
+		super.draw(img, color);
 	}
 
 	public void fill(CvArr img, CvScalar color) {

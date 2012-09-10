@@ -4,6 +4,9 @@ import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 import static com.googlecode.javacv.cpp.opencv_core.*;
+
+import java.io.File;
+
 import math.Vector;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
@@ -159,6 +162,7 @@ public class Image {
 	}
 
 	public static void write(IplImage img, String filename) {
+		new File(filename).mkdir();
 		cvSaveImage(filename, img);
 	}
 
