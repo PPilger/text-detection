@@ -13,7 +13,7 @@ public class SizeFeatureRule implements FeatureRule {
 
 	@Override
 	public boolean isValid(Feature feature) {
-		return width.isValid(feature.width()) && height.isValid(feature.height());
+		return width.isValid(feature.getWidth()) && height.isValid(feature.getHeight());
 	}
 	
 }

@@ -1,24 +1,10 @@
 package feature;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
+import static application.TextDetection.count;
+import static application.TextDetection.start;
+import static application.TextDetection.stop;
 
-import math.Rotation2D;
-import math.Vector2D;
-import miscellanous.AngleIterable;
-import miscellanous.Maximum;
-import miscellanous.Validator;
-
-import static application.TextDetection.*;
+import java.util.*;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -51,16 +37,11 @@ public class FeatureLinker {
 		// fill the adjacency list
 		start();
 		{
-			// for (int i = 0; i < features.size(); i++) {
-			// for (int j = i + 1; j < features.size(); j++) {
 			Set<Feature> marked = new HashSet<Feature>();
 			for (Feature f0 : features) {
 				marked.add(f0);
 				for (Feature f1 : features.getNeighbours(f0)) {
 					if (!marked.contains(f1)) {
-						// Feature f0 = features.get(i);
-						// Feature f1 = features.get(j);
-
 						if (link(f0, f1)) {
 							adjacencyList.get(f0).add(f1);
 							adjacencyList.get(f1).add(f0);

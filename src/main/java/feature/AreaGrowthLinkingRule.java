@@ -14,7 +14,7 @@ public class AreaGrowthLinkingRule extends LinkingRule {
 	@Override
 	public boolean link(Feature f0, Feature f1) {
 		LinkedFeature lf = LinkedFeature.create(Arrays.asList(f0, f1));
-		double growth = lf.area()-f0.area()-f1.area();
+		double growth = lf.getArea()-f0.getArea()-f1.getArea();
 		return areaGrowth.isValid(growth);
 	}
 }

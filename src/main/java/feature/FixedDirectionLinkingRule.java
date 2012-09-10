@@ -1,40 +1,37 @@
 package feature;
 
-import math.Box2D;
-import math.Rotation2D;
-import math.Vector2D;
+import math.Rotation;
+import math.Vector;
 import miscellanous.Validator;
 
 public class FixedDirectionLinkingRule extends LinkingRule {
 	// parameters
-	private Rotation2D matrix;
+	private Rotation rotation;
 	private Validator<Integer> width;
 	private Validator<Integer> height;
 
 	public FixedDirectionLinkingRule(double angle,
 			Validator<Integer> width, Validator<Integer> height) {
-		this.matrix = new Rotation2D(angle);
+		this.rotation = new Rotation(angle);
 		this.width = width;
 		this.height = height;
 	}
 
 	@Override
 	public boolean link(Feature f0, Feature f1) {
-		Vector2D min0;
-		Vector2D max0;
-		Vector2D min1;
-		Vector2D max1;
+		Vector min0;
+		Vector max0;
+		Vector min1;
+		Vector max1;
 		
 		{
-			Vector2D center = f0.position().center(f1.position());
+			Vector center = f0.getCenter().center(f1.getCenter());
 			
-			Box2D box = f0.box();
-			Vector2D[] bounds = Vector2D.bounds(matrix.rotate(box.corners, center));
+			Vector[] bounds = Vector.bounds(rotation.rotate(f0.getCorners(), center));
 			min0 = bounds[0];
 			max0 = bounds[1];
 			
-			box = f1.box();
-			bounds = Vector2D.bounds(matrix.rotate(box.corners, center));
+			bounds = Vector.bounds(rotation.rotate(f1.getCorners(), center));
 			min1 = bounds[0];
 			max1 = bounds[1];
 		}

@@ -11,6 +11,6 @@ public class AreaFeatureRule implements FeatureRule {
 
 	@Override
 	public boolean isValid(Feature feature) {
-		return area.isValid(feature.area());
+		return area.isValid(feature.getArea());
 	}
 }

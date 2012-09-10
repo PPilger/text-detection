@@ -27,8 +27,8 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		 britishIsles();
-		//portolanAtlas();
+		//britishIsles();
+		portolanAtlas();
 		//mooskirchen();
 
 		System.out.println(counter);
@@ -169,7 +169,7 @@ public class TextDetection {
 			image.process(new DilateProcessor(3));
 			image.process(new CloseProcessor(3));
 
-			// display.show(image.getImg());
+			//display.show(image.getImg());
 
 			// image.process(new DilateProcessor(3));
 			// display.show(image.getColor());
@@ -184,7 +184,7 @@ public class TextDetection {
 			bigImage.process(new InvertProcessor());
 			bigImage.process(new CloseProcessor());
 
-			display.show(bigImage.getImg());
+			//display.show(bigImage.getImg());
 		}
 		
 		//detect small text
@@ -257,11 +257,11 @@ public class TextDetection {
 		}
 		
 		//merge big and small features
-		FeatureSet features = bigFeatures;
-		
-		
+		FeatureSet features = smallFeatures;
 
-		features.draw(image.getColor(), CvScalar.GREEN);
+		features.merge(bigFeatures);
+		
+		features.draw(image.getColor(), CvScalar.BLUE);
 		display.show(image.getColor());
 
 		features.write("Portolan Atlas Features.js");

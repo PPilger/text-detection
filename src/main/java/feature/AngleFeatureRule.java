@@ -11,6 +11,6 @@ public class AngleFeatureRule implements FeatureRule {
 
 	@Override
 	public boolean isValid(Feature feature) {
-		return angle.isValid(feature.angle().getRadians());
+		return angle.isValid(feature.getAngle().getRadians());
 	}
 }

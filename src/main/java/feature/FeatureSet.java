@@ -5,11 +5,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import math.Vector2D;
+import math.Vector;
 
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
@@ -70,7 +73,7 @@ public class FeatureSet implements Iterable<Feature> {
 	}
 
 	public Collection<Feature> getNeighbours(Feature feature) {
-		Vector2D pos = feature.position();
+		Vector pos = feature.getCenter();
 
 		int x = (int) (pos.x / distance);
 		int y = (int) (pos.y / distance);
@@ -163,6 +166,36 @@ public class FeatureSet implements Iterable<Feature> {
 		return result;
 	}
 
+	public void merge(FeatureSet other) {
+		List<Feature> add = new ArrayList<Feature>();
+		List<Feature> remove = new ArrayList<Feature>();
+
+		for (Feature f0 : allFeatures) {
+			for (Collection<Feature> cell : other.getNeighbourCells(f0)) {
+				for (Feature f1 : cell) {
+					double area = f0.intersectionArea(f1);
+					double area0 = f0.getArea();
+					double area1 = f1.getArea();
+					
+					if (area / area0 > 0.5 || area / area1 > 0.5) {
+						if(area0 < area1) {
+							remove.add(f0);
+							add.add(f1);
+						}
+					} else {
+						add.add(f1);
+					}
+				}
+			}
+		}
+
+		for(Feature f : remove) {
+			remove(f);
+		}
+		
+		add(add);
+	}
+
 	@Override
 	public Iterator<Feature> iterator() {
 		return new Iterator<Feature>() {
@@ -187,29 +220,6 @@ public class FeatureSet implements Iterable<Feature> {
 				for (Collection<Feature> cell : getNeighbourCells(current)) {
 					cell.remove(current);
 				}
-			}
-		};
-	}
-
-	public Iterator<Feature> iterator(final Feature feature) {
-		return new Iterator<Feature>() {
-			Iterator<Feature> iter = getNeighbours(feature).iterator();
-			Feature current;
-
-			@Override
-			public boolean hasNext() {
-				return iter.hasNext();
-			}
-
-			@Override
-			public Feature next() {
-				current = iter.next();
-				return current;
-			}
-
-			@Override
-			public void remove() {
-				FeatureSet.this.remove(current);
 			}
 		};
 	}
@@ -254,8 +264,8 @@ public class FeatureSet implements Iterable<Feature> {
 	private List<Collection<Feature>> getNeighbourCells(Feature feature) {
 		List<Collection<Feature>> neighbourCells = new ArrayList<Collection<Feature>>();
 
-		Vector2D min = feature.box().min();
-		Vector2D max = feature.box().max();
+		Vector min = feature.getMin();
+		Vector max = feature.getMax();
 		int xmin = (int) (min.x / distance) - 1;
 		int ymin = (int) (min.y / distance) - 1;
 		int xmax = (int) (max.x / distance) + 1;

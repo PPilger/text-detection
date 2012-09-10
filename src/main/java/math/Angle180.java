@@ -26,7 +26,7 @@ public class Angle180 {
 		fix();
 	}
 
-	public Angle180(Vector2D p, Vector2D q) {
+	public Angle180(Vector p, Vector q) {
 		if (p.x == q.x) {
 			this.rad = Math.PI / 2;
 		} else {

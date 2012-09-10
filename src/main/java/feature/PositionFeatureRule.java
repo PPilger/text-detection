@@ -1,6 +1,6 @@
 package feature;
 
-import math.Vector2D;
+import math.Vector;
 import miscellanous.Validator;
 
 public class PositionFeatureRule implements FeatureRule {
@@ -14,7 +14,7 @@ public class PositionFeatureRule implements FeatureRule {
 
 	@Override
 	public boolean isValid(Feature feature) {
-		Vector2D pos = feature.position();
+		Vector pos = feature.getCenter();
 		return x.isValid((int) Math.round(pos.x)) && y.isValid((int) Math.round(pos.y));
 	}
 

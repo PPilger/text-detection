@@ -10,9 +10,9 @@ import image.Image;
 import java.util.*;
 
 import math.Angle180;
-import math.Box2D;
-import math.Rotation2D;
-import math.Vector2D;
+import math.Box;
+import math.Rotation;
+import math.Vector;
 import miscellanous.Validator;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
@@ -158,8 +158,8 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			CvMat subDirection;
 			CvMat subMask;
 			{
-				Box2D box = feature.box();
-				CvRect rect = Image.clip(img, box.min, box.max);
+				CvRect rect = Image.clip(img, feature.getMin(),
+						feature.getMax());
 
 				int width = rect.width();
 				int height = rect.height();
@@ -190,18 +190,7 @@ public class BestDirectionLinkingRule extends LinkingRule {
 		{
 			double max = 0;
 
-			/*int a = hist0.max();
-			int b = hist1.max();
-			if (hist0.get(a) < hist1.get(b)) {
-				idx = b;
-				max = hist1.get(b);
-			} else {
-				idx = a;
-				max = hist0.get(a);
-			}*/
-
 			for (int i = 0; i < hist0.size(); i++) {
-				//double val = (hist0.get(i) + hist1.get(i)) / 2;
 				double val = Math.min(hist0.get(i), hist1.get(i));
 				if (max < val) {
 					idx = i;
@@ -210,8 +199,6 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			}
 
 			if (!featureRating.isValid(max)) {
-				//angle = new Angle180(f0.position(), f1.position()).getRadians();
-				//idx = (int) Math.round(angle / Math.PI * hist0.size());
 				return false;
 			}
 
@@ -220,26 +207,25 @@ public class BestDirectionLinkingRule extends LinkingRule {
 
 		//
 		{
-			Rotation2D matrix = new Rotation2D(-angle);
-			Rotation2D inv = new Rotation2D(angle);
+			Rotation matrix = new Rotation(-angle);
+			Rotation inv = new Rotation(angle);
 
-			Vector2D min0;
-			Vector2D max0;
-			Vector2D min1;
-			Vector2D max1;
+			Vector min0;
+			Vector max0;
+			Vector min1;
+			Vector max1;
 
-			Vector2D center;
+			Vector center;
 			{
-				center = f0.position().center(f1.position());
+				center = f0.getCenter().center(f1.getCenter());
 
-				Box2D box = f0.box();
-				Vector2D[] bounds = Vector2D.bounds(matrix.rotate(box.corners,
-						center));
+				Vector[] bounds = Vector.bounds(matrix.rotate(
+						f0.getCorners(), center));
 				min0 = bounds[0];
 				max0 = bounds[1];
 
-				box = f1.box();
-				bounds = Vector2D.bounds(matrix.rotate(box.corners, center));
+				bounds = Vector
+						.bounds(matrix.rotate(f1.getCorners(), center));
 				min1 = bounds[0];
 				max1 = bounds[1];
 			}
@@ -298,8 +284,8 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			cvSetZero(mask);
 			cvFillConvexPoly(mask, points, 4, CvScalar.WHITE, 8, 0);
 
-			Vector2D[] bounds = Vector2D.bounds(f0.box().min, f0.box().max,
-					f1.box().min, f1.box().max);
+			Vector[] bounds = Vector.bounds(new Vector[] { f0.getMin(),
+					f0.getMax(), f1.getMin(), f1.getMax() });
 			CvRect rect = Image.clip(mask, bounds[0], bounds[1]);
 
 			CvMat subDirection = CvMat.createHeader(rect.height(),
@@ -335,20 +321,11 @@ public class BestDirectionLinkingRule extends LinkingRule {
 		cvResize(img, imgL, CV_INTER_NN);
 		cvResize(direction, directionL, CV_INTER_NN);
 		cvResize(mask, maskL, CV_INTER_NN);
-		/*
-		 * int width = 200*scale; int height = 120*scale; int px = 800, py =
-		 * 600; //int px = 850, py = 650; //int px = 620, py = 580; CvRect roi =
-		 * cvRect(px*scale, py*scale, width, height); cvSetImageROI(imgL, roi);
-		 * cvSetImageROI(directionL, roi); cvSetImageROI(maskL, roi);
-		 * cvSetImageROI(angle, roi);
-		 */
+
 		img = imgL;
 		direction = directionL;
 		mask = maskL;
 
-		/*
-		 * IplImage angle = temp32f;
-		 */
 		int size3 = 5;
 		int border3 = size3 / 2 + 1;
 
@@ -362,10 +339,6 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			cvCmpS(direction, i, mask, CV_CMP_EQ);
 			cvSet(angle, cvScalarAll(a), mask);
 		}
-
-		// average angles over the displayed area
-		// not always correct (180° == 0°)
-		// cvSmooth(angle, angle, CV_BLUR, size3);
 
 		// draw angles
 		for (int y = border3; y < height - border3; y += size3) {
@@ -382,7 +355,6 @@ public class BestDirectionLinkingRule extends LinkingRule {
 		}
 
 		cvSaveImage("direction.png", img);
-		// cvShowImage("img", img);
 		cvWaitKey();
 	}
 }

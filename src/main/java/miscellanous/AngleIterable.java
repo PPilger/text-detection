@@ -16,7 +16,10 @@ public class AngleIterable implements Iterable<Double> {
 	public AngleIterable(int numAngles, Interval<Double> range) {
 		this.numAngles = numAngles;
 		this.min = range.getMin();
-		this.step = (range.getMax() - min) / (numAngles - 1);
+		this.step = range.getMax() - min;
+		if(numAngles > 1) {
+			this.step /= numAngles - 1;
+		}
 	}
 
 	@Override

@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import math.Rotation2D;
-import math.Vector2D;
+import math.Rotation;
+import math.Vector;
 import miscellanous.AngleIterable;
 import miscellanous.DoubleIterable;
 import miscellanous.Interval;
@@ -41,15 +41,15 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 		FeatureSet result = new FeatureSet(features);
 		{
 
-			Map<Double, Map<Feature, Vector2D>> anglePositions = new HashMap<Double, Map<Feature, Vector2D>>();
+			Map<Double, Map<Feature, Vector>> anglePositions = new HashMap<Double, Map<Feature, Vector>>();
 
 			for (double angle : angles) {
-				Rotation2D rotation = new Rotation2D(angle);
+				Rotation rotation = new Rotation(angle);
 
-				Map<Feature, Vector2D> positions = new HashMap<Feature, Vector2D>();
+				Map<Feature, Vector> positions = new HashMap<Feature, Vector>();
 
 				for (Feature feature : features) {
-					Vector2D pos = rotation.rotate(feature.position());
+					Vector pos = rotation.rotate(feature.getCenter());
 					positions.put(feature, pos);
 				}
 
@@ -63,7 +63,7 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 
 				for (double angle : angles) {
 
-					Map<Feature, Vector2D> positions = anglePositions
+					Map<Feature, Vector> positions = anglePositions
 							.get(angle);
 
 					Set<Feature> component = new HashSet<Feature>();
@@ -72,7 +72,7 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 					double upperY;
 					double lowerY;
 					{
-						Vector2D pos = positions.get(start);
+						Vector pos = positions.get(start);
 						upperY = pos.y;
 						lowerY = pos.y;
 					}
@@ -86,7 +86,7 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 						Feature feature = todo.remove(todo.size() - 1);
 
 						{
-							Vector2D pos = positions.get(feature);
+							Vector pos = positions.get(feature);
 							if (upperY < pos.y) {
 								upperY = pos.y;
 							} else if (pos.y < lowerY) {
@@ -103,7 +103,7 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 							if (!marked.contains(neighbour)) {
 								marked.add(neighbour);
 
-								Vector2D pos = positions.get(feature);
+								Vector pos = positions.get(feature);
 								double u = upperY;
 								double l = lowerY;
 								if (upperY < pos.y) {
@@ -144,9 +144,9 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 				LinkedFeature temp = LinkedFeature.create(lf);
 				double area = 0;
 				for (Feature f : lf) {
-					area += f.area();
+					area += f.getArea();
 				}
-				double rank = lf.size() * area / temp.area();
+				double rank = lf.size() * area / temp.getArea();
 
 				ranking.put(lf, rank);
 			}
@@ -184,9 +184,9 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 
 	private class RotatedPositionComparator implements Comparator<Feature> {
 		private double yOffset = 0;
-		private Map<Feature, Vector2D> positions;
+		private Map<Feature, Vector> positions;
 
-		public RotatedPositionComparator(Map<Feature, Vector2D> positions,
+		public RotatedPositionComparator(Map<Feature, Vector> positions,
 				double yOffset) {
 			this.positions = positions;
 			this.yOffset = yOffset;

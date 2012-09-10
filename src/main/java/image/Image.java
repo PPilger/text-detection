@@ -4,7 +4,7 @@ import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 import static com.googlecode.javacv.cpp.opencv_core.*;
-import math.Vector2D;
+import math.Vector;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -162,7 +162,7 @@ public class Image {
 		cvSaveImage(filename, img);
 	}
 
-	public static CvRect clip(IplImage img, Vector2D min, Vector2D max) {
+	public static CvRect clip(IplImage img, Vector min, Vector max) {
 		int xmin = Image.clipX(img, min.x);
 		int xmax = Image.clipX(img, max.x);
 		int ymin = Image.clipY(img, min.y);

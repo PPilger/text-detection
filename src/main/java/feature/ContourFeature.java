@@ -3,7 +3,7 @@ package feature;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
-import math.Vector2D;
+import math.Vector;
 
 public class ContourFeature extends Feature {
 
@@ -25,12 +25,12 @@ public class ContourFeature extends Feature {
 	private static double invSqrt2 = 1 / Math.sqrt(2);
 
 	public boolean insideOf(ContourFeature other) {
-		if (width() >= other.width() || height() >= other.height()) {
+		if (getWidth() >= other.getWidth() || getHeight() >= other.getHeight()) {
 			return false;
 		}
 
-		Vector2D v0 = position();
-		Vector2D v1 = other.position();
+		Vector v0 = getCenter();
+		Vector v1 = other.getCenter();
 		double dx = v0.x - v1.x;
 		dx = dx < 0 ? -dx : dx;
 		double dy = v0.y - v1.y;
@@ -39,7 +39,7 @@ public class ContourFeature extends Feature {
 		// width/sqrt(2) as upper bound approximation for the bounding sphere
 		// radius
 		// max(dx, dy) as lower bound approximation for the distance
-		if (Math.max(width(), other.width()) * invSqrt2 < Math.max(dx, dy)) {
+		if (Math.max(getWidth(), other.getWidth()) * invSqrt2 < Math.max(dx, dy)) {
 			return false;
 		}
 
@@ -50,7 +50,7 @@ public class ContourFeature extends Feature {
 	}
 	
 	@Override
-	public int[] getCorners() {
+	public int[] getICorners() {
 		if (corners == null) {
 			CvSeq hull = cvConvexHull2(contour, mem, CV_CLOCKWISE, 1);
 
@@ -61,7 +61,6 @@ public class ContourFeature extends Feature {
 				corners[j] = p.x();
 				corners[j + 1] = p.y();
 			}
-
 		}
 		return corners;
 	}
@@ -69,8 +68,8 @@ public class ContourFeature extends Feature {
 	@Override
 	public void draw(CvArr img, CvScalar color) {
 		cvDrawContours(img, contour, color, color, -1, 1, 0);
-		cvDrawCircle(img, cvPosition(), 1, color, 2, 0, 0);
-		//box().draw(img, color);
+		cvDrawCircle(img, getCvCenter(), 1, color, 2, 0, 0);
+		super.draw(img, color);
 	}
 
 	@Override

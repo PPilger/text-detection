@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import math.Angle180;
-import math.Line2D;
+import math.InfiniteLine;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -28,7 +28,7 @@ public class RemoveLinesProcessor extends SimpleImageProcessor {
 		for (int i = 0; i < lines.total(); i++) {
 			CvPoint2D32f polar = new CvPoint2D32f(cvGetSeqElem(lines, i));
 
-			Line2D line = new Line2D(polar.x(), polar.y());
+			InfiniteLine line = new InfiniteLine(polar.x(), polar.y());
 			line.draw(img, CvScalar.BLACK);
 			line.draw(temp, CvScalar.WHITE);
 		}

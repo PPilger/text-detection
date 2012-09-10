@@ -11,7 +11,7 @@ public class CenterDistanceLinkingRule  extends LinkingRule {
 
 		@Override
 		public boolean link(Feature f0, Feature f1) {
-			double dist = f0.position().distance(f1.position());
+			double dist = f0.getCenter().distance(f1.getCenter());
 			return distance.isValid(dist);
 		}
 }
