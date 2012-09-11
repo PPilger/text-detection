@@ -162,7 +162,10 @@ public class Image {
 	}
 
 	public static void write(IplImage img, String filename) {
-		new File(filename).mkdir();
+		File f = new File(filename);
+		if(f.isDirectory()) {
+			f.mkdir();
+		}
 		cvSaveImage(filename, img);
 	}
 

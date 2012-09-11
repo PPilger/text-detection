@@ -30,8 +30,8 @@ public class TextDetection {
 	 */
 	public static void main(String[] args) throws InterruptedException {
 		britishIsles();
-		//portolanAtlas();
-		//mooskirchen();
+		// portolanAtlas();
+		// mooskirchen();
 
 		System.out.println(counter);
 	}
@@ -122,7 +122,7 @@ public class TextDetection {
 		features.draw(image.getColor(), CvScalar.GREEN);
 		display.show(image.getColor());
 
-		features.write("Mooskirchen Features.js");
+		features.writeJSON("Mooskirchen Features.js");
 		Image.write(image.getColor(), "Mooskirchen.jpg");
 	}
 
@@ -137,12 +137,12 @@ public class TextDetection {
 
 			lines.process(new ThresholdProcessor(165));
 			lines.process(new InvertProcessor());
-			//Image.write(lines.getImg(), "lines3.jpg");
+			// Image.write(lines.getImg(), "lines3.jpg");
 			lines.process(new BigObjectEraseProcessor(4));
-			//Image.write(lines.getImg(), "lines2.jpg");
+			// Image.write(lines.getImg(), "lines2.jpg");
 			lines.process(new SmallObjectErasorProcessor(20));
 			Image.write(lines.getImg(), "lines1.jpg");
-			lines.process(new LineSegmentsProcessor(90, 256, 64));//40,50,800
+			lines.process(new LineSegmentsProcessor(90, 256, 64));// 40,50,800
 
 			/*
 			 * lines.process(new DilateProcessor(3));
@@ -155,7 +155,7 @@ public class TextDetection {
 		{
 			image.process(new ThresholdProcessor(165));
 			image.process(new InvertProcessor());
-			
+
 			image.process(new CloseProcessor(3));
 			image.process(new BigObjectEraseProcessor(11));
 			image.process(new SmallObjectErasorProcessor(10));
@@ -188,13 +188,13 @@ public class TextDetection {
 			bigImage.process(new InvertProcessor());
 			bigImage.process(new CloseProcessor());
 		}
-		
-		//detect small text
+
+		// detect small text
 		FeatureSet smallFeatures;
 		{
 			smallFeatures = new FeatureSet(25, image.getWidth(),
 					image.getHeight());
-			
+
 			{
 				FeatureRule rule;
 				rule = new AreaFeatureRule(new Interval<Double>(1., 5000.));
@@ -220,14 +220,15 @@ public class TextDetection {
 				System.out.println("number of features after linking: "
 						+ smallFeatures.size());
 			}
-			smallFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(30.),
-					new Minimum<Double>(8.)));
+			smallFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(
+					30.), new Minimum<Double>(8.)));
 		}
 
-		//detect big text
+		// detect big text
 		FeatureSet bigFeatures;
 		{
-			bigFeatures = new FeatureSet(70, image.getWidth(), image.getHeight());
+			bigFeatures = new FeatureSet(70, image.getWidth(),
+					image.getHeight());
 
 			{
 				FeatureRule rule;
@@ -239,10 +240,10 @@ public class TextDetection {
 				int num = detector.findFeatures(bigImage.getImg(), bigFeatures);
 				System.out.println("number of features detected: " + num);
 			}
-			bigFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(16.),
-					new Valid<Double>()));
-			bigFeatures.dontRemove(new AreaFeatureRule(new Interval<Double>(70.,
-					1800.)));
+			bigFeatures.dontRemove(new SizeFeatureRule(
+					new Minimum<Double>(16.), new Valid<Double>()));
+			bigFeatures.dontRemove(new AreaFeatureRule(new Interval<Double>(
+					70., 1800.)));
 
 			{
 				FeatureLinker linker = new BestDirectionFeatureLinker(1,
@@ -256,37 +257,49 @@ public class TextDetection {
 				System.out.println("number of features after linking: "
 						+ bigFeatures.size());
 			}
-			bigFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(100.),
-					new Minimum<Double>(16.)));
+			bigFeatures.dontRemove(new SizeFeatureRule(
+					new Minimum<Double>(100.), new Minimum<Double>(16.)));
 		}
-		
-		//merge big and small features
+
+		// merge big and small features
 		FeatureSet features = smallFeatures;
 
 		features.merge(bigFeatures);
 		System.out.println("number of features after merging: "
 				+ features.size());
-		
+
 		features.draw(image.getColor(), CvScalar.BLUE);
 		display.show(image.getColor());
 
-		features.write("Portolan Atlas Features.js");
+		features.writeJSON("Portolan Atlas Features.js");
 		Image.write(image.getColor(), "Portolan Atlas.jpg");
 	}
 
 	public static void britishIsles() {
 		Image image = new Image("samples" + File.separator
-				+ "British Isles S.jpg");
+				+ "British Isles.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
-		
-		image.process(new ThresholdProcessor(190));//207
-		image.process(new InvertProcessor());
-		image.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10, false));
-		image.process(new ThicknessProcessor(1, 5));
-		//image.process(new RemoveLinesProcessor(60));
-		image.process(new DilateProcessor(3));
-		image.process(new CloseProcessor(3));
+
+		Image lines = new Image(image.getGray());
+		{
+			lines.process(new ThresholdProcessor(210));
+			lines.process(new InvertProcessor());
+			lines.process(new CloseProcessor(5));
+			lines.process(new ThicknessProcessor(1, 3));
+			lines.process(new LineSegmentsProcessor(50, 100, 50));
+		}
+
+		{
+			image.process(new ThresholdProcessor(190));// 207
+			image.process(new InvertProcessor());
+			image.process(new ColorEraseProcessor(0, 100, 0, 50, 0, 50, 10,
+					false));
+			image.process(new ThicknessProcessor(1, 5));
+			image.process(new EraseProcessor(lines.getImg()));
+			image.process(new DilateProcessor(3));
+			image.process(new CloseProcessor(3));
+		}
 
 		FeatureSet features = new FeatureSet(30, image.getWidth(),
 				image.getHeight());
@@ -305,26 +318,38 @@ public class TextDetection {
 		{
 			FeatureLinker linker = new FeatureLinker();
 
-			linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(1000.)));
-			linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(10.)));
+			linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(800.)));
+			linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(16.)));
 
 			features = linker.link(features, image.getImg());
 			System.out.println("number of features after linking: "
 					+ features.size());
 		}
-		features.remove(new SizeFeatureRule(new Maximum<Double>(40.), new Maximum<Double>(20.)));
+		features.remove(new SizeFeatureRule(new Maximum<Double>(40.),
+				new Maximum<Double>(20.)));
 		System.out.println("number of features after removing: "
 				+ features.size());
 
-		for(Feature f : features) {
+		for (Feature f : features) {
 			f.write(image.getColor(), "British Isles", 10);
 		}
-		
+
+		/*Image inpainted = new Image(image.getColor().clone());
+		cvSetZero(inpainted.getImg());
+		features.fill(inpainted.getImg(), CvScalar.WHITE);
+		inpainted.process(new DilateProcessor(5));
+
+		display.show(inpainted.getColor());
+		cvInpaint(inpainted.getColor(), inpainted.getImg(), inpainted.getColor(), 2,
+				CV_INPAINT_NS);
+		Image.write(inpainted.getColor(), "British Isles inpainted.jpg");*/
+
 		features.draw(image.getColor(), CvScalar.GREEN);
 		display.show(image.getColor());
 
-		features.write("British Isles Features.js");
+		//features.dontRemove(new PositionFeatureRule(new Interval<Integer>(944,  1744), new Interval<Integer>(1396,1996)));
+		features.writeJSON("British Isles Features.js");
 		Image.write(image.getColor(), "British Isles.jpg");
-		
+
 	}
 }

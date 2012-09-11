@@ -7,6 +7,7 @@ import image.Image;
 import image.ImageDisplay;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Locale;
 
 import math.Box;
@@ -37,16 +38,15 @@ public abstract class Feature extends Box {
 
 	public abstract void fill(CvArr img, CvScalar color);
 
-	public String toJSON() {
+	public String toJSON(int border) {
 		Vector[] corners = getCorners();
-		String corner0 = corners[0].toJSON();
-		String corner1 = corners[1].toJSON();
-		String corner2 = corners[2].toJSON();
-		String corner3 = corners[3].toJSON();
+		Vector[] buffered = makeBorder(border).getCorners();
 
-		return String.format(Locale.US,
-				"{\"angle\": %.2f, \"corners\": [%s, %s, %s, %s]}", getAngle()
-						.getDegrees(), corner0, corner1, corner2, corner3);
+		return String
+				.format(Locale.US,
+						"{\"id\": %d, \"angle\": %.2f, \"corners\": %s, \"buffered\": %s}",
+						id, getAngle().getDegrees(), Arrays.toString(corners),
+						Arrays.toString(buffered));
 	}
 
 	public void write(IplImage source, String folder) {
@@ -141,6 +141,7 @@ public abstract class Feature extends Box {
 			cvSetImageROI(output, rect);
 		}
 
-		Image.write(output, folder + File.separatorChar + "Label " + id + ".jpg");
+		Image.write(output, folder + File.separatorChar + "Label " + id
+				+ ".jpg");
 	}
 }

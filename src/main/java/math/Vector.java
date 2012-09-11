@@ -100,13 +100,9 @@ public class Vector {
 		return new int[] { (int) Math.round(x), (int) Math.round(y) };
 	}
 
-	public String toJSON() {
-		return String.format(Locale.US, "{\"x\": %.2f, \"y\": %.2f}", x, y);
-	}
-
 	@Override
 	public String toString() {
-		return String.format(Locale.US, "[x=%.2f, y=%.2f]", x, y);
+		return String.format(Locale.US, "{\"x\": %.2f, \"y\": %.2f}", x, y);
 	}
 
 	@Override

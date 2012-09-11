@@ -17,6 +17,12 @@ public class Box {
 	private double height;
 	private Angle180 angle;
 
+	public Box(Vector center, double width, double height,
+			Angle180 angle) {
+		this(new CvBox2D(cvPoint2D32f(center.x, center.y), cvSize2D32f(width,
+				height), (float) angle.getDegrees()));
+	}
+	
 	public Box(double xcenter, double ycenter, double width, double height,
 			double angle) {
 		this(new CvBox2D(cvPoint2D32f(xcenter, ycenter), cvSize2D32f(width,
@@ -67,6 +73,10 @@ public class Box {
 			this.height = temp;
 			this.angle.rotate(Math.PI / 2);
 		}
+	}
+	
+	public Box makeBorder(double border) {
+		return new Box(center, width + border, height + border, angle);
 	}
 
 	public Vector[] getCorners() {

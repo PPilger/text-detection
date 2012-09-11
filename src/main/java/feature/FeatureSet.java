@@ -229,8 +229,18 @@ public class FeatureSet implements Iterable<Feature> {
 			f.draw(img, color);
 		}
 	}
+	
+	public void fill(IplImage img, CvScalar color) {
+		for (Feature f : this) {
+			f.fill(img, color);
+		}
+	}
 
-	public void write(String filename) {
+	public void writeJSON(String filename) {
+		writeJSON(filename, 10);
+	}
+	
+	public void writeJSON(String filename, int border) {
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(filename));
@@ -239,10 +249,10 @@ public class FeatureSet implements Iterable<Feature> {
 
 			Iterator<Feature> iter = iterator();
 			if (iter.hasNext()) {
-				writer.write(iter.next().toJSON());
+				writer.write(iter.next().toJSON(border));
 				while (iter.hasNext()) {
 					writer.write(',');
-					writer.write(iter.next().toJSON());
+					writer.write(iter.next().toJSON(border));
 				}
 			}
 
