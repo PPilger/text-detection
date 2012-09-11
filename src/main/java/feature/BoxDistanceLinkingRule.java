@@ -1,11 +1,11 @@
 package feature;
 
-import miscellanous.Validator;
+import validator.DoubleValidator;
 
 public class BoxDistanceLinkingRule extends LinkingRule {
-	private Validator<Double> distance;
+	private DoubleValidator distance;
 
-	public BoxDistanceLinkingRule(Validator<Double> distance) {
+	public BoxDistanceLinkingRule(DoubleValidator distance) {
 		this.distance = distance;
 	}
 

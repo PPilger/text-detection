@@ -112,7 +112,7 @@ public abstract class Feature extends Box {
 			// black
 			sub = cvCreateImage(cvSize(size, size), source.depth(),
 					source.nChannels());
-
+			cvSetZero(sub);
 			cvSetImageROI(sub, cvRect(tx - x, ty - y, twidth, theight));
 			cvCopy(mat, sub);
 			cvResetImageROI(sub);
@@ -141,7 +141,7 @@ public abstract class Feature extends Box {
 			cvSetImageROI(output, rect);
 		}
 
-		Image.write(output, folder + File.separatorChar + "Label " + id
+		Image.write(output, folder + File.separatorChar + "Label_" + id
 				+ ".jpg");
 	}
 }

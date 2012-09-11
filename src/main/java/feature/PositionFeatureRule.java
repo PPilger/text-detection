@@ -1,13 +1,13 @@
 package feature;
 
+import validator.IntValidator;
 import math.Vector;
-import miscellanous.Validator;
 
 public class PositionFeatureRule implements FeatureRule {
-	private Validator<Integer> x;
-	private Validator<Integer> y;
+	private IntValidator x;
+	private IntValidator y;
 	
-	public PositionFeatureRule(Validator<Integer> x, Validator<Integer> y) {
+	public PositionFeatureRule(IntValidator x, IntValidator y) {
 		this.x = x;
 		this.y = y;
 	}

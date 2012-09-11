@@ -1,6 +1,6 @@
 package feature;
 
-import miscellanous.Maximum;
+import validator.DoubleMaximum;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 

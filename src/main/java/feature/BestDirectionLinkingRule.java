@@ -9,11 +9,11 @@ import image.Image;
 
 import java.util.*;
 
-import math.Angle180;
-import math.Box;
+import validator.DoubleValidator;
+import validator.IntValidator;
+
 import math.Rotation;
 import math.Vector;
-import miscellanous.Validator;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
@@ -23,9 +23,9 @@ public class BestDirectionLinkingRule extends LinkingRule {
 	private int dilateSize;
 	private int numAngles;
 	private int lineWidth;
-	private Validator<Double> featureRating;
-	private Validator<Integer> width;
-	private Validator<Integer> height;
+	private DoubleValidator featureRating;
+	private IntValidator width;
+	private IntValidator height;
 
 	private HashMap<Feature, Histogram> hists;
 
@@ -33,8 +33,8 @@ public class BestDirectionLinkingRule extends LinkingRule {
 	private IplImage mask;
 
 	public BestDirectionLinkingRule(int filterSize, int dilateSize,
-			int numAngles, int lineWidth, Validator<Double> featureRating,
-			Validator<Integer> width, Validator<Integer> height) {
+			int numAngles, int lineWidth, DoubleValidator featureRating,
+			IntValidator width, IntValidator height) {
 		this.filterSize = filterSize;
 		this.dilateSize = dilateSize;
 		this.numAngles = numAngles;
@@ -219,13 +219,12 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			{
 				center = f0.getCenter().center(f1.getCenter());
 
-				Vector[] bounds = Vector.bounds(matrix.rotate(
-						f0.getCorners(), center));
+				Vector[] bounds = Vector.bounds(matrix.rotate(f0.getCorners(),
+						center));
 				min0 = bounds[0];
 				max0 = bounds[1];
 
-				bounds = Vector
-						.bounds(matrix.rotate(f1.getCorners(), center));
+				bounds = Vector.bounds(matrix.rotate(f1.getCorners(), center));
 				min1 = bounds[0];
 				max1 = bounds[1];
 			}

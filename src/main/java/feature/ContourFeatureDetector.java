@@ -10,16 +10,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import miscellanous.Maximum;
-import miscellanous.Validator;
+import validator.IntValidator;
+
 
 import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 
 public class ContourFeatureDetector implements FeatureDetector {
-	private Validator<Integer> perimeter;
+	private IntValidator perimeter;
 	private FeatureRule[] rules;
 
-	public ContourFeatureDetector(Validator<Integer> perimeter, FeatureRule... rules) {
+	public ContourFeatureDetector(IntValidator perimeter, FeatureRule... rules) {
 		this.perimeter = perimeter;
 		this.rules = rules;
 	}

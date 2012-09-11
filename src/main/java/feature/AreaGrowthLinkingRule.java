@@ -2,12 +2,13 @@ package feature;
 
 import java.util.*;
 
-import miscellanous.Validator;
+import validator.DoubleValidator;
+
 
 public class AreaGrowthLinkingRule extends LinkingRule {
-	private Validator<Double> areaGrowth;
+	private DoubleValidator areaGrowth;
 
-	public AreaGrowthLinkingRule(Validator<Double> areaGrowth) {
+	public AreaGrowthLinkingRule(DoubleValidator areaGrowth) {
 		this.areaGrowth = areaGrowth;
 	}
 

@@ -1,11 +1,11 @@
 package feature;
 
-import miscellanous.Validator;
+import validator.DoubleValidator;
 
 public class AngleFeatureRule implements FeatureRule {
-	private Validator<Double> angle;
+	private DoubleValidator angle;
 	
-	public AngleFeatureRule(Validator<Double> angle) {
+	public AngleFeatureRule(DoubleValidator angle) {
 		this.angle = angle;
 	}
 

@@ -1,11 +1,11 @@
 package feature;
 
-import miscellanous.Validator;
+import validator.DoubleValidator;
 
 public class AreaFeatureRule implements FeatureRule {
-	private Validator<Double> area;
+	private DoubleValidator area;
 	
-	public AreaFeatureRule(Validator<Double> area) {
+	public AreaFeatureRule(DoubleValidator area) {
 		this.area = area;
 	}
 

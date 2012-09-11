@@ -1,12 +1,12 @@
 package feature;
 
-import miscellanous.Validator;
+import validator.DoubleValidator;
 
 public class SizeFeatureRule implements FeatureRule {
-	private Validator<Double> width;
-	private Validator<Double> height;
+	private DoubleValidator width;
+	private DoubleValidator height;
 	
-	public SizeFeatureRule(Validator<Double> width, Validator<Double> height) {
+	public SizeFeatureRule(DoubleValidator width, DoubleValidator height) {
 		this.width = width;
 		this.height = height;
 	}

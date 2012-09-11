@@ -4,18 +4,12 @@ import feature.*;
 import image.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
 
-import math.*;
-import miscellanous.Interval;
-import miscellanous.Maximum;
-import miscellanous.Minimum;
-import miscellanous.Valid;
+import validator.*;
+
 
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 
@@ -29,8 +23,8 @@ public class TextDetection {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		britishIsles();
-		// portolanAtlas();
+		//britishIsles();
+		portolanAtlas();
 		// mooskirchen();
 
 		System.out.println(counter);
@@ -86,10 +80,10 @@ public class TextDetection {
 				image.getHeight());
 		{
 			FeatureRule rule;
-			rule = new AreaFeatureRule(new Interval<Double>(100., 5000.));
+			rule = new AreaFeatureRule(new DoubleInterval(100, 5000));
 
 			FeatureDetector detector = new ContourFeatureDetector(
-					new Interval<Integer>(35, 1000000), rule);
+					new IntInterval(35, 1000000), rule);
 
 			int num = detector.findFeatures(image.getImg(), features);
 			System.out.println("number of features detected: " + num);
@@ -102,10 +96,10 @@ public class TextDetection {
 		start();
 		{
 			FeatureLinker linker = new FeatureLinker();
-			linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(81.)));
+			linker.addRule(new BoxDistanceLinkingRule(new DoubleMaximum(81)));
 
-			linker.addRule(new FixedDirectionLinkingRule(0,
-					new Valid<Integer>(), new Minimum<Integer>(20)));
+			linker.addRule(new FixedDirectionLinkingRule(0, new Valid(),
+					new IntMinimum(20)));
 
 			features = linker.link(features, image.getImg());
 			System.out.println("number of features after linking: "
@@ -113,9 +107,9 @@ public class TextDetection {
 		}
 		stop("linking");
 
-		features.remove(new AreaFeatureRule(new Maximum<Double>(3000.)));
-		features.remove(new SizeFeatureRule(new Maximum<Double>(30.),
-				new Maximum<Double>(30.)));
+		features.remove(new AreaFeatureRule(new DoubleMaximum(3000)));
+		features.remove(new SizeFeatureRule(new DoubleMaximum(30),
+				new DoubleMaximum(30)));
 		System.out.println("number of features after removing: "
 				+ features.size());
 
@@ -197,10 +191,10 @@ public class TextDetection {
 
 			{
 				FeatureRule rule;
-				rule = new AreaFeatureRule(new Interval<Double>(1., 5000.));
+				rule = new AreaFeatureRule(new DoubleInterval(1, 5000));
 
 				FeatureDetector detector = new ContourFeatureDetector(
-						new Interval<Integer>(15, 1000000), rule);
+						new IntInterval(15, 1000000), rule);
 
 				int num = detector.findFeatures(image.getImg(), smallFeatures);
 				System.out.println("number of features detected: " + num);
@@ -208,20 +202,18 @@ public class TextDetection {
 
 			{
 				FeatureLinker linker = new BestDirectionFeatureLinker(16,
-						new Maximum<Double>(10.));
+						new DoubleMaximum(10));
 
-				linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(
-						22.)));
-				linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(
-						400.)));
+				linker.addRule(new BoxDistanceLinkingRule(new DoubleMaximum(22)));
+				linker.addRule(new AreaGrowthLinkingRule(new DoubleMaximum(400)));
 
 				smallFeatures = linker.link(smallFeatures, image.getImg());
 
 				System.out.println("number of features after linking: "
 						+ smallFeatures.size());
 			}
-			smallFeatures.dontRemove(new SizeFeatureRule(new Minimum<Double>(
-					30.), new Minimum<Double>(8.)));
+			smallFeatures.dontRemove(new SizeFeatureRule(new DoubleMinimum(30),
+					new DoubleMinimum(8)));
 		}
 
 		// detect big text
@@ -232,33 +224,33 @@ public class TextDetection {
 
 			{
 				FeatureRule rule;
-				rule = new AreaFeatureRule(new Interval<Double>(1., 5000.));
+				rule = new AreaFeatureRule(new DoubleInterval(1, 5000));
 
 				FeatureDetector detector = new ContourFeatureDetector(
-						new Interval<Integer>(30, 240), rule);
+						new IntInterval(30, 240), rule);
 
 				int num = detector.findFeatures(bigImage.getImg(), bigFeatures);
 				System.out.println("number of features detected: " + num);
 			}
-			bigFeatures.dontRemove(new SizeFeatureRule(
-					new Minimum<Double>(16.), new Valid<Double>()));
-			bigFeatures.dontRemove(new AreaFeatureRule(new Interval<Double>(
-					70., 1800.)));
+			bigFeatures.dontRemove(new SizeFeatureRule(new DoubleMinimum(16),
+					new Valid()));
+			bigFeatures.dontRemove(new AreaFeatureRule(new DoubleInterval(70,
+					1800)));
 
 			{
 				FeatureLinker linker = new BestDirectionFeatureLinker(1,
-						new Maximum<Double>(25.));
+						new DoubleMaximum(25));
 
 				linker.addRule(new CenterDistanceLinkingRule(
-						new Interval<Double>(40., 70.)));
+						new DoubleInterval(40, 70)));
 
 				bigFeatures = linker.link(bigFeatures, bigImage.getImg());
 
 				System.out.println("number of features after linking: "
 						+ bigFeatures.size());
 			}
-			bigFeatures.dontRemove(new SizeFeatureRule(
-					new Minimum<Double>(100.), new Minimum<Double>(16.)));
+			bigFeatures.dontRemove(new SizeFeatureRule(new DoubleMinimum(100),
+					new DoubleMinimum(16)));
 		}
 
 		// merge big and small features
@@ -277,7 +269,7 @@ public class TextDetection {
 
 	public static void britishIsles() {
 		Image image = new Image("samples" + File.separator
-				+ "British Isles.jpg");
+				+ "British Isles S2.jpg");
 
 		ImageDisplay display = new ImageDisplay("output", 1200, 800);
 
@@ -306,10 +298,10 @@ public class TextDetection {
 
 		{
 			FeatureRule rule;
-			rule = new AreaFeatureRule(new Interval<Double>(100., 5000.));
+			rule = new AreaFeatureRule(new DoubleInterval(100, 5000));
 
 			FeatureDetector detector = new ContourFeatureDetector(
-					new Interval<Integer>(20, 1000000), rule);
+					new IntInterval(20, 1000000), rule);
 
 			int num = detector.findFeatures(image.getImg(), features);
 			System.out.println("number of features detected: " + num);
@@ -318,38 +310,39 @@ public class TextDetection {
 		{
 			FeatureLinker linker = new FeatureLinker();
 
-			linker.addRule(new AreaGrowthLinkingRule(new Maximum<Double>(800.)));
-			linker.addRule(new BoxDistanceLinkingRule(new Maximum<Double>(16.)));
+			linker.addRule(new AreaGrowthLinkingRule(new DoubleMaximum(800)));
+			linker.addRule(new BoxDistanceLinkingRule(new DoubleMaximum(16)));
 
 			features = linker.link(features, image.getImg());
 			System.out.println("number of features after linking: "
 					+ features.size());
 		}
-		features.remove(new SizeFeatureRule(new Maximum<Double>(40.),
-				new Maximum<Double>(20.)));
+		features.remove(new SizeFeatureRule(new DoubleMaximum(40),
+				new DoubleMaximum(20)));
 		System.out.println("number of features after removing: "
 				+ features.size());
 
-		for (Feature f : features) {
+		/*for (Feature f : features) {
 			f.write(image.getColor(), "British Isles", 10);
-		}
+		}*/
 
-		/*Image inpainted = new Image(image.getColor().clone());
-		cvSetZero(inpainted.getImg());
-		features.fill(inpainted.getImg(), CvScalar.WHITE);
-		inpainted.process(new DilateProcessor(5));
-
-		display.show(inpainted.getColor());
-		cvInpaint(inpainted.getColor(), inpainted.getImg(), inpainted.getColor(), 2,
-				CV_INPAINT_NS);
-		Image.write(inpainted.getColor(), "British Isles inpainted.jpg");*/
+		/*
+		 * Image inpainted = new Image(image.getColor().clone());
+		 * cvSetZero(inpainted.getImg()); features.fill(inpainted.getImg(),
+		 * CvScalar.WHITE); inpainted.process(new DilateProcessor(5));
+		 * 
+		 * display.show(inpainted.getColor()); cvInpaint(inpainted.getColor(),
+		 * inpainted.getImg(), inpainted.getColor(), 2, CV_INPAINT_NS);
+		 * Image.write(inpainted.getColor(), "British Isles inpainted.jpg");
+		 */
 
 		features.draw(image.getColor(), CvScalar.GREEN);
 		display.show(image.getColor());
 
-		//features.dontRemove(new PositionFeatureRule(new Interval<Integer>(944,  1744), new Interval<Integer>(1396,1996)));
-		features.writeJSON("British Isles Features.js");
-		Image.write(image.getColor(), "British Isles.jpg");
+		// features.dontRemove(new PositionFeatureRule(new
+		// Interval<Integer>(944, 1744), new Interval<Integer>(1396,1996)));
+		features.writeJSON("British_Isles_Features.js");
+		Image.write(image.getColor(), "British_Isles.jpg");
 
 	}
 }

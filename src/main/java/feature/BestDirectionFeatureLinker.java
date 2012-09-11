@@ -9,29 +9,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import validator.DoubleValidator;
+
 import math.Rotation;
 import math.Vector;
-import miscellanous.AngleIterable;
-import miscellanous.DoubleIterable;
-import miscellanous.Interval;
-import miscellanous.Validator;
 
 public class BestDirectionFeatureLinker extends FeatureLinker {
-	private Iterable<Double> angles;
-	private Validator<Double> centerVariance;
+	private double[] angles;
+	private DoubleValidator centerVariance;
 	
-	public BestDirectionFeatureLinker(int numDirections, Validator<Double> centerVariance) {
-		this.angles = new AngleIterable(numDirections);
+	public BestDirectionFeatureLinker(int numDirections, DoubleValidator centerVariance) {
+		this.angles = new double[numDirections];
+		double step = Math.PI / numDirections;
+		for(int i = 0; i < numDirections; i++) {
+			angles[i] = i * step;
+		}
 		this.centerVariance = centerVariance;
 	}
 	
-	public BestDirectionFeatureLinker(int numDirections, Interval<Double> directionRange, Validator<Double> centerVariance) {
-		this.angles = new AngleIterable(numDirections, directionRange);
-		this.centerVariance = centerVariance;
-	}
-	
-	public BestDirectionFeatureLinker(Validator<Double> centerVariance, double... angles) {
-		this.angles = new DoubleIterable(angles);
+	public BestDirectionFeatureLinker(DoubleValidator centerVariance, double[] angles) {
+		this.angles = angles;
 		this.centerVariance = centerVariance;
 	}
 
