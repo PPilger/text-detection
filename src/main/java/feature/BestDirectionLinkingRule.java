@@ -9,8 +9,8 @@ import image.Image;
 
 import java.util.*;
 
-import validator.DoubleValidator;
-import validator.IntValidator;
+import validator.DValidator;
+import validator.IValidator;
 
 import math.Rotation;
 import math.Vector;
@@ -23,9 +23,9 @@ public class BestDirectionLinkingRule extends LinkingRule {
 	private int dilateSize;
 	private int numAngles;
 	private int lineWidth;
-	private DoubleValidator featureRating;
-	private IntValidator width;
-	private IntValidator height;
+	private DValidator featureRating;
+	private IValidator width;
+	private IValidator height;
 
 	private HashMap<Feature, Histogram> hists;
 
@@ -33,8 +33,8 @@ public class BestDirectionLinkingRule extends LinkingRule {
 	private IplImage mask;
 
 	public BestDirectionLinkingRule(int filterSize, int dilateSize,
-			int numAngles, int lineWidth, DoubleValidator featureRating,
-			IntValidator width, IntValidator height) {
+			int numAngles, int lineWidth, DValidator featureRating,
+			IValidator width, IValidator height) {
 		this.filterSize = filterSize;
 		this.dilateSize = dilateSize;
 		this.numAngles = numAngles;

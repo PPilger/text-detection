@@ -1,13 +1,13 @@
 package feature;
 
-import validator.DoubleValidator;
+import validator.DValidator;
 import math.Angle180;
 import math.Vector;
 
 public class BoxDirectionLinkingRule extends LinkingRule {
-	private DoubleValidator difference;
+	private DValidator difference;
 
-	public BoxDirectionLinkingRule(DoubleValidator difference) {
+	public BoxDirectionLinkingRule(DValidator difference) {
 		this.difference = difference;
 	}
 

@@ -4,31 +4,27 @@ import static com.googlecode.javacpp.Loader.sizeof;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
-import static application.TextDetection.*;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import validator.IntValidator;
+import validator.IValidator;
 
 
 import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 
-public class ContourFeatureDetector implements FeatureDetector {
-	private IntValidator perimeter;
-	private FeatureRule[] rules;
+public class ContourFeatureDetector extends FeatureDetector {
+	private IValidator perimeter;
 
-	public ContourFeatureDetector(IntValidator perimeter, FeatureRule... rules) {
+	public ContourFeatureDetector(IValidator perimeter) {
 		this.perimeter = perimeter;
-		this.rules = rules;
 	}
 
 	@Override
 	public int findFeatures(IplImage img, FeatureSet features) {
 		List<ContourFeature> contourFeatures = new ArrayList<ContourFeature>();
+		List<FeatureRule> rules = getRules();
 		
-		start();
 		// find contours
 		{
 			CvMemStorage mem = cvCreateMemStorage(0);
@@ -51,9 +47,7 @@ public class ContourFeatureDetector implements FeatureDetector {
 				}
 			}
 		}
-		stop("find contours");
 		
-		start();
 		//remove enclosed features
 		{
 			Iterator<ContourFeature> iter = contourFeatures.iterator();
@@ -68,7 +62,6 @@ public class ContourFeatureDetector implements FeatureDetector {
 				}
 			}
 		}
-		stop("remove enclosed features");
 		
 		features.add(contourFeatures);
 		

@@ -1,17 +1,17 @@
 package feature;
 
-import validator.IntValidator;
+import validator.IValidator;
 import math.Rotation;
 import math.Vector;
 
 public class FixedDirectionLinkingRule extends LinkingRule {
 	// parameters
 	private Rotation rotation;
-	private IntValidator width;
-	private IntValidator height;
+	private IValidator width;
+	private IValidator height;
 
-	public FixedDirectionLinkingRule(double angle, IntValidator width,
-			IntValidator height) {
+	public FixedDirectionLinkingRule(double angle, IValidator width,
+			IValidator height) {
 		this.rotation = new Rotation(angle);
 		this.width = width;
 		this.height = height;

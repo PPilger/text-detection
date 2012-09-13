@@ -23,7 +23,7 @@ public class RemoveLinesProcessor extends SimpleImageProcessor {
 
 		CvMemStorage mem = cvCreateMemStorage(0);
 		CvSeq lines = cvHoughLines2(img, mem, CV_HOUGH_STANDARD, 0.5,
-				Angle180.degToRad(0.5), threshold, 0, 0);
+				Math.toRadians(0.5), threshold, 0, 0);
 
 		for (int i = 0; i < lines.total(); i++) {
 			CvPoint2D32f polar = new CvPoint2D32f(cvGetSeqElem(lines, i));

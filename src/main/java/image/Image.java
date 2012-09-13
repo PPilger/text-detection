@@ -1,8 +1,7 @@
 package image;
 
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
-import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
+import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
 import java.io.File;
@@ -19,9 +18,6 @@ public class Image {
 	private IplImage red;
 	private IplImage green;
 	private IplImage blue;
-	private IplImage rgRatio;
-	private IplImage rbRatio;
-	private IplImage gbRatio;
 
 	public Image(String filename) {
 		this(cvLoadImage(filename));
@@ -63,11 +59,6 @@ public class Image {
 			cvSetImageROI(green, rect);
 			cvSetImageROI(blue, rect);
 		}
-		if (rgRatio != null){
-			cvSetImageROI(rgRatio, rect);
-			cvSetImageROI(rbRatio, rect);
-			cvSetImageROI(gbRatio, rect);
-		}
 	}
 	
 	public void resetROI() {
@@ -78,9 +69,6 @@ public class Image {
 		cvResetImageROI(red);
 		cvResetImageROI(green);
 		cvResetImageROI(blue);
-		cvResetImageROI(rgRatio);
-		cvResetImageROI(rbRatio);
-		cvResetImageROI(gbRatio);
 	}
 
 	public void initRGB() {
@@ -88,19 +76,6 @@ public class Image {
 		this.green = gray.clone();
 		this.blue = gray.clone();
 		cvSplit(color, blue, green, red, null);
-	}
-
-	public void initRatios() {
-		if(red == null) {
-			initRGB();
-		}
-		this.rgRatio = IplImage.create(gray.cvSize(), IPL_DEPTH_32F, 1);
-		this.rbRatio = cvCloneImage(rgRatio);
-		this.gbRatio = cvCloneImage(rgRatio);
-
-		cvDiv(red, green, rgRatio, 1);
-		cvDiv(red, blue, rbRatio, 1);
-		cvDiv(green, blue, gbRatio, 1);
 	}
 
 	public IplImage getColor() {
@@ -138,27 +113,6 @@ public class Image {
 			initRGB();
 		}
 		return blue;
-	}
-
-	public IplImage getRgRatio() {
-		if (rgRatio == null) {
-			initRatios();
-		}
-		return rgRatio;
-	}
-
-	public IplImage getRbRatio() {
-		if (rbRatio == null) {
-			initRatios();
-		}
-		return rbRatio;
-	}
-
-	public IplImage getGbRatio() {
-		if (gbRatio == null) {
-			initRatios();
-		}
-		return gbRatio;
 	}
 
 	public static void write(IplImage img, String filename) {

@@ -171,7 +171,7 @@ public class FeatureSet implements Iterable<Feature> {
 		List<Feature> remove = new ArrayList<Feature>();
 
 		for (Feature f0 : allFeatures) {
-			for (Collection<Feature> cell : other.getNeighbourCells(f0)) {
+			for (Collection<Feature> cell : other.getCells(f0)) {
 				for (Feature f1 : cell) {
 					double area = f0.intersectionArea(f1);
 					double area0 = f0.getArea();
@@ -235,6 +235,12 @@ public class FeatureSet implements Iterable<Feature> {
 			f.fill(img, color);
 		}
 	}
+	
+	public void write(IplImage source, String folder, int border) {
+		for (Feature f : this) {
+			f.write(source, folder, border);
+		}
+	}
 
 	public void writeJSON(String filename) {
 		writeJSON(filename, 10);
@@ -293,5 +299,29 @@ public class FeatureSet implements Iterable<Feature> {
 		}
 
 		return neighbourCells;
+	}
+	
+	private List<Collection<Feature>> getCells(Feature feature) {
+		List<Collection<Feature>> cells = new ArrayList<Collection<Feature>>();
+
+		Vector min = feature.getMin();
+		Vector max = feature.getMax();
+		int xmin = (int) (min.x / distance);
+		int ymin = (int) (min.y / distance);
+		int xmax = (int) (max.x / distance);
+		int ymax = (int) (max.y / distance);
+
+		xmin = xmin >= 0 ? xmin : 0;
+		ymin = ymin >= 0 ? ymin : 0;
+		xmax = xmax < cols ? xmax : (cols - 1);
+		ymax = ymax < rows ? ymax : (rows - 1);
+
+		for (int i = ymin; i <= ymax; i++) {
+			for (int j = xmin; j <= xmax; j++) {
+				cells.add(featureMap[i][j]);
+			}
+		}
+
+		return cells;
 	}
 }

@@ -26,7 +26,7 @@ public class Box {
 	public Box(double xcenter, double ycenter, double width, double height,
 			double angle) {
 		this(new CvBox2D(cvPoint2D32f(xcenter, ycenter), cvSize2D32f(width,
-				height), (float) Angle180.radToDeg(angle)));
+				height), (float) Math.toDegrees(angle)));
 	}
 
 	public Box(CvBox2D box) {
@@ -65,7 +65,7 @@ public class Box {
 		this.center = new Vector(box.center().x(), box.center().y());
 		this.width = box.size().width();
 		this.height = box.size().height();
-		this.angle = new Angle180(Angle180.degToRad(box.angle()));
+		this.angle = new Angle180(Math.toRadians(box.angle()));
 
 		if (width < height) {
 			double temp = width;
@@ -111,10 +111,6 @@ public class Box {
 		return angle;
 	}
 
-	public double overlappingArea(Box other) {
-		return 0;
-	}
-
 	public CvPoint getCvCenter() {
 		return cvPoint((int) Math.round(center.x), (int) Math.round(center.y));
 	}
@@ -158,15 +154,8 @@ public class Box {
 			return false;
 		return true;
 	}
-
-	public double distance(Box other) {
-		double distance = Double.POSITIVE_INFINITY;
-
-		Vector[][] corners = new Vector[2][];
-		corners[0] = this.corners;
-		corners[1] = other.corners;
-
-		// distance is 0 if the two boxes intersect
+	
+	public boolean intersects(Box other) {
 		int ip = 3;
 		for (int i = 0; i < 4; ip = i, i++) {
 			Line line0 = new Line(this.corners[ip], this.corners[i]);
@@ -176,9 +165,24 @@ public class Box {
 				Line line1 = new Line(other.corners[jp], other.corners[j]);
 
 				if (line0.intersects(line1)) {
-					return 0;
+					return true;
 				}
 			}
+		}
+		
+		return false;
+	}
+
+	public double distance(Box other) {
+		double distance = Double.POSITIVE_INFINITY;
+
+		Vector[][] corners = new Vector[2][];
+		corners[0] = this.corners;
+		corners[1] = other.corners;
+
+		// distance is 0 if the two boxes intersect
+		if(this.intersects(other)) {
+			return 0;
 		}
 
 		// calculate the distance of the two boxes

@@ -75,4 +75,9 @@ public class ContourFeature extends Feature {
 	public void fill(CvArr img, CvScalar color) {
 		cvDrawContours(img, contour, color, color, -1, -1, 0);
 	}
+
+	@Override
+	public double getRating() {
+		return 1;
+	}
 }

@@ -1,35 +1,47 @@
 package feature;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import validator.DoubleValidator;
+import application.TextDetection;
+
+import validator.DInterval;
+import validator.DValidator;
 
 import math.Rotation;
 import math.Vector;
 
 public class BestDirectionFeatureLinker extends FeatureLinker {
 	private double[] angles;
-	private DoubleValidator centerVariance;
-	
-	public BestDirectionFeatureLinker(int numDirections, DoubleValidator centerVariance) {
+	private DValidator centerVariance;
+
+	public BestDirectionFeatureLinker(DValidator centerVariance,
+			int numDirections) {
+		this.centerVariance = centerVariance;
 		this.angles = new double[numDirections];
+
 		double step = Math.PI / numDirections;
-		for(int i = 0; i < numDirections; i++) {
+
+		for (int i = 0; i < numDirections; i++) {
 			angles[i] = i * step;
 		}
-		this.centerVariance = centerVariance;
 	}
-	
-	public BestDirectionFeatureLinker(DoubleValidator centerVariance, double[] angles) {
-		this.angles = angles;
+
+	public BestDirectionFeatureLinker(DValidator centerVariance,
+			int numDirections, DInterval range) {
 		this.centerVariance = centerVariance;
+		this.angles = new double[numDirections];
+
+		if (numDirections == 1) {
+			this.angles[0] = 0;
+		} else {
+			double min = range.getMin();
+			double max = range.getMax();
+			double step = (max - min) / (numDirections - 1);
+
+			for (int i = 0; i < numDirections; i++) {
+				angles[i] = i * step + min;
+			}
+		}
 	}
 
 	@Override
@@ -53,15 +65,16 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 				anglePositions.put(angle, positions);
 			}
 
-			List<Set<Feature>> linkedFeatures = new ArrayList<Set<Feature>>();
+			// List<Set<Feature>> linkedFeatures = new
+			// ArrayList<Set<Feature>>();
+			List<LinkedFeature> linkedFeatures = new ArrayList<LinkedFeature>();
 			for (Feature start : features) {
 				double bestVal = -1;
 				Set<Feature> best = null;
 
 				for (double angle : angles) {
 
-					Map<Feature, Vector> positions = anglePositions
-							.get(angle);
+					Map<Feature, Vector> positions = anglePositions.get(angle);
 
 					Set<Feature> component = new HashSet<Feature>();
 					List<Feature> todo = new ArrayList<Feature>();
@@ -128,36 +141,23 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 				}
 
 				if (best == null) {
-					Set<Feature> temp = new HashSet<Feature>();
-					temp.add(start);
-					linkedFeatures.add(temp);
-				} else {
-					linkedFeatures.add(best);
+					best = new HashSet<Feature>();
+					best.add(start);
 				}
+				linkedFeatures.add(LinkedFeature.create(best));
 			}
-
-			Map<Set<Feature>, Double> ranking = new HashMap<Set<Feature>, Double>();
-			for (Set<Feature> lf : linkedFeatures) {
-				LinkedFeature temp = LinkedFeature.create(lf);
-				double area = 0;
-				for (Feature f : lf) {
-					area += f.getArea();
-				}
-				double rank = lf.size() * area / temp.getArea();
-
-				ranking.put(lf, rank);
-			}
-
-			Collections.sort(linkedFeatures, new RankedSetComparator(ranking));
-
+			
+			Collections.sort(linkedFeatures);
+			
+			int x = 0, y = 0, z = 0;
 			for (int i = 0; i < linkedFeatures.size() - 1; i++) {
-				Set<Feature> a = linkedFeatures.get(i);
+				LinkedFeature a = linkedFeatures.get(i);
 				if (a == null) {
 					continue;
 				}
 
 				for (int j = i + 1; j < linkedFeatures.size(); j++) {
-					Set<Feature> b = linkedFeatures.get(j);
+					LinkedFeature b = linkedFeatures.get(j);
 					if (b == null) {
 						continue;
 					}
@@ -165,14 +165,15 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 					for (Feature f : b) {
 						if (a.contains(f)) {
 							linkedFeatures.set(j, null);
+							break;
 						}
 					}
 				}
 			}
 
-			for (Set<Feature> linkedFeature : linkedFeatures) {
+			for (LinkedFeature linkedFeature : linkedFeatures) {
 				if (linkedFeature != null) {
-					result.add(LinkedFeature.create(linkedFeature));
+					result.add(linkedFeature);
 				}
 			}
 		}
@@ -207,10 +208,10 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 		}
 
 	}
-	
+
 	private class RankedSetComparator implements Comparator<Set<Feature>> {
 		private Map<Set<Feature>, Double> ranking;
-		
+
 		public RankedSetComparator(Map<Set<Feature>, Double> ranking) {
 			this.ranking = ranking;
 		}

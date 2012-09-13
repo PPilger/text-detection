@@ -47,7 +47,7 @@ public class LineSegmentsProcessor extends SimpleImageProcessor {
 				cvSetImageROI(temp, rect);
 				
 				CvSeq lines = cvHoughLines2(temp, mem,
-						CV_HOUGH_PROBABILISTIC, .5, Angle180.degToRad(.5),
+						CV_HOUGH_PROBABILISTIC, .5, Math.toRadians(.5),
 						threshold, minLength, maxGap);
 
 				for (int k = 0; k < lines.total(); k += 1) {

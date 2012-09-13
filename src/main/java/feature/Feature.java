@@ -4,7 +4,6 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
 import image.Image;
-import image.ImageDisplay;
 
 import java.io.File;
 import java.util.Arrays;
@@ -13,7 +12,7 @@ import java.util.Locale;
 import math.Box;
 import math.Vector;
 
-public abstract class Feature extends Box {
+public abstract class Feature extends Box implements Comparable<Feature> {
 	private int id;
 	public static int counter = 0;
 
@@ -37,6 +36,8 @@ public abstract class Feature extends Box {
 	}
 
 	public abstract void fill(CvArr img, CvScalar color);
+	
+	public abstract double getRating();
 
 	public String toJSON(int border) {
 		Vector[] corners = getCorners();
@@ -143,5 +144,19 @@ public abstract class Feature extends Box {
 
 		Image.write(output, folder + File.separatorChar + "Label_" + id
 				+ ".jpg");
+	}
+	
+	@Override
+	public int compareTo(Feature other) {
+		double r0 = getRating();
+		double r1 = other.getRating();
+		
+		if(r0 < r1){
+			return 1;
+		} else if(r0 > r1) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
 }

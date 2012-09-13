@@ -15,10 +15,8 @@ public class FeatureLinker {
 		this.linkingRules = new ArrayList<LinkingRule>();
 	}
 
-	public void addRule(LinkingRule... linkingRules) {
-		for (LinkingRule l : linkingRules) {
-			this.linkingRules.add(l);
-		}
+	public void addRule(LinkingRule linkingRule) {
+		this.linkingRules.add(linkingRule);
 	}
 
 	public FeatureSet link(FeatureSet features, IplImage img) {
@@ -35,7 +33,6 @@ public class FeatureLinker {
 		}
 
 		// fill the adjacency list
-		start();
 		{
 			Set<Feature> marked = new HashSet<Feature>();
 			for (Feature f0 : features) {
@@ -50,12 +47,9 @@ public class FeatureLinker {
 				}
 			}
 		}
-		stop("adjacency list");
 
-		start();
 		FeatureSet result = link(features, adjacencyList);
-		stop("connecting");
-		
+
 		return result;
 	}
 
@@ -93,7 +87,7 @@ public class FeatureLinker {
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
