@@ -159,8 +159,8 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 					LinkedFeature b = linkedFeatures.get(j);
 
 					boolean removed = false;
+					
 					Iterator<Feature> iter = b.iterator();
-					// for (Feature f : b) {
 					while (iter.hasNext()) {
 						Feature f = iter.next();
 						if (a.contains(f)) {

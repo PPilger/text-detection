@@ -1,5 +1,10 @@
 package validator;
 
+import static com.googlecode.javacv.cpp.opencv_core.CV_CMP_LE;
+import static com.googlecode.javacv.cpp.opencv_core.cvCmpS;
+
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
 /**
  * An integer has to be lower or equal than a specified maximum value to be
  * valid
@@ -20,5 +25,10 @@ public class IMaximum implements IValidator {
 
 	public boolean isValid(int value) {
 		return value <= max;
+	}
+
+	@Override
+	public void validate(IplImage src, IplImage dst) {
+		cvCmpS(src, max, dst, CV_CMP_LE);
 	}
 }

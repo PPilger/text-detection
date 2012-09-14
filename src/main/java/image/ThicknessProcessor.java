@@ -1,20 +1,25 @@
 package image;
+
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
+import validator.IValidator;
 
+import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
+import com.googlecode.javacv.cpp.opencv_imgproc.IplConvKernel;
 
+/**
+ * Makes a skeleton transformation and removes all objects with an invalid
+ * thickness.
+ * 
+ * @author PilgerstorferP
+ * 
+ */
 public class ThicknessProcessor implements ImageProcessor {
-	private int minThickness;
-	private int maxThickness;
+	private IValidator thickness;
 
-	public ThicknessProcessor(int maxThickness) {
-		this(1, maxThickness);
-	}
-
-	public ThicknessProcessor(int minThickness, int maxThickness) {
-		this.minThickness = minThickness;
-		this.maxThickness = maxThickness;
+	public ThicknessProcessor(IValidator thickness) {
+		this.thickness = thickness;
 	}
 
 	@Override
@@ -25,8 +30,7 @@ public class ThicknessProcessor implements ImageProcessor {
 		IplImage centers = IplImage.create(temp.cvSize(), IPL_DEPTH_8U, 1);
 		IplImage distance = IplImage.create(temp.cvSize(), IPL_DEPTH_8U, 1);
 
-		cvSetZero(temp);
-
+		// do a distance transformation
 		cvDistTransform(img, distance, CV_DIST_L1, 3, null, null, 0);
 
 		// get the centers of all objects
@@ -36,15 +40,14 @@ public class ThicknessProcessor implements ImageProcessor {
 		cvCmp(distance, temp, centers, CV_CMP_EQ);
 
 		// set the centers to the distance-value (distance to the next 0)
-		cvSetZero(temp);
-		cvSet(temp, CvScalar.ONE, centers);
-		cvMul(distance, temp, centers, 1);
+		cvCmpS(centers, 0, temp, CV_CMP_GT);
+		cvAnd(distance, temp, centers, null);
 
 		// set all valid centers to white
-		cvSetZero(img);
-		cvCmpS(centers, maxThickness, img, CV_CMP_LT);
-		cvCmpS(centers, minThickness, temp, CV_CMP_LT);
+		thickness.validate(centers, img);
 
+		// remove all pixel with distance null (no center)
+		cvCmpS(centers, 0, temp, CV_CMP_EQ);
 		cvSet(img, CvScalar.BLACK, temp);
 	}
 }

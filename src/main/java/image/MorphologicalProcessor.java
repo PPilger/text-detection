@@ -19,5 +19,5 @@ public abstract class MorphologicalProcessor extends SimpleImageProcessor {
 
 	public IplConvKernel getStructuringElement() {
 		return strel;
-	}
+	} 
 }

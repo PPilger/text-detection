@@ -9,6 +9,8 @@ import validator.DInterval;
 import validator.DMaximum;
 import validator.DMinimum;
 import validator.IInterval;
+import validator.IMaximum;
+import validator.IMinimum;
 import validator.Valid;
 
 import feature.AreaFeatureRule;
@@ -34,8 +36,8 @@ import image.ObstacleRemoveProcessor;
 import image.SecondDerivateEraseProcessor;
 import image.SmallObjectErasorProcessor;
 import image.ThicknessProcessor;
-import image.ThresholdProcessor;
-import image.VarianceProcessor;
+import image.BinaryProcessor;
+import image.DensityProcessor;
 
 public class PortolanAtlas implements TextDetector {
 	private Image smallImage;
@@ -82,8 +84,7 @@ public class PortolanAtlas implements TextDetector {
 		Image lines = new Image(smallImage.getGray());
 		{
 
-			lines.process(new ThresholdProcessor(165));
-			lines.process(new InvertProcessor());
+			lines.process(new BinaryProcessor(new IMaximum(165)));
 			// Image.write(lines.getImg(), "lines3.jpg");
 			lines.process(new BigObjectEraseProcessor(4));
 			// Image.write(lines.getImg(), "lines2.jpg");
@@ -92,21 +93,20 @@ public class PortolanAtlas implements TextDetector {
 		}
 
 		{
-			smallImage.process(new ThresholdProcessor(165));
-			smallImage.process(new InvertProcessor());
+			smallImage.process(new BinaryProcessor(new IMaximum(165)));
 
 			smallImage.process(new CloseProcessor(3));
 			smallImage.process(new BigObjectEraseProcessor(11));
 			smallImage.process(new SmallObjectErasorProcessor(10));
 
-			smallImage.process(new ThicknessProcessor(1, 7));
+			smallImage.process(new ThicknessProcessor(new IMaximum(7)));
 
 			smallImage.process(new EraseProcessor(lines.getImg()));
 
 			smallImage.process(new FirstDerivateEraseProcessor(120, 9));
 			smallImage.process(new SecondDerivateEraseProcessor(130, 9));
 
-			smallImage.process(new VarianceProcessor(11, 50));
+			smallImage.process(new DensityProcessor(11, 17, new IMinimum(50)));
 			smallImage.process(new ObstacleRemoveProcessor(3, 3));
 
 			smallImage.process(new DilateProcessor(3));
@@ -114,8 +114,7 @@ public class PortolanAtlas implements TextDetector {
 		}
 
 		{
-			bigImage.process(new ThresholdProcessor(140));
-			bigImage.process(new InvertProcessor());
+			bigImage.process(new BinaryProcessor(new IMaximum(140)));
 			bigImage.process(new CloseProcessor());
 		}
 

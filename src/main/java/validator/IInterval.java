@@ -1,5 +1,10 @@
 package validator;
 
+import static com.googlecode.javacv.cpp.opencv_core.cvInRangeS;
+import static com.googlecode.javacv.cpp.opencv_core.cvScalarAll;
+
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
 /**
  * An integer has to be inside the specified range [min, max] (incl.) to be
  * valid
@@ -26,5 +31,10 @@ public class IInterval implements IValidator {
 
 	public boolean isValid(int value) {
 		return min <= value && value <= max;
+	}
+
+	@Override
+	public void validate(IplImage src, IplImage dst) {
+		cvInRangeS(src, cvScalarAll(min), cvScalarAll(max), dst);
 	}
 }

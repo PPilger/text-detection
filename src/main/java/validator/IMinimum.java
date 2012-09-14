@@ -1,5 +1,10 @@
 package validator;
 
+import static com.googlecode.javacv.cpp.opencv_core.CV_CMP_GE;
+import static com.googlecode.javacv.cpp.opencv_core.cvCmpS;
+
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
 /**
  * An integer has to be greater or equal than a specified minimum value to be
  * valid
@@ -20,5 +25,10 @@ public class IMinimum implements IValidator {
 
 	public boolean isValid(int value) {
 		return min <= value;
+	}
+
+	@Override
+	public void validate(IplImage src, IplImage dst) {
+		cvCmpS(src, min, dst, CV_CMP_GE);
 	}
 }
