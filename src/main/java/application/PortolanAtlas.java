@@ -33,8 +33,8 @@ import image.ImageDisplay;
 import image.InvertProcessor;
 import image.LineSegmentsProcessor;
 import image.ObstacleRemoveProcessor;
-import image.SecondDerivateEraseProcessor;
-import image.SmallObjectErasorProcessor;
+import image.SecondDerivateProcessor;
+import image.PerimeterProcessor;
 import image.ThicknessProcessor;
 import image.BinaryProcessor;
 import image.DensityProcessor;
@@ -88,7 +88,7 @@ public class PortolanAtlas implements TextDetector {
 			// Image.write(lines.getImg(), "lines3.jpg");
 			lines.process(new BigObjectEraseProcessor(4));
 			// Image.write(lines.getImg(), "lines2.jpg");
-			lines.process(new SmallObjectErasorProcessor(20));
+			lines.process(new PerimeterProcessor(new IMaximum(19)));
 			lines.process(new LineSegmentsProcessor(90, 256, 64));// 40,50,800
 		}
 
@@ -97,14 +97,14 @@ public class PortolanAtlas implements TextDetector {
 
 			smallImage.process(new CloseProcessor(3));
 			smallImage.process(new BigObjectEraseProcessor(11));
-			smallImage.process(new SmallObjectErasorProcessor(10));
+			smallImage.process(new PerimeterProcessor(new IMaximum(9)));
 
 			smallImage.process(new ThicknessProcessor(new IMaximum(7)));
 
 			smallImage.process(new EraseProcessor(lines.getImg()));
 
 			smallImage.process(new FirstDerivateEraseProcessor(120, 9));
-			smallImage.process(new SecondDerivateEraseProcessor(130, 9));
+			smallImage.process(new SecondDerivateProcessor(3, new IMinimum(130), 9));
 
 			smallImage.process(new DensityProcessor(11, 17, new IMinimum(50)));
 			smallImage.process(new ObstacleRemoveProcessor(3, 3));
