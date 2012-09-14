@@ -1,20 +1,38 @@
 package math;
 
+/**
+ * Represents a line between two points.
+ * 
+ * @author PilgerstorferP
+ * 
+ */
 public class Line {
+	// the start and end points of the line
 	private Vector p;
 	private Vector q;
 
+	// slope and offset of the line (compare y = k * x + d)
 	private double k;
 	private double d;
 
-	public Line(Vector v0, Vector v1) {
-		this.p = v0;
-		this.q = v1;
+	/**
+	 * Creates a new Line from p to q
+	 * 
+	 * @param p
+	 * @param q
+	 */
+	public Line(Vector p, Vector q) {
+		this.p = p;
+		this.q = q;
 
 		this.k = (q.y - p.y) / (q.x - p.x);
 		this.d = p.y - k * p.x;
 	}
 
+	/**
+	 * @param value
+	 * @return true if value lies between the two points along the x-axis
+	 */
 	private boolean insideX(double value) {
 		if (p.x < q.x) {
 			return p.x < value && value < q.x;
@@ -23,6 +41,10 @@ public class Line {
 		}
 	}
 
+	/**
+	 * @param value
+	 * @return true if value lies between the two points along the y-axis
+	 */
 	private boolean insideY(double value) {
 		if (p.y < q.y) {
 			return p.y < value && value < q.y;
@@ -31,6 +53,10 @@ public class Line {
 		}
 	}
 
+	/**
+	 * @param other
+	 * @return true if the line intersects other, false otherwise
+	 */
 	public boolean intersects(Line other) {
 		if (k == other.k
 				|| (Double.isInfinite(k) && Double.isInfinite(other.k))) {
@@ -49,32 +75,6 @@ public class Line {
 			double x = (other.d - d) / (d - other.k);
 
 			return insideX(x) && other.insideX(x);
-		}
-	}
-	
-	public static void draw(int[] img, int width, int x0, int y0, int x1, int y1) {
-		int dx = Math.abs(x1 - x0);
-		int dy = Math.abs(y1 - y0);
-		int sx;
-		int sy;
-
-		sx = x0 < x1 ? 1 : -1;
-		sy = y0 < y1 ? 1 : -1;
-
-		int err = dx - dy;
-
-		img[y0 * width + x0] = 1;
-		while (x0 != x1 || y0 != y1) {
-			int e2 = 2 * err;
-			if (e2 > -dy) {
-				err = err - dy;
-				x0 = x0 + sx;
-			}
-			if (e2 < dx) {
-				err = err + dx;
-				y0 = y0 + sy;
-			}
-			img[y0 * width + x0] = 1;
 		}
 	}
 }

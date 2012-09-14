@@ -2,10 +2,23 @@ package math;
 
 import java.util.Locale;
 
+/**
+ * Defines a 2D vector.
+ * 
+ * @author PilgerstorferP
+ * 
+ */
 public class Vector {
+	// Cartesian coordinates
 	public double x;
 	public double y;
-	
+
+	/**
+	 * Transforms the points to the form {x0, y0, x1, y1, ..., xn, yn}
+	 * 
+	 * @param points
+	 * @return
+	 */
 	public static int[] asIntArray(Vector[] points) {
 		int[] array = new int[points.length * 2];
 
@@ -19,6 +32,12 @@ public class Vector {
 		return array;
 	}
 
+	/**
+	 * Calculates the bounds (min, max) of the points.
+	 * 
+	 * @param points
+	 * @return an array of two points {min, max}
+	 */
 	public static Vector[] bounds(Vector[] points) {
 		double xmin = points[0].x;
 		double xmax = points[0].x;
@@ -40,13 +59,8 @@ public class Vector {
 			}
 		}
 
-		Vector[] bounds = { new Vector(xmin, ymin),
-				new Vector(xmax, ymax) };
+		Vector[] bounds = { new Vector(xmin, ymin), new Vector(xmax, ymax) };
 		return bounds;
-	}
-
-	public Vector() {
-
 	}
 
 	public Vector(double x, double y) {
@@ -54,50 +68,22 @@ public class Vector {
 		this.y = y;
 	}
 
-	public Vector add(Vector vector) {
-		return new Vector(x + vector.x, y + vector.y);
-	}
-
-	public Vector sub(Vector vector) {
-		return new Vector(x - vector.x, y - vector.y);
-	}
-
-	public Vector mul(double scalar) {
-		return new Vector(x * scalar, y * scalar);
-	}
-
-	public Vector div(double scalar) {
-		return mul(1 / scalar);
-	}
-
+	/**
+	 * @param other
+	 * @return the point in the middle of this point and other
+	 */
 	public Vector center(Vector other) {
 		return new Vector((x + other.x) / 2, (y + other.y) / 2);
 	}
 
-	public Vector max(Vector other) {
-		return new Vector(Math.max(x, other.x), Math.max(y, other.y));
-	}
-
-	public double dot(Vector vector) {
-		return x * vector.x + y * vector.y;
-	}
-
-	public double length() {
+	/**
+	 * @param other
+	 * @return the distance between this point and other
+	 */
+	public double distance(Vector other) {
+		double x = other.x - this.x;
+		double y = other.y - this.y;
 		return Math.sqrt(x * x + y * y);
-	}
-
-	public double distance(Vector point) {
-		double x = point.x - this.x;
-		double y = point.y - this.y;
-		return Math.sqrt(x * x + y * y);
-	}
-
-	public Vector normalize() {
-		return div(length());
-	}
-
-	public int[] asIntArray() {
-		return new int[] { (int) Math.round(x), (int) Math.round(y) };
 	}
 
 	@Override

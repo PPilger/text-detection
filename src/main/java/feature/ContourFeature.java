@@ -3,6 +3,8 @@ package feature;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
+import com.googlecode.javacv.cpp.opencv_core.CvPoint;
+
 import math.Vector;
 
 public class ContourFeature extends Feature {
@@ -68,7 +70,11 @@ public class ContourFeature extends Feature {
 	@Override
 	public void draw(CvArr img, CvScalar color) {
 		cvDrawContours(img, contour, color, color, -1, 1, 0);
-		cvDrawCircle(img, getCvCenter(), 1, color, 2, 0, 0);
+
+		Vector center = getCenter();
+		CvPoint cvCenter = cvPoint((int) Math.round(center.x), (int) Math.round(center.y));
+		
+		cvDrawCircle(img, cvCenter, 1, color, 2, 0, 0);
 	}
 
 	@Override

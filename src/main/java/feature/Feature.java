@@ -21,17 +21,15 @@ public abstract class Feature extends Box implements Comparable<Feature> {
 		this.id = counter++;
 	}
 
-	public Feature(double xcenter, double ycenter, double width, double height,
-			double angle) {
-		super(xcenter, ycenter, width, height, angle);
-	}
-
 	public int[] getICorners() {
 		return Vector.asIntArray(getCorners());
 	}
 
 	public void draw(CvArr img, CvScalar color) {
-		cvDrawCircle(img, getCvCenter(), 1, color, 2, 0, 0);
+		Vector center = getCenter();
+		CvPoint cvCenter = cvPoint((int) Math.round(center.x), (int) Math.round(center.y));
+		
+		cvDrawCircle(img, cvCenter, 1, color, 2, 0, 0);
 		super.draw(img, color);
 	}
 
