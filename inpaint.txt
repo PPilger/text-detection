@@ -1,9 +1,0 @@
-import static com.googlecode.javacv.cpp.opencv_photo.*;
-
-
-image.process(new DilateProcessor(3));
-ImageDisplay display = new ImageDisplay("output1", 1200, 800);
-ImageDisplay display2 = new ImageDisplay("output2", 1200, 800);
-display.show(image.getColor());
-cvInpaint(image.getColor(), image.getImg(), image.getColor(), 20, CV_INPAINT_TELEA);
-display2.show(image.getColor());

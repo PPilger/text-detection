@@ -5,7 +5,6 @@ import validator.DInterval;
 import com.googlecode.javacv.cpp.opencv_core.*;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvSaveImage;
 
 public class ChromacityProcessor implements ImageProcessor {
 	private DInterval[] range;
@@ -32,9 +31,6 @@ public class ChromacityProcessor implements ImageProcessor {
 			IplImage ch = rgb[i];
 			cvConvert(ch, tempColor);
 			cvDiv(tempColor, br, tempColor, 1);
-			
-			//cvScale(tempColor, tempColor, 128, 0);
-			//cvSaveImage("chromacity"+i+".jpg", tempColor);
 			
 			range[i].validate(tempColor, temp);
 			

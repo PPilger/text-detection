@@ -88,7 +88,6 @@ public class PortolanAtlas implements TextDetector {
 			lines.process(new BigObjectEraseProcessor(4));
 			// Image.write(lines.getImg(), "lines2.jpg");
 			lines.process(new SmallObjectErasorProcessor(20));
-			Image.write(lines.getImg(), "lines1.jpg");
 			lines.process(new LineSegmentsProcessor(90, 256, 64));// 40,50,800
 		}
 
@@ -112,8 +111,6 @@ public class PortolanAtlas implements TextDetector {
 
 			smallImage.process(new DilateProcessor(3));
 			smallImage.process(new CloseProcessor(3));
-
-			display.show(smallImage.getImg());
 		}
 
 		{
@@ -158,7 +155,7 @@ public class PortolanAtlas implements TextDetector {
 			linker.addRule(new BoxDistanceLinkingRule(new DMaximum(22)));
 			linker.addRule(new AreaGrowthLinkingRule(new DMaximum(400)));
 
-			linker.link(smallFeatures, smallImage.getImg());
+			smallFeatures = linker.link(smallFeatures, smallImage.getImg());
 		}
 
 		{

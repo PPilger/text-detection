@@ -32,7 +32,9 @@ public class InfiniteLine {
 		double x1;
 		double y0;
 		double y1;
-		if (angle.absRadians() > Math.PI / 4) {
+		
+		double rad = angle.getRadians();
+		if (Math.PI / 4 < rad && rad < Math.PI * 3 / 4) {
 			double k = Math.tan(Math.PI / 2 - angle.getRadians());
 			double d = position.x - k * position.y;
 

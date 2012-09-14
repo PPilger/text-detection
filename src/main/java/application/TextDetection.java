@@ -20,9 +20,9 @@ public class TextDetection {
 	 */
 	public static void main(String[] args) throws InterruptedException {
 		TextDetector detector = new BritishIsles();
-		// TextDetector detector = new PortolanAtlas();
+		//TextDetector detector = new PortolanAtlas();
 
-		// TextDetector detector = new Mooskirchen();
+		//TextDetector detector = new Mooskirchen();
 
 		start();
 		{
@@ -53,6 +53,8 @@ public class TextDetection {
 				System.out.println("number of features after filtering: "
 						+ features.size());
 			}
+			
+			detector.featureMerging();
 		}
 		stop("total");
 

@@ -146,26 +146,33 @@ public class BestDirectionFeatureLinker extends FeatureLinker {
 				}
 				linkedFeatures.add(LinkedFeature.create(best));
 			}
-			
+
 			Collections.sort(linkedFeatures);
-			
+
+			Map<LinkedFeature, Integer> smaller = new HashMap<LinkedFeature, Integer>();
+
 			int x = 0, y = 0, z = 0;
 			for (int i = 0; i < linkedFeatures.size() - 1; i++) {
 				LinkedFeature a = linkedFeatures.get(i);
-				if (a == null) {
-					continue;
-				}
 
 				for (int j = i + 1; j < linkedFeatures.size(); j++) {
 					LinkedFeature b = linkedFeatures.get(j);
-					if (b == null) {
-						continue;
+
+					boolean removed = false;
+					Iterator<Feature> iter = b.iterator();
+					// for (Feature f : b) {
+					while (iter.hasNext()) {
+						Feature f = iter.next();
+						if (a.contains(f)) {
+							iter.remove();
+							removed = true;
+						}
 					}
 
-					for (Feature f : b) {
-						if (a.contains(f)) {
-							linkedFeatures.set(j, null);
-							break;
+					if (removed) {
+						if (!b.getSubFeatures().isEmpty()) {
+							linkedFeatures.set(j,
+									LinkedFeature.create(b.getSubFeatures()));
 						}
 					}
 				}

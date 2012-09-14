@@ -1,0 +1,13 @@
+CvMemStorage mem = cvCreateMemStorage(0);
+CvSeq hull = cvConvexHull2(contour, mem, CV_CLOCKWISE, 0);
+CvMemStorage mem2 = cvCreateMemStorage(0);
+CvSeq defects = cvConvexityDefects(contour, hull, mem2);
+List<Double> list = new ArrayList<Double>();
+for (int i = 0; i < defects.total(); i++) {
+	CvConvexityDefect defect;
+	defect = new CvConvexityDefect(cvGetSeqElem(defects, i));
+	int dx = defect.end().x() - defect.start().x();
+	int dy = defect.end().y() - defect.start().y();
+	double length = Math.sqrt(dx * dx + dy * dy);
+	double depth = defect.depth();
+}

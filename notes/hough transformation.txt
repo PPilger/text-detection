@@ -1,0 +1,81 @@
+temp = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+
+
+cvSetZero(temp);
+cvDrawContours(temp, contour, CV_RGB(255, 255, 255),
+		CV_RGB(255, 255, 255), -1, 1, 0);
+
+CvMemStorage mem2 = cvCreateMemStorage(0);
+
+CvSeq line = cvHoughLines2(temp, mem2, CV_HOUGH_STANDARD, 8,
+		Math.PI / 360 * 32, contour.total() / 4, 0, 0);
+
+double avg = 0;
+double min = 2 * Math.PI;
+double max = 0;
+double minR = 2 * Math.PI;
+double maxR = 0;
+for (int j = 0; j < line.total(); j++) {
+	CvPoint2D32f polar = new CvPoint2D32f(cvGetSeqElem(
+			line, j));
+	
+	int px = (int)(Math.cos(polar.y()) * polar.x());
+	int py = (int)(Math.sin(polar.y()) * polar.x());
+
+	double normal = polar.y();
+	double angle = polar.y() + Math.PI / 2;
+	CvScalar color = CvScalar.GRAY;
+	if (aspectRatio > 0.7) {
+		color = CV_RGB(64, 64, 64);
+	}
+	cvDrawLine(
+			temp,
+			cvPoint(px - (int) (Math.cos(angle) * 1000),
+					py - (int) (Math.sin(angle) * 1000)),
+			cvPoint(px + (int) (Math.cos(angle) * 1000),
+					py + (int) (Math.sin(angle) * 1000)),
+			color, 1, 0, 0);
+	avg += angle;
+
+	if (normal < min) {
+		min = normal;
+	}
+	if (max < normal) {
+		max = normal;
+	}
+
+	angle = angle >= Math.PI ? angle - Math.PI : angle;
+	if (angle < minR) {
+		minR = angle;
+	}
+	if (maxR < angle) {
+		maxR = angle;
+	}
+}
+avg = avg /= line.total();
+
+cvDrawLine(
+		temp,
+		cvPoint(img.width() / 2, img.height() / 2),
+		cvPoint(img.width() / 2
+				+ (int) (Math.cos(avg) * 1000),
+				img.height() / 2
+						+ (int) (Math.sin(avg) * 1000)),
+		CvScalar.WHITE, 1, 0, 0);
+
+if (max - min < Math.PI / 2 || maxR - minR < Math.PI / 2) {
+					title = "TEXT";
+					color = CvScalar.BLUE;
+					cvShowImage(title, temp);
+					cvWaitKey();
+
+					features.add(new Feature(pos, diam, avg, diam));
+				} else if (aspectRatio > 0.5){
+					title = "CHARACTER";
+					color = CvScalar.GREEN;
+					features.add(new Feature(pos, diam));
+				} else {
+					title = "SKIPPED";
+					color = CvScalar.RED;
+					features.add(new Feature(pos, diam));
+				}

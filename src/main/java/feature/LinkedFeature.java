@@ -70,6 +70,10 @@ public class LinkedFeature extends Feature implements Iterable<Feature> {
 		return subFeatures.contains(f);
 	}
 	
+	public Set<Feature> getSubFeatures() {
+		return subFeatures;
+	}
+	
 	@Override
 	public double getRating() {
 		if(rating == -1) {
