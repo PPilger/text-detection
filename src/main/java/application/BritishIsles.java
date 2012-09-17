@@ -39,8 +39,8 @@ public class BritishIsles implements TextDetector {
 
 	@Override
 	public void imageProcessing() {
-		image.process(new RemoveBackgroundProcessor(51, 30));
-		image.process(new ChromacityProcessor(DInterval.around(1.26, 0.21),
+		image.process(new BackgroundProcessor(51, new IMinimum(30)));
+		image.process(new ChromaticityProcessor(DInterval.around(1.26, 0.21),
 				DInterval.around(0.93, 0.14), DInterval.around(0.86, 0.08)));
 		image.process(new CloseProcessor(3));
 	}

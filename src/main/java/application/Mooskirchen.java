@@ -22,7 +22,7 @@ import feature.FixedDirectionLinkingRule;
 import feature.RankingFeatureRule;
 import feature.SizeFeatureRule;
 import image.Image;
-import image.RemoveBackgroundProcessor;
+import image.BackgroundProcessor;
 
 public class Mooskirchen implements TextDetector {
 	private Image image;
@@ -51,7 +51,7 @@ public class Mooskirchen implements TextDetector {
 
 	@Override
 	public void imageProcessing() {
-		image.process(new RemoveBackgroundProcessor(101, 50));
+		image.process(new BackgroundProcessor(101, new IMinimum(50)));
 
 	}
 

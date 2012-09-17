@@ -1,7 +1,8 @@
 package image;
 
-import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_imgproc.*;
+import static com.googlecode.javacv.cpp.opencv_core.cvAnd;
+import static com.googlecode.javacv.cpp.opencv_imgproc.CV_GAUSSIAN;
+import static com.googlecode.javacv.cpp.opencv_imgproc.cvSmooth;
 import validator.IValidator;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;

@@ -1,53 +1,45 @@
 package image;
 
-import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_imgproc.*;
-import validator.IValidator;
+import static com.googlecode.javacv.cpp.opencv_core.cvSet;
+import static com.googlecode.javacv.cpp.opencv_core.cvSetZero;
 
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
-import com.googlecode.javacv.cpp.opencv_imgproc.IplConvKernel;
 
 /**
- * Makes a skeleton transformation and removes all objects with an invalid
- * thickness.
+ * Erases thick parts in the image. This is done by removing the opened image
+ * from the original (the difference between the opened image and the original
+ * is the result).
  * 
  * @author PilgerstorferP
  * 
  */
-public class ThicknessProcessor implements ImageProcessor {
-	private IValidator thickness;
+public class ThicknessProcessor extends SimpleImageProcessor {
+	private int openSize;
+	private int dilSize;
 
-	public ThicknessProcessor(IValidator thickness) {
-		this.thickness = thickness;
+	/**
+	 * @param openSize
+	 *            the size of the open operator
+	 * @param dilSize
+	 *            the size of the dilate operator used to dilate the opened
+	 *            region in order to remove artifacts on the edge of thick
+	 *            objects.
+	 */
+	public ThicknessProcessor(int openSize, int dilSize) {
+		this.openSize = openSize;
+		this.dilSize = dilSize;
 	}
 
 	@Override
-	public void process(Image image) {
-		IplImage img = image.getImg();
-		IplImage temp = image.getTemp();
+	public void process(IplImage img, IplImage temp) {
+		cvSetZero(temp);
+		cvSet(temp, CvScalar.WHITE, img);
 
-		IplImage centers = IplImage.create(temp.cvSize(), IPL_DEPTH_8U, 1);
-		IplImage distance = IplImage.create(temp.cvSize(), IPL_DEPTH_8U, 1);
+		new OpenProcessor(openSize).process(temp, null);
+		new DilateProcessor(dilSize).process(temp, null);
 
-		// do a distance transformation
-		cvDistTransform(img, distance, CV_DIST_L1, 3, null, null, 0);
-
-		// get the centers of all objects
-		IplConvKernel strel = cvCreateStructuringElementEx(3, 3, 1, 1,
-				CV_SHAPE_CROSS, null);
-		cvDilate(distance, temp, strel, 1);
-		cvCmp(distance, temp, centers, CV_CMP_EQ);
-
-		// set the centers to the distance-value (distance to the next 0)
-		cvCmpS(centers, 0, temp, CV_CMP_GT);
-		cvAnd(distance, temp, centers, null);
-
-		// set all valid centers to white
-		thickness.validate(centers, img);
-
-		// remove all pixel with distance null (no center)
-		cvCmpS(centers, 0, temp, CV_CMP_EQ);
 		cvSet(img, CvScalar.BLACK, temp);
 	}
+
 }

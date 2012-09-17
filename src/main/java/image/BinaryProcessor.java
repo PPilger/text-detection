@@ -14,7 +14,9 @@ public class BinaryProcessor extends SimpleImageProcessor {
 	private IValidator value;
 
 	/**
-	 * @param value defines the range that is set to WHITE (the rest is set to BLACK)
+	 * @param value
+	 *            defines the range that is set to WHITE (the rest is set to
+	 *            BLACK)
 	 */
 	public BinaryProcessor(IValidator value) {
 		this.value = value;

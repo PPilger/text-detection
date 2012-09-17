@@ -5,39 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import validator.DInterval;
-import validator.DMaximum;
-import validator.DMinimum;
-import validator.IInterval;
-import validator.IMaximum;
-import validator.IMinimum;
-import validator.Valid;
-
-import feature.AreaFeatureRule;
-import feature.AreaGrowthLinkingRule;
-import feature.BestDirectionFeatureLinker;
-import feature.BoxDistanceLinkingRule;
-import feature.CenterDistanceLinkingRule;
-import feature.ContourFeatureDetector;
-import feature.FeatureDetector;
-import feature.FeatureLinker;
-import feature.FeatureSet;
-import feature.SizeFeatureRule;
-import image.BigObjectEraseProcessor;
-import image.CloseProcessor;
-import image.DilateProcessor;
-import image.EraseProcessor;
-import image.FirstDerivateEraseProcessor;
-import image.Image;
-import image.ImageDisplay;
-import image.InvertProcessor;
-import image.LineSegmentsProcessor;
-import image.ObstacleRemoveProcessor;
-import image.SecondDerivateProcessor;
-import image.PerimeterProcessor;
-import image.ThicknessProcessor;
-import image.BinaryProcessor;
-import image.DensityProcessor;
+import feature.*;
+import image.*;
+import validator.*;
 
 public class PortolanAtlas implements TextDetector {
 	private Image smallImage;
@@ -68,12 +38,12 @@ public class PortolanAtlas implements TextDetector {
 	@Override
 	public List<FeatureSet> getFeatures() {
 		List<FeatureSet> featureSets = new ArrayList<FeatureSet>();
-		
+
 		featureSets.add(smallFeatures);
 		if (bigFeatures == null) {
 			featureSets.add(bigFeatures);
 		}
-		
+
 		return featureSets;
 	}
 
@@ -83,31 +53,30 @@ public class PortolanAtlas implements TextDetector {
 
 		Image lines = new Image(smallImage.getGray());
 		{
-
 			lines.process(new BinaryProcessor(new IMaximum(165)));
-			// Image.write(lines.getImg(), "lines3.jpg");
-			lines.process(new BigObjectEraseProcessor(4));
-			// Image.write(lines.getImg(), "lines2.jpg");
-			lines.process(new PerimeterProcessor(new IMaximum(19)));
-			lines.process(new LineSegmentsProcessor(90, 256, 64));// 40,50,800
+
+			lines.process(new ThicknessProcessor(5, 1));
+			lines.process(new PerimeterProcessor(new IMinimum(19)));
+
+			lines.process(new LineSegmentsProcessor(90, new DMinimum(256),
+					new DMaximum(64)));
 		}
 
 		{
 			smallImage.process(new BinaryProcessor(new IMaximum(165)));
 
 			smallImage.process(new CloseProcessor(3));
-			smallImage.process(new BigObjectEraseProcessor(11));
-			smallImage.process(new PerimeterProcessor(new IMaximum(9)));
+			smallImage.process(new PerimeterProcessor(new IMinimum(9)));
 
-			smallImage.process(new ThicknessProcessor(new IMaximum(7)));
-
+			smallImage.process(new SkelettonProcessor(new IMaximum(7)));
 			smallImage.process(new EraseProcessor(lines.getImg()));
 
-			smallImage.process(new FirstDerivateEraseProcessor(120, 9));
-			smallImage.process(new SecondDerivateProcessor(3, new IMinimum(130), 9));
+			smallImage.process(new FirstDerivativeProcessor(new IMinimum(120),
+					9));
+			smallImage.process(new SecondDerivativeProcessor(3, new IMinimum(
+					130), 9));
 
 			smallImage.process(new DensityProcessor(11, 17, new IMinimum(50)));
-			smallImage.process(new ObstacleRemoveProcessor(3, 3));
 
 			smallImage.process(new DilateProcessor(3));
 			smallImage.process(new CloseProcessor(3));
@@ -115,7 +84,7 @@ public class PortolanAtlas implements TextDetector {
 
 		{
 			bigImage.process(new BinaryProcessor(new IMaximum(140)));
-			bigImage.process(new CloseProcessor());
+			bigImage.process(new CloseProcessor(3));
 		}
 
 	}

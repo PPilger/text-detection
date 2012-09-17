@@ -1,21 +1,27 @@
 package image;
-import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 
+import static com.googlecode.javacv.cpp.opencv_imgproc.cvDilate;
 
-import java.util.Map;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-import com.googlecode.javacv.cpp.opencv_core.*;
-
+/**
+ * Does a dilate image operation.
+ * 
+ * @author PilgerstorferP
+ * 
+ */
 public class DilateProcessor extends MorphologicalProcessor {
-	
-	public DilateProcessor() {
-		super();
-	}
 
+	/**
+	 * size has to be odd!
+	 * 
+	 * @param size
+	 *            size of the structuring element
+	 */
 	public DilateProcessor(int size) {
 		super(size);
 	}
-	
+
 	public void process(IplImage processed, IplImage temp) {
 		cvDilate(processed, processed, getStructuringElement(), 1);
 	}
