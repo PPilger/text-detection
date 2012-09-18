@@ -76,7 +76,7 @@ public class PortolanAtlas implements TextDetector {
 			smallImage.process(new SecondDerivativeProcessor(3, new IMinimum(
 					130), 9));
 
-			smallImage.process(new DensityProcessor(11, 17, new IMinimum(50)));
+			smallImage.process(new DensityProcessor(11, 17, new IMinimum(25)));
 
 			smallImage.process(new DilateProcessor(3));
 			smallImage.process(new CloseProcessor(3));

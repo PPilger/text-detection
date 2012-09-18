@@ -1,7 +1,7 @@
 package image;
 
 import static com.googlecode.javacv.cpp.opencv_core.cvAnd;
-import static com.googlecode.javacv.cpp.opencv_imgproc.CV_GAUSSIAN;
+import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BLUR;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvSmooth;
 import validator.IValidator;
 
@@ -38,7 +38,7 @@ public class DensityProcessor extends SimpleImageProcessor {
 	public void process(IplImage img, IplImage temp) {
 		// calculate the density (average pixel value in the area around a
 		// pixel)
-		cvSmooth(img, temp, CV_GAUSSIAN, areaSize, areaSize, 0, 0);
+		cvSmooth(img, temp, CV_BLUR, areaSize, areaSize, 0, 0);
 
 		// dilate the density, so that parts at the edge of a region also get
 		// ranked with a high density
