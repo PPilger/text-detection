@@ -208,30 +208,6 @@ public class Box {
 
 	/**
 	 * @param other
-	 *            box to be tested for intersection
-	 * @return true if the box intersects with other, false otherwise
-	 */
-	public boolean intersects(Box other) {
-		// intersect all possible pairs of lines
-		int ip = 3;
-		for (int i = 0; i < 4; ip = i, i++) {
-			Line line0 = new Line(this.corners[ip], this.corners[i]);
-
-			int jp = 3;
-			for (int j = 0; j < 4; jp = j, j++) {
-				Line line1 = new Line(other.corners[jp], other.corners[j]);
-
-				if (line0.intersects(line1)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param other
 	 * @return distance between this box and the box other
 	 */
 	public double distance(Box other) {
@@ -350,6 +326,30 @@ public class Box {
 		distances[3] = point.distance(others[3]);
 
 		return distances;
+	}
+
+	/**
+	 * @param other
+	 *            box to be tested for intersection
+	 * @return true if the box intersects with other, false otherwise
+	 */
+	public boolean intersects(Box other) {
+		// intersect all possible pairs of lines
+		int ip = 3;
+		for (int i = 0; i < 4; ip = i, i++) {
+			Line line0 = new Line(this.corners[ip], this.corners[i]);
+
+			int jp = 3;
+			for (int j = 0; j < 4; jp = j, j++) {
+				Line line1 = new Line(other.corners[jp], other.corners[j]);
+
+				if (line0.intersects(line1)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

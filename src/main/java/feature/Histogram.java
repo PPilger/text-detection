@@ -4,10 +4,29 @@ import static com.googlecode.javacv.cpp.opencv_core.cvGetReal2D;
 
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
 
+/**
+ * Represents a histogram of an image or part of an image. For each color value
+ * the amount of Occurrences in the image is stored as a percentage of the total
+ * amount.
+ * 
+ * @author PilgerstorferP
+ * 
+ */
 public class Histogram {
 	private double[] hist;
-	private double sum;
-	
+
+	/**
+	 * Creates a new Histogram. Only pixels with a non zero mask-value are
+	 * considered. All pixels in img have to have a color value in the range of
+	 * [0, numColors).
+	 * 
+	 * @param img
+	 *            a 8U1C matrix (8 bit unsigned, 1 channel)
+	 * @param mask
+	 *            a 8U1C matrix
+	 * @param numColors
+	 *            a positive number
+	 */
 	public Histogram(CvMat img, CvMat mask, int numColors) {
 		hist = new double[numColors];
 
@@ -22,7 +41,7 @@ public class Histogram {
 		}
 
 		// calculate sum
-		sum = 0;
+		double sum = 0;
 		for (int i = 0; i < hist.length; i++) {
 			sum += hist[i];
 		}
@@ -33,10 +52,13 @@ public class Histogram {
 		}
 	}
 
+	/**
+	 * @return the id (color value) of the element with the highest percentage.
+	 */
 	public int max() {
 		int idx = 0;
 		double max = 0;
-		
+
 		for (int i = 0; i < hist.length; i++) {
 			double val = hist[i];
 			if (max < val) {
@@ -44,14 +66,19 @@ public class Histogram {
 				max = val;
 			}
 		}
-		
+
 		return idx;
 	}
-	
+
+	/**
+	 * @param idx
+	 *            the index (color value)
+	 * @return the occurrence percentage of the specified color.
+	 */
 	public double get(int idx) {
 		return hist[idx];
 	}
-	
+
 	public int size() {
 		return hist.length;
 	}

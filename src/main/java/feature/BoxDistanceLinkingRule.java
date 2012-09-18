@@ -2,6 +2,12 @@ package feature;
 
 import validator.DValidator;
 
+/**
+ * Only permits links between features that have a valid box to box distance.
+ * 
+ * @author PilgerstorferP
+ * 
+ */
 public class BoxDistanceLinkingRule extends LinkingRule {
 	private DValidator distance;
 

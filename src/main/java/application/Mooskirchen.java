@@ -73,7 +73,7 @@ public class Mooskirchen implements TextDetector {
 
 		linker.addRule(new BoxDistanceLinkingRule(new DMaximum(81)));
 		linker.addRule(new FixedDirectionLinkingRule(0, new Valid(),
-				new IMinimum(20)));
+				new DMinimum(19.5)));
 
 		features = linker.link(features, image.getImg());
 	}

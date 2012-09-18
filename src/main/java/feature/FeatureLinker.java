@@ -1,14 +1,24 @@
 package feature;
 
 import static application.TextDetection.count;
-import static application.TextDetection.start;
-import static application.TextDetection.stop;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class FeatureLinker {
+/**
+ * A FeatureLinker is able to link features to a LinkedFeature. LinkingRules
+ * define which features get linked and which don't.
+ * 
+ * @author PilgerstorferP
+ * 
+ */
+public abstract class FeatureLinker {
 	private List<LinkingRule> linkingRules;
 
 	public FeatureLinker() {
@@ -19,6 +29,15 @@ public class FeatureLinker {
 		this.linkingRules.add(linkingRule);
 	}
 
+	/**
+	 * Starts the linking algorithm.
+	 * 
+	 * @param features
+	 *            the input features
+	 * @param img
+	 *            may be used by a linking rule for initialization
+	 * @return a new FeatureSet containing the linked features
+	 */
 	public FeatureSet link(FeatureSet features, IplImage img) {
 		Map<Feature, List<Feature>> adjacencyList = new HashMap<Feature, List<Feature>>();
 
@@ -48,48 +67,11 @@ public class FeatureLinker {
 			}
 		}
 
-		FeatureSet result = link(features, adjacencyList);
-
-		return result;
+		return link(features, adjacencyList);
 	}
 
-	public FeatureSet link(FeatureSet features,
-			Map<Feature, List<Feature>> adjacencyList) {
-
-		// find all connected components of the graph
-
-		FeatureSet result = new FeatureSet(features);
-		{
-			Set<Feature> marked = new HashSet<Feature>();
-			Stack<Feature> stack = new Stack<Feature>();
-
-			for (Feature start : features) {
-				if (!marked.contains(start)) {
-					List<Feature> component = new ArrayList<Feature>();
-
-					// breadth first search stack.push(start);
-					marked.add(start);
-					stack.push(start);
-
-					while (!stack.isEmpty()) {
-						Feature feature = stack.pop();
-						component.add(feature);
-
-						for (Feature neighbour : adjacencyList.get(feature)) {
-							if (!marked.contains(neighbour)) {
-								marked.add(neighbour);
-								stack.push(neighbour);
-							}
-						}
-					}
-
-					result.add(LinkedFeature.create(component));
-				}
-			}
-		}
-
-		return result;
-	}
+	public abstract FeatureSet link(FeatureSet features,
+			Map<Feature, List<Feature>> adjacencyList);
 
 	private boolean link(Feature f0, Feature f1) {
 		for (LinkingRule l : linkingRules) {

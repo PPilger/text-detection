@@ -1,45 +1,70 @@
 package feature;
 
-import static com.googlecode.javacv.cpp.opencv_core.*;
-import static com.googlecode.javacv.cpp.opencv_highgui.*;
-import static com.googlecode.javacv.cpp.opencv_imgproc.*;
-
+import static com.googlecode.javacv.cpp.opencv_core.CV_32FC1;
+import static com.googlecode.javacv.cpp.opencv_core.CV_8UC1;
+import static com.googlecode.javacv.cpp.opencv_core.CV_CMP_EQ;
+import static com.googlecode.javacv.cpp.opencv_core.CV_CMP_LE;
+import static com.googlecode.javacv.cpp.opencv_core.CV_CMP_LT;
+import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32F;
+import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
+import static com.googlecode.javacv.cpp.opencv_core.cvCmp;
+import static com.googlecode.javacv.cpp.opencv_core.cvCmpS;
+import static com.googlecode.javacv.cpp.opencv_core.cvConvertScale;
+import static com.googlecode.javacv.cpp.opencv_core.cvDrawLine;
+import static com.googlecode.javacv.cpp.opencv_core.cvFillConvexPoly;
+import static com.googlecode.javacv.cpp.opencv_core.cvGetReal2D;
+import static com.googlecode.javacv.cpp.opencv_core.cvGetSubRect;
+import static com.googlecode.javacv.cpp.opencv_core.cvMax;
+import static com.googlecode.javacv.cpp.opencv_core.cvMul;
+import static com.googlecode.javacv.cpp.opencv_core.cvPoint;
+import static com.googlecode.javacv.cpp.opencv_core.cvScalarAll;
+import static com.googlecode.javacv.cpp.opencv_core.cvScale;
+import static com.googlecode.javacv.cpp.opencv_core.cvSet;
+import static com.googlecode.javacv.cpp.opencv_core.cvSetZero;
+import static com.googlecode.javacv.cpp.opencv_core.cvSum;
+import static com.googlecode.javacv.cpp.opencv_highgui.cvSaveImage;
+import static com.googlecode.javacv.cpp.opencv_highgui.cvWaitKey;
+import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BLUR;
+import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_NN;
+import static com.googlecode.javacv.cpp.opencv_imgproc.cvFilter2D;
+import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
+import static com.googlecode.javacv.cpp.opencv_imgproc.cvSmooth;
 import image.DilateProcessor;
 import image.Image;
 
-import java.util.*;
-
-import validator.DValidator;
-import validator.IValidator;
+import java.util.HashMap;
 
 import math.Rotation;
 import math.Vector;
+import validator.DValidator;
 
+import com.googlecode.javacv.cpp.opencv_core.CvMat;
+import com.googlecode.javacv.cpp.opencv_core.CvPoint;
+import com.googlecode.javacv.cpp.opencv_core.CvRect;
+import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class BestDirectionLinkingRule extends LinkingRule {
 	// parameters
 	private int filterSize;
-	private int dilateSize;
+	private int dilSize;
 	private int numAngles;
-	private int lineWidth;
-	private DValidator featureRating;
-	private IValidator width;
-	private IValidator height;
+	private DValidator directionPossibility;
+	private DValidator width;
+	private DValidator height;
 
 	private HashMap<Feature, Histogram> hists;
 
 	private IplImage direction;
 	private IplImage mask;
 
-	public BestDirectionLinkingRule(int filterSize, int dilateSize,
-			int numAngles, int lineWidth, DValidator featureRating,
-			IValidator width, IValidator height) {
+	public BestDirectionLinkingRule(int filterSize, int dilSize,
+			int numAngles, DValidator directionPossibility,
+			DValidator width, DValidator height) {
 		this.filterSize = filterSize;
-		this.dilateSize = dilateSize;
+		this.dilSize = dilSize;
 		this.numAngles = numAngles;
-		this.lineWidth = lineWidth;
-		this.featureRating = featureRating;
+		this.directionPossibility = directionPossibility;
 		this.width = width;
 		this.height = height;
 	}
@@ -88,7 +113,7 @@ public class BestDirectionLinkingRule extends LinkingRule {
 				cvSetZero(filters[i]);
 
 				cvDrawLine(filters[i], cvPoint(c - x, c - y),
-						cvPoint(c + x, c + y), CvScalar.ONE, lineWidth, 8, 0);
+						cvPoint(c + x, c + y), CvScalar.ONE, 1, 8, 0);
 
 				double sum = cvSum(filters[i]).blue();
 				cvScale(filters[i], filters[i], 1 / sum, 0);
@@ -120,7 +145,7 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			IplImage maxSum = sum.clone();
 			cvSetZero(maxSum);
 
-			DilateProcessor processor = new DilateProcessor(dilateSize);
+			DilateProcessor processor = new DilateProcessor(dilSize);
 
 			cvSetZero(direction);
 			for (int i = 0; i < numAngles; i++) {
@@ -129,12 +154,11 @@ public class BestDirectionLinkingRule extends LinkingRule {
 				cvSet(dil, CvScalar.ONE, mask);
 
 				cvConvertScale(mask, sum, 1 / 255., 0);
-				cvSmooth(sum, sum, CV_BLUR, dilateSize);
+				cvSmooth(sum, sum, CV_BLUR, dilSize);
 
 				cvMul(sum, dil, dil, 1);
 
 				processor.process(dil, null);
-				// cvDilate(dil, dil, strels[i], 1);
 
 				cvCmp(maxSum, dil, mask, CV_CMP_LE);
 				cvSet(direction, cvScalarAll(i), mask);
@@ -198,7 +222,7 @@ public class BestDirectionLinkingRule extends LinkingRule {
 				}
 			}
 
-			if (!featureRating.isValid(max)) {
+			if (!directionPossibility.isValid(max)) {
 				return false;
 			}
 
@@ -230,10 +254,10 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			}
 
 			double x;
-			int w;
+			double w;
 			if (max0.x <= min1.x || max1.x <= min0.x) {
 				x = Math.min(max0.x, max1.x);
-				w = (int) Math.round(Math.max(min0.x, min1.x) - x);
+				w = Math.max(min0.x, min1.x) - x;
 			} else {
 				x = 0;
 				w = 0;
@@ -244,13 +268,13 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			}
 
 			double y;
-			int h;
+			double h;
 			if (max0.y <= min1.y || max1.y <= min0.y) {
 				y = 0;
 				h = 0;
 			} else {
 				y = Math.max(min0.y, min1.y);
-				h = (int) Math.round(Math.min(max0.y, max1.y) - y);
+				h = Math.min(max0.y, max1.y) - y;
 			}
 
 			if (!height.isValid(h)) {
@@ -266,8 +290,8 @@ public class BestDirectionLinkingRule extends LinkingRule {
 			{
 				int xi = (int) Math.round(x);
 				int yi = (int) Math.round(y);
-				int xwi = xi + w;
-				int yhi = yi + h;
+				int xwi = xi + (int) Math.round(w);
+				int yhi = yi + (int) Math.round(h);
 				points[0] = xi;
 				points[1] = yi;
 				points[2] = xi;

@@ -107,10 +107,10 @@ public class PortolanAtlas implements TextDetector {
 
 			detector.findFeatures(bigImage.getImg(), bigFeatures);
 
-			bigFeatures.dontRemove(new SizeFeatureRule(new DMinimum(16),
+			bigFeatures.keep(new SizeFeatureRule(new DMinimum(16),
 					new Valid()));
 			bigFeatures
-					.dontRemove(new AreaFeatureRule(new DInterval(70, 1800)));
+					.keep(new AreaFeatureRule(new DInterval(70, 1800)));
 		}
 	}
 
@@ -138,17 +138,17 @@ public class PortolanAtlas implements TextDetector {
 
 	@Override
 	public void featureFiltering() {
-		smallFeatures.dontRemove(new SizeFeatureRule(new DMinimum(30),
+		smallFeatures.keep(new SizeFeatureRule(new DMinimum(30),
 				new DMinimum(8)));
 
-		bigFeatures.dontRemove(new SizeFeatureRule(new DMinimum(100),
+		bigFeatures.keep(new SizeFeatureRule(new DMinimum(100),
 				new DMinimum(16)));
 
 	}
 
 	@Override
 	public void featureMerging() {
-		smallFeatures.merge(bigFeatures);
+		smallFeatures.merge(bigFeatures, new DMaximum(0.5));
 		bigFeatures = null;
 	}
 }
