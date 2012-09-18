@@ -1,7 +1,5 @@
 package feature;
 
-import static application.TextDetection.count;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,10 +74,8 @@ public abstract class FeatureLinker {
 	private boolean link(Feature f0, Feature f1) {
 		for (LinkingRule l : linkingRules) {
 			if (!l.link(f0, f1)) {
-				count(l.getClass().toString() + " invalid");
 				return false;
 			}
-			count(l.getClass().toString() + " valid");
 		}
 
 		return true;
