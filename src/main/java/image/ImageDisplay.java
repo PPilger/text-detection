@@ -1,11 +1,14 @@
 package image;
 
 import static com.googlecode.javacv.cpp.opencv_core.cvAdd;
+import static com.googlecode.javacv.cpp.opencv_core.cvAndS;
 import static com.googlecode.javacv.cpp.opencv_core.cvCloneImage;
+import static com.googlecode.javacv.cpp.opencv_core.cvSetZero;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvResizeWindow;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvShowImage;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvWaitKey;
 
+import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 /**
@@ -48,6 +51,25 @@ public class ImageDisplay {
 		height = (height == -1) ? img.height() : Math.min(img.height(), height);
 
 		cvShowImage(title, img);
+
+		cvResizeWindow(title, width, height);
+		cvWaitKey();
+	}
+
+	/**
+	 * Displays all pixels of img where mask is not zero. All other pixels are displayed black.
+	 * @param img
+	 * @param mask an 8U1C image (8 bit unsigned, 1 channel)
+	 */
+	public void show(IplImage img, IplImage mask) {
+		width = (width == -1) ? img.width() : Math.min(img.width(), width);
+		height = (height == -1) ? img.height() : Math.min(img.height(), height);
+
+		IplImage temp = img.clone();
+		cvSetZero(temp);
+		cvAndS(img, CvScalar.WHITE, temp, mask);
+
+		cvShowImage(title, temp);
 
 		cvResizeWindow(title, width, height);
 		cvWaitKey();

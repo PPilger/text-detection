@@ -1,13 +1,43 @@
 package application;
 
+import feature.AreaFeatureRule;
+import feature.AreaGrowthLinkingRule;
+import feature.BestDirectionFeatureLinker;
+import feature.BoxDistanceLinkingRule;
+import feature.CenterDistanceLinkingRule;
+import feature.ContourFeatureDetector;
+import feature.FeatureDetector;
+import feature.FeatureLinker;
+import feature.FeatureSet;
+import feature.SizeFeatureRule;
+import image.BackgroundProcessor;
+import image.BinaryProcessor;
+import image.CloseProcessor;
+import image.DensityProcessor;
+import image.DilateProcessor;
+import image.EraseProcessor;
+import image.FirstDerivativeProcessor;
+import image.Image;
+import image.ImageDisplay;
+import image.LineSegmentsProcessor;
+import image.MedianProcessor;
+import image.PerimeterProcessor;
+import image.SecondDerivativeProcessor;
+import image.SkelettonProcessor;
+import image.ThicknessProcessor;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import feature.*;
-import image.*;
-import validator.*;
+import validator.DInterval;
+import validator.DMaximum;
+import validator.DMinimum;
+import validator.IInterval;
+import validator.IMaximum;
+import validator.IMinimum;
+import validator.Valid;
 
 public class PortolanAtlas implements TextDetector {
 	private Image smallImage;
@@ -64,7 +94,7 @@ public class PortolanAtlas implements TextDetector {
 
 		{
 			smallImage.process(new BinaryProcessor(new IMaximum(165)));
-
+			
 			smallImage.process(new CloseProcessor(3));
 			smallImage.process(new PerimeterProcessor(new IMinimum(9)));
 
@@ -103,14 +133,11 @@ public class PortolanAtlas implements TextDetector {
 		{
 			FeatureDetector detector = new ContourFeatureDetector(
 					new IInterval(30, 240));
-			detector.addRule(new AreaFeatureRule(new DInterval(1, 5000)));
+
+			detector.addRule(new AreaFeatureRule(new DInterval(70, 1800)));
+			detector.addRule(new SizeFeatureRule(new DMinimum(16), new Valid()));
 
 			detector.findFeatures(bigImage.getImg(), bigFeatures);
-
-			bigFeatures.keep(new SizeFeatureRule(new DMinimum(16),
-					new Valid()));
-			bigFeatures
-					.keep(new AreaFeatureRule(new DInterval(70, 1800)));
 		}
 	}
 
