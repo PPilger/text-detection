@@ -18,7 +18,7 @@ public class BritishIsles implements TextDetector {
 	private FeatureSet features;
 
 	public BritishIsles() {
-		image = new Image("samples" + File.separator + "British Isles.jpg");
+		image = new Image("samples" + File.separator + "British Isles S2.jpg");
 		features = new FeatureSet(30, image.getWidth(), image.getHeight());
 	}
 

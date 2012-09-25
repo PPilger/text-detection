@@ -54,13 +54,15 @@ public class TextDetection {
 			}
 			
 			detector.featureMerging();
+			System.out.println("total number of features: "
+					+ detector.getFeatures().get(0).size());
 		}
 		stop("total");
 
-		// writeFeatures(detector);
+		//writeFeatures(detector);
 		writeJSON(detector);
 		writeImage(detector);
-		// writeInpaint(detector);
+		//writeInpaint(detector);
 		// displayImage(detector);
 
 		System.out.println(counter);
@@ -119,7 +121,7 @@ public class TextDetection {
 		ImageDisplay display = new ImageDisplay("features", 1200, 800);
 
 		IplImage img = image.getColor().clone();
-		features.draw(img, CvScalar.GREEN);
+		features.draw(img, CvScalar.BLACK);
 		display.show(img);
 	}
 

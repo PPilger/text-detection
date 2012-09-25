@@ -1,29 +1,22 @@
 package application;
 
 import feature.AreaFeatureRule;
-import feature.AreaGrowthLinkingRule;
 import feature.BestDirectionFeatureLinker;
-import feature.BoxDistanceLinkingRule;
 import feature.CenterDistanceLinkingRule;
 import feature.ContourFeatureDetector;
 import feature.FeatureDetector;
 import feature.FeatureLinker;
 import feature.FeatureSet;
+import feature.RankingFeatureRule;
 import feature.SizeFeatureRule;
 import image.BackgroundProcessor;
 import image.BinaryProcessor;
+import image.ChromaticityProcessor;
 import image.CloseProcessor;
-import image.DensityProcessor;
-import image.DilateProcessor;
 import image.EraseProcessor;
-import image.FirstDerivativeProcessor;
 import image.Image;
 import image.ImageDisplay;
 import image.LineSegmentsProcessor;
-import image.MedianProcessor;
-import image.PerimeterProcessor;
-import image.SecondDerivativeProcessor;
-import image.SkelettonProcessor;
 import image.ThicknessProcessor;
 
 import java.io.File;
@@ -70,7 +63,7 @@ public class PortolanAtlas implements TextDetector {
 		List<FeatureSet> featureSets = new ArrayList<FeatureSet>();
 
 		featureSets.add(smallFeatures);
-		if (bigFeatures == null) {
+		if (bigFeatures != null) {
 			featureSets.add(bigFeatures);
 		}
 
@@ -79,37 +72,23 @@ public class PortolanAtlas implements TextDetector {
 
 	@Override
 	public void imageProcessing() {
-		ImageDisplay display = new ImageDisplay("output1", 1200, 800);
-
 		Image lines = new Image(smallImage.getGray());
 		{
-			lines.process(new BinaryProcessor(new IMaximum(165)));
-
+			lines.process(new BackgroundProcessor(21, new IMinimum(20)));
+			lines.process(new CloseProcessor(3));
 			lines.process(new ThicknessProcessor(5, 1));
-			lines.process(new PerimeterProcessor(new IMinimum(19)));
-
-			lines.process(new LineSegmentsProcessor(90, new DMinimum(256),
+			lines.process(new LineSegmentsProcessor(110, new DMinimum(256),
 					new DMaximum(64)));
 		}
 
 		{
-			smallImage.process(new BinaryProcessor(new IMaximum(165)));
-			
-			smallImage.process(new CloseProcessor(3));
-			smallImage.process(new PerimeterProcessor(new IMinimum(9)));
-
-			smallImage.process(new SkelettonProcessor(new IMaximum(7)));
-			smallImage.process(new EraseProcessor(lines.getImg()));
-
-			smallImage.process(new FirstDerivativeProcessor(new IMinimum(120),
-					9));
-			smallImage.process(new SecondDerivativeProcessor(3, new IMinimum(
-					130), 9));
-
-			smallImage.process(new DensityProcessor(11, 11, new IMinimum(25)));
-
-			smallImage.process(new DilateProcessor(3));
-			smallImage.process(new CloseProcessor(3));
+			smallImage.process(new BackgroundProcessor(21, new IMinimum(30)));
+			smallImage
+					.process(new ChromaticityProcessor(
+							new DInterval(1.01, 1.57),
+							new DInterval(0.70, 1.02),
+							new DInterval(0.46, 0.94)));
+			smallImage.process(new EraseProcessor(lines.getImg()));	
 		}
 
 		{
@@ -123,9 +102,10 @@ public class PortolanAtlas implements TextDetector {
 	public void featureDetection() {
 		{
 			FeatureDetector detector = new ContourFeatureDetector(
-					new IInterval(15, 1000000));
+					new IInterval(5, 1000000));
 
-			detector.addRule(new AreaFeatureRule(new DInterval(1, 5000)));
+			detector.addRule(new AreaFeatureRule(new DInterval(1, 2500)));
+			detector.addRule(new SizeFeatureRule(new DMaximum(30), new Valid()));
 
 			detector.findFeatures(smallImage.getImg(), smallFeatures);
 		}
@@ -145,10 +125,9 @@ public class PortolanAtlas implements TextDetector {
 	public void featureLinking() {
 		{
 			FeatureLinker linker = new BestDirectionFeatureLinker(new DMaximum(
-					10), 16);
+					8), 16);
 
-			linker.addRule(new BoxDistanceLinkingRule(new DMaximum(22)));
-			linker.addRule(new AreaGrowthLinkingRule(new DMaximum(400)));
+			linker.addRule(new CenterDistanceLinkingRule(new DMaximum(20)));
 
 			smallFeatures = linker.link(smallFeatures, smallImage.getImg());
 		}
@@ -167,6 +146,7 @@ public class PortolanAtlas implements TextDetector {
 	public void featureFiltering() {
 		smallFeatures.keep(new SizeFeatureRule(new DMinimum(30),
 				new DMinimum(8)));
+		smallFeatures.keep(new RankingFeatureRule(new DMinimum(1)));
 
 		bigFeatures.keep(new SizeFeatureRule(new DMinimum(100),
 				new DMinimum(16)));
