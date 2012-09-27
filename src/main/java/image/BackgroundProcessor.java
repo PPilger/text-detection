@@ -47,7 +47,7 @@ public class BackgroundProcessor implements ImageProcessor {
 		cvSub(temp, gray, img, null);
 		cvSub(gray, temp, temp, null);
 		cvMax(temp, img, img);
-
+		
 		// make img to a binary image
 		difference.validate(img, img);
 	}

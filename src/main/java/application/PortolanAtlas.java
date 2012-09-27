@@ -15,7 +15,6 @@ import image.ChromaticityProcessor;
 import image.CloseProcessor;
 import image.EraseProcessor;
 import image.Image;
-import image.ImageDisplay;
 import image.LineSegmentsProcessor;
 import image.ThicknessProcessor;
 
@@ -74,7 +73,7 @@ public class PortolanAtlas implements TextDetector {
 	public void imageProcessing() {
 		Image lines = new Image(smallImage.getGray());
 		{
-			lines.process(new BackgroundProcessor(21, new IMinimum(20)));
+			lines.process(new BackgroundProcessor(21, new IMinimum(29)));
 			lines.process(new CloseProcessor(3));
 			lines.process(new ThicknessProcessor(5, 1));
 			lines.process(new LineSegmentsProcessor(110, new DMinimum(256),
@@ -82,13 +81,13 @@ public class PortolanAtlas implements TextDetector {
 		}
 
 		{
-			smallImage.process(new BackgroundProcessor(21, new IMinimum(30)));
+			smallImage.process(new BackgroundProcessor(21, new IMinimum(29)));
 			smallImage
 					.process(new ChromaticityProcessor(
 							new DInterval(1.01, 1.57),
 							new DInterval(0.70, 1.02),
 							new DInterval(0.46, 0.94)));
-			smallImage.process(new EraseProcessor(lines.getImg()));	
+			smallImage.process(new EraseProcessor(lines.getImg()));
 		}
 
 		{

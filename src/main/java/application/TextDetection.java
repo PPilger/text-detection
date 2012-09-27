@@ -20,8 +20,8 @@ public class TextDetection {
 	 */
 	public static void main(String[] args) throws InterruptedException {
 		//TextDetector detector = new BritishIsles();
-		//TextDetector detector = new Mooskirchen();
-		TextDetector detector = new PortolanAtlas();
+		TextDetector detector = new Mooskirchen();
+		//TextDetector detector = new PortolanAtlas();
 
 		start();
 		{
@@ -92,7 +92,7 @@ public class TextDetection {
 		System.out.println("writing image");
 		
 		IplImage img = image.getColor().clone();
-		features.draw(img, CvScalar.GREEN);
+		features.draw(img, CvScalar.BLACK);
 		Image.write(img, detector.getName() + ".jpg");
 	}
 

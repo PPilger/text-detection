@@ -1,16 +1,5 @@
 package application;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
-import validator.DInterval;
-import validator.DMaximum;
-import validator.DMinimum;
-import validator.IInterval;
-import validator.IMinimum;
-import validator.Valid;
-
 import feature.AreaFeatureRule;
 import feature.BestDirectionFeatureLinker;
 import feature.BoxDistanceLinkingRule;
@@ -21,8 +10,19 @@ import feature.FeatureSet;
 import feature.FixedDirectionLinkingRule;
 import feature.RankingFeatureRule;
 import feature.SizeFeatureRule;
-import image.Image;
 import image.BackgroundProcessor;
+import image.Image;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
+import validator.DInterval;
+import validator.DMaximum;
+import validator.DMinimum;
+import validator.IInterval;
+import validator.IMinimum;
+import validator.Valid;
 
 public class Mooskirchen implements TextDetector {
 	private Image image;
@@ -52,7 +52,6 @@ public class Mooskirchen implements TextDetector {
 	@Override
 	public void imageProcessing() {
 		image.process(new BackgroundProcessor(101, new IMinimum(50)));
-
 	}
 
 	@Override
