@@ -1,5 +1,6 @@
 package feature;
 
+import static com.googlecode.javacv.cpp.opencv_core.cvClearMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvDrawCircle;
 import static com.googlecode.javacv.cpp.opencv_core.cvDrawContours;
@@ -87,6 +88,7 @@ public class ContourFeature extends Feature {
 	@Override
 	public int[] getConvexHull() {
 		if (hull == null) {
+			cvClearMemStorage(mem);
 			CvSeq cvHull = cvConvexHull2(contour, mem, CV_CLOCKWISE, 1);
 
 			hull = new int[cvHull.total() * 2];

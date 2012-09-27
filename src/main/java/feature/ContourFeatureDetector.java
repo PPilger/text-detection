@@ -60,6 +60,8 @@ public class ContourFeatureDetector extends FeatureDetector {
 					}
 				}
 			}
+			
+			//mem must not be released, as the contour is used in ContourFeature
 		}
 
 		// remove enclosed features

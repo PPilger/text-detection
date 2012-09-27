@@ -3,6 +3,7 @@ package feature;
 import static com.googlecode.javacpp.Loader.sizeof;
 import static com.googlecode.javacv.cpp.opencv_core.CV_FRONT;
 import static com.googlecode.javacv.cpp.opencv_core.CV_SEQ_ELTYPE_POINT;
+import static com.googlecode.javacv.cpp.opencv_core.cvClearMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateSeq;
 import static com.googlecode.javacv.cpp.opencv_core.cvSeqPushMulti;
@@ -72,6 +73,7 @@ public class LinkedFeature extends Feature {
 			cvSeqPushMulti(seq, new PointerPointer(coords).get(),
 					coords.length / 2, CV_FRONT);
 
+			cvClearMemStorage(mem);
 			box = cvMinAreaRect2(seq, mem);
 		}
 

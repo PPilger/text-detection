@@ -1,9 +1,11 @@
 package image;
 
+import static com.googlecode.javacv.cpp.opencv_core.cvClearMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvDrawLine;
 import static com.googlecode.javacv.cpp.opencv_core.cvGetSeqElem;
 import static com.googlecode.javacv.cpp.opencv_core.cvRect;
+import static com.googlecode.javacv.cpp.opencv_core.cvReleaseMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvResetImageROI;
 import static com.googlecode.javacv.cpp.opencv_core.cvSetImageROI;
 import static com.googlecode.javacv.cpp.opencv_core.cvSetZero;
@@ -81,6 +83,7 @@ public class LineSegmentsProcessor extends SimpleImageProcessor {
 				cvSetImageROI(temp, rect);
 
 				// use hough transform to detect line segments
+				cvClearMemStorage(mem);
 				CvSeq lines = cvHoughLines2(temp, mem, CV_HOUGH_PROBABILISTIC,
 						.5, Math.toRadians(.5), threshold, length.getMin(),
 						gap.getMax());
@@ -97,5 +100,7 @@ public class LineSegmentsProcessor extends SimpleImageProcessor {
 
 		cvResetImageROI(img);
 		cvResetImageROI(temp);
+
+		cvReleaseMemStorage(mem);
 	}
 }

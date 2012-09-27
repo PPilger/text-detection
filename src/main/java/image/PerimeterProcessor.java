@@ -5,6 +5,7 @@ import static com.googlecode.javacv.cpp.opencv_core.CV_FILLED;
 import static com.googlecode.javacv.cpp.opencv_core.cvConvert;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateMemStorage;
 import static com.googlecode.javacv.cpp.opencv_core.cvDrawContours;
+import static com.googlecode.javacv.cpp.opencv_core.cvReleaseMemStorage;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_CHAIN_APPROX_NONE;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_RETR_LIST;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvFindContours;
@@ -46,6 +47,8 @@ public class PerimeterProcessor extends SimpleImageProcessor {
 						CV_FILLED, 8);
 			}
 		}
+		
+		cvReleaseMemStorage(mem);
 	}
 
 }
